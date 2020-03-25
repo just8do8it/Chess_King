@@ -184,7 +184,7 @@ class Game:
 			self.chess_board.counter += 1
 
 
-pre_moves = ["A2-A4", "B7-B5", "A4-B5", "C7-C6", "E2-E4", "D8-A5"]
+pre_moves = []
 
 game = Game(chess_board, w_player, b_player, ok, passed)
 game.run(pre_moves)
