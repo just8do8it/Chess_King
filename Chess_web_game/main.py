@@ -79,7 +79,7 @@ class Game:
 
 			print("White's player won figures: ", end="")
 			print(", ".join(self.w_player.won_figures))
-			print("Black's player won figures: " + '\033[m', end="")
+			print("Black's player won figures: ", end="")
 			print(", ".join(self.b_player.won_figures))
 			self.chess_board.print_board(b_player)
 
