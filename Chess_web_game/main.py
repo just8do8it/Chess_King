@@ -74,9 +74,9 @@ class Game:
 			curr_player = Player("", [])
 			command = ""
 
-			#subprocess.call("clear")
+			subprocess.call("clear")
 			
-			print("White's player won figures: ", end="")
+			print("\nWhite's player won figures: ", end="")
 			print(", ".join(self.w_player.won_figures))
 			print("Black's player won figures: ", end="")
 			print(", ".join(self.b_player.won_figures))
@@ -133,7 +133,6 @@ class Game:
 			for figure in curr_player.figures:
 				if figure.name == figure_print and figure.player == curr_player.color and \
 					chr(figure.curr_pos_ltr) == src_letter and figure.curr_pos_num == src_number:
-						# print("hell no")
 						true = True
 						result = figure.move(dest_letter, dest_number)
 
