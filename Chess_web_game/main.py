@@ -183,3 +183,5 @@ class Game:
 				continue
 
 			self.chess_board.counter += 1
+game = Game()
+game.run([])
