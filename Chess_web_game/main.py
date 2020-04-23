@@ -75,21 +75,12 @@ class Game:
 			command = ""
 
 			#subprocess.call("clear")
-
-			if command_counter < len(external_commands):
-				command = external_commands[command_counter]
-				if command == "exit":
-					self.chess_board.print_board(self.b_player)
-					break
-				command_counter += 1
-
-			else:
-				command = input("Enter a command: ")
-
+			
 			print("White's player won figures: ", end="")
 			print(", ".join(self.w_player.won_figures))
 			print("Black's player won figures: ", end="")
 			print(", ".join(self.b_player.won_figures))
+			
 			self.chess_board.print_board(self.b_player)
 
 			if self.ok == 0 or self.passed == 0:
@@ -103,7 +94,15 @@ class Game:
 			else:
 				print("\nWhite's turn\n\n")
 				curr_player = self.w_player
-			print(command)
+				
+			if command_counter < len(external_commands):
+				command = external_commands[command_counter]
+				if command == "exit":
+					break
+				command_counter += 1
+
+			else:
+				command = input("Enter a command: ")
 
 			if len(command) != 5:
 				self.ok = 0
