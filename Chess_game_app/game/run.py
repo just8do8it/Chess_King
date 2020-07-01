@@ -58,6 +58,12 @@ class Game:
 					b_figure_10, b_figure_11, b_figure_12,
 					b_figure_13, b_figure_14, b_figure_15, b_figure_16]
 
+		special_figures = []
+		for x in w_figures:
+			special_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.is_alive, x.player])
+		for x in b_figures:
+			special_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.is_alive, x.player])
+
 
 		w_player = Player("white", w_figures)
 		b_player = Player("black", b_figures)
@@ -65,6 +71,7 @@ class Game:
 		self.chess_board = chess_board
 		self.w_player = w_player
 		self.b_player = b_player
+		self.special_figures = []
 		self.ok = ok
 		self.passed = passed
 
@@ -183,8 +190,13 @@ class Game:
 
 		# if self.ok == 0 or self.passed == 0:
 		# 	continue
+		self.special_figures = []
+		for x in self.w_player.figures:
+			self.special_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
+		for x in self.b_player.figures:
+			self.special_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
 
 		self.chess_board.counter += 1
-		return self.chess_board.board
+		return self
 # game = Game()
 # game.run([])

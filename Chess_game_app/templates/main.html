@@ -6,9 +6,20 @@
 		<link rel="stylesheet" type="text/css" href="static/main.css">
     </head>
     <body>
+    	<!-- { % block body % } -->
     	<ul id="board">
-    		{{ result }}
+    		{{ board }}
     	</ul>
+    	<ul id="all_figures">
+    		{{ all_figures }}
+    	</ul>
+    	<ul id="w_won_figures">
+    		{{ w_won_figures }}
+    	</ul>
+    	<ul id="b_won__figures">
+    		{{ b_won_figures }}
+    	</ul>
+    	<!-- { % endblock % } -->
 		<div class="chessboard">
 			<!-- 1st -->
 			<div id="A8" class="white" onclick="clicked(this.id)">&#9820;</div>
