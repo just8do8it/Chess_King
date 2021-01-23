@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/mnt/c/TUES/Github/TUES/Chess_game_app/python_game')
+sys.path.append('/mnt/c/TUES/Github/TUES/Chess Website/python_game')
 import pdb
 import subprocess
 import time
