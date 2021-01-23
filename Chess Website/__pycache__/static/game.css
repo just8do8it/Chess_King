@@ -1,0 +1,43 @@
+body {
+    background-color: #c49dff !important;
+    margin: 0;
+    padding: 0;
+}
+
+.chessboard {
+    border-radius: 2em;
+    border-color: black;
+    width: 50%;
+    height: 50%;
+    margin: auto;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+}
+
+.black {
+    float: left;
+    background-color: #999;
+    font-size: 4em;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.white {
+    float: left;
+    background-color: #fff;
+    font-size: 4em;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.black:hover {
+	background-color: #5c5c5c;
+}
+
+.white:hover {
+	background-color: #5c5c5c;
+}

@@ -1,0 +1,19 @@
+body {
+    background-color: #c49dff !important;
+}
+
+p a #signUp {
+    color: black !important;
+}
+
+p a #signUp:hover {
+    color: #aa73fd !important;
+}
+
+h1 {
+    font-size: 3em;
+}
+  
+p, label, input, button {
+    font-size: 1.5em;
+}

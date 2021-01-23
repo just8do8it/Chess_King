@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Logout</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/logout.css">
+    <link rel="stylesheet" type="text/css" href="../static/shared.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Checkmate</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li><a href="http://localhost:5000/home">Home</a></li>
+      <li id="play"><a href="http://localhost:5000/play">Play</a></li>
+      <li class="active"><a id="login" href="http://localhost:5000/logout">Logout</a></li>
+      <li id="profile"><a href="http://localhost:5000/profile">Your Profile</a></li>
+    </ul>
+  </div>
+</nav>
+  
+<div class="container">
+  <form action="" onsubmit="logout()">
+    <h1><b>Are you sure you want to logout?</b></h1>
+
+    <button type="submit" id="loginbtn">Logout</button>
+  </form>
+</div>
+
+<script src="../static/logout.js"></script>
+<script src="../static/islogged.js"></script>
+
+</body>
+</html>

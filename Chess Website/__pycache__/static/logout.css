@@ -1,0 +1,17 @@
+body {
+    background-color: #c49dff !important;
+}
+
+h1 {
+    text-align: center;
+    position: relative;
+    top: 20%;
+    font-size: 4em;
+}
+
+button {
+    position: relative;
+    left: 42%;
+    font-size: 3em;
+    margin-top: 5%; 
+}

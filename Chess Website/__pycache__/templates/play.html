@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Play</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../static/play.css">
+    <link rel="stylesheet" type="text/css" href="../static/shared.css">
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Checkmate</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li><a href="http://localhost:5000/home">Home</a></li>
+      <li class="active" id="play"><a href="http://localhost:5000/play">Play</a></li>
+      <li><a id="login" href="http://localhost:5000/logout">Logout</a></li>
+      <li id="profile"><a href="http://localhost:5000/profile">Your Profile</a></li>
+    </ul>
+  </div>
+</nav>
+<h1 id="heading">What do you choose?</h1>
+<button type="button" id="multiplayer" onclick="multiplayer()">1v1</button>
+<button type="button" id="tournament" onclick="tournament()">Tournament</button>
+
+<script src="../static/islogged.js"></script>
+<script src="../static/play.js"></script>
+
+</body>
+</html>
