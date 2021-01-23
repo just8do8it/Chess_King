@@ -69,6 +69,8 @@ def get_in_game():
 
 @app.route("/get_online_players", methods=['GET'])
 def get_online_players():
+    games = db_session.query(GameT)
+
     count = db_session.query(User).filter_by(waiting = True).count()
     if count >= 2:
         users = db_session.query(User).filter_by(waiting = True).limit(2)
