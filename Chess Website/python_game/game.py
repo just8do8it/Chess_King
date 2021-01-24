@@ -172,13 +172,12 @@ class Game:
 
 			
 			self.win_condition_check(curr_player)
-			
+
 			if command_counter < len(external_commands):
 				command = external_commands[command_counter]
 				if command == "exit":
 					break
 				command_counter += 1
-
 
 			
 			# else:

@@ -3,6 +3,7 @@ from init import create_app
 from flask import Flask, jsonify, request, render_template, abort, session, redirect, url_for
 from flask_login import login_required, current_user
 from flask_session import Session
+from sqlalchemy import or_
 from flask_sqlalchemy import SQLAlchemy
 from database import db_session
 from models import User, GameT, gameDetails
@@ -58,9 +59,7 @@ def quit_game():
 
 @app.route("/get_in_game", methods=['GET'])
 def get_in_game():
-    game_white = db_session.query(GameT).filter_by(w_player = current_user.id).first()
-    games_black = db_session.query(GameT).filter_by(b_player = current_user.id).first()
-    game = game_white or games_black
+    game = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id, GameT.b_player == current_user.id)).first()
     if game:
         variable = dict(game_id=game.id)
         return variable
@@ -69,7 +68,9 @@ def get_in_game():
 
 @app.route("/get_online_players", methods=['GET'])
 def get_online_players():
-    games = db_session.query(GameT)
+    # game = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id, GameT.b_player == current_user.id))
+    # if game.count():
+    #     return abort(409)
 
     count = db_session.query(User).filter_by(waiting = True).count()
     if count >= 2:
@@ -77,8 +78,11 @@ def get_online_players():
         first_user = users[0]
         second_user = users[1]
         game_id = get_random_string(7)
+
         gameT = GameT(game_id, first_user.id, second_user.id)
         db_session.add(gameT)
+        game_details = gameDetails(game_id, "", "")
+        db_session.add(game_details)
 
         first_user.waiting = False
         first_user.is_playing = True
@@ -87,6 +91,7 @@ def get_online_players():
         second_user.is_playing = True
 
         db_session.commit()
+        print(current_user)
         variables = dict(game_id=game_id)
 
         return variables
@@ -98,6 +103,7 @@ def chess(game_id):
     if request.method == "GET":
         return render_template("game.html")
     else:
+        
         py_game = Game([], [], None)       
         variables = {}
 
@@ -113,18 +119,17 @@ def chess(game_id):
             commands = game_details.moves.split(',')
         else:
             commands.append(command)
-            game_details = gameDetails(game_id, "", "")
-            db_session.add(game_details)
-            db_session.commit()
 
         before_board = py_game.chess_board.board
-        py_game.run([commands])
+        py_game.run(commands)
+        print(command)
         after_board = py_game.chess_board.board
         
         w_won_figs = []
         b_won_figs = []
 
         name_board = [{}, {}, {}, {}, {}, {}, {}, {}]
+        
         
         for fig in py_game.w_player.won_figures:
             w_won_figs.append(fig.name)
@@ -144,6 +149,8 @@ def chess(game_id):
         if before_board != after_board:
             commands.append(command)
             game_details.update({game_details.moves: str(commands), game_details.board: name_board})
+
+        print(command)
         
         db_session.commit()
         variables = dict(board=name_board, 
@@ -152,7 +159,7 @@ def chess(game_id):
                         b_won_figures=b_won_figs)
         
         print("\n")
-        game.chess_board.print_board()
+        py_game.chess_board.print_board()
         print("\n")
 
         return variables

@@ -12,7 +12,7 @@ app = Flask(__name__)
 def create_app():
     app.secret_key = 'Str0ng_Super_Secret_Key'
     app.config['SESSION_TYPE'] = 'filesystem'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:\\TUES\\Github\\TUES\\Chess_game_app\\chess.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:\\TUES\\Github\\TUES\\Chess Website\\chess.db'
 
     sess = Session()
     sess.init_app(app)

@@ -4,7 +4,7 @@ var game_id, white_player, black_player;
 function start_waiting(){
 	$.ajax({
 		url: '/start_waiting',
-		data: $('form').serialize(),
+		// data: $('form').serialize(),
         type: 'POST',
 		success: function(response){
 			console.log(response);
@@ -18,7 +18,7 @@ function start_waiting(){
 function end_waiting(){
 	$.ajax({
 		url: '/end_waiting',
-		data: $('form').serialize(),
+		// data: $('form').serialize(),
         type: 'POST',
 		success: function(response){
 			console.log(response);

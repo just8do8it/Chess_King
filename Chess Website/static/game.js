@@ -14,7 +14,7 @@ window.onbeforeunload = function () {
 function quit_game(){
 	$.ajax({
 		url: '/quit_game',
-		data: $('form').serialize(),
+		// data: $('form').serialize(),
         type: 'POST',
 		success: function(response){
 			console.log(response);
@@ -42,7 +42,8 @@ function clicked(clicked_id) {
 
 function sendCommand() {
 	var game = new String(window.location);
-	game.slice(21);
+	game = game.slice(21);
+	console.log(command);
 	fetch(game, {
 	    method: 'POST',
 		body: JSON.stringify(command),
@@ -59,7 +60,23 @@ function sendCommand() {
 
 			changeHTML();
 		});
+	}).catch(error => {
+		console.error('Error:', error);
 	});
+
+	// $.ajax({
+	// 	type: 'POST',
+	// 	url: game,
+	// 	data: JSON.stringify({command: command}),
+	// 	success: function (response) {
+	// 		alert(response);
+	// 	},
+	// 	error: function (error) {
+	// 		console.log(error);
+	// 	},
+	// 	dataType: "json",
+  	// 	contentType: "application/json"
+	// });
 }
 
 function changeHTML() {
