@@ -180,13 +180,12 @@ class Game:
 				if command == "exit":
 					break
 				command_counter += 1
-			else:
-				print("wrong 5")
-				break
-
-			print("Commands: ", external_commands)
 			# else:
 			# 	command = input("Enter a command: ")
+			else:
+				break
+
+			# print("Commands: ", external_commands)
 
 			if len(command) != 5:
 				print("wrong 6")

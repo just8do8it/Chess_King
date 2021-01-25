@@ -57,18 +57,30 @@ def quit_game():
     db_session.commit()
     return "OK"
 
+
 @app.route("/get_in_game", methods=['GET'])
 def get_in_game():
     game = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id, GameT.b_player == current_user.id)).first()
     if game:
-        if current_user.waiting == 1:
+        first_player = db_session.query(User).filter_by(id = game.w_player).first()
+        second_player = db_session.query(User).filter_by(id = game.b_player).first()
+        opponent = None
+        if current_user == first_player:
+            opponent = second_player
+        else:
+            opponent = first_player
+
+        if (first_player.waiting == 1 and second_player.waiting == 1) or opponent.is_playing == 1:
             current_user.waiting = False
             current_user.is_playing = True
             db_session.commit()
-        variable = dict(game_id=game.id)
-        return variable
+            variable = dict(game_id=game.id)
+            return variable
+        else:
+            abort(405)
     else:
         return abort(405)
+
 
 @app.route("/get_online_players", methods=['GET'])
 def get_online_players():
@@ -77,6 +89,11 @@ def get_online_players():
         users = db_session.query(User).filter_by(waiting = True).limit(2)
         first_user = users[0]
         second_user = users[1]
+        
+        created_game = db_session.query(GameT).filter(or_(GameT.w_player == first_user.id, 
+                                                        GameT.b_player == first_user.id)).first()
+        if created_game:
+            return abort(405)
         
         game_id = get_random_string(7)
 
@@ -101,6 +118,7 @@ def get_online_players():
     else:
         return abort(405)
 
+
 @app.route('/game/<string:game_id>', methods=['GET', 'POST'])
 def chess(game_id):
     if request.method == "GET":
@@ -119,8 +137,9 @@ def chess(game_id):
         if game_details.moves != "":
             commands = ast.literal_eval(game_details.moves)
         
-        commands.append(command)
-        print(commands)
+        if command != "update":
+            commands.append(command)
+        # print(commands)
         is_moved = py_game.run(commands)        
 
         w_won_figs = []
@@ -145,7 +164,7 @@ def chess(game_id):
             counter += 1
         
         # print("HEREE")
-        print(is_moved)
+        # print(is_moved)
         if is_moved:
             details_query.update({"moves": str(commands), "board": str(name_board)})
         
@@ -155,9 +174,9 @@ def chess(game_id):
                         w_won_figures=w_won_figs,
                         b_won_figures=b_won_figs)
         
-        print("\n")
-        py_game.chess_board.print_board()
-        print("\n")
+        # print("\n")
+        # py_game.chess_board.print_board()
+        # print("\n")
 
         return variables
 

@@ -36,14 +36,23 @@ function clicked(clicked_id) {
 		document.getElementById(sourceId).style.backgroundColor = prevColor;
 		count = 0;
 		command = sourceId + "-" + destinationId;
-		sendCommand();
+		sendCommand(0);
+		waitForOpponent();
 	}
 }
 
-function sendCommand() {
+function waitForOpponent() {
+	setInterval(function() { 
+		if (sendCommand(1) == "OK")
+			return;
+	}, 2000);
+}
+
+function sendCommand(update) {
 	var game = new String(window.location);
 	game = game.slice(21);
-
+	if (update)
+		command = "update";
 	fetch(game, {
 	    method: 'POST',
 		body: JSON.stringify(command),
@@ -59,6 +68,7 @@ function sendCommand() {
 			b_won_figures = data["b_won_figures"];
 
 			changeHTML();
+			return "OK";
 		});
 	}).catch(error => {
 		console.error('Error:', error);
