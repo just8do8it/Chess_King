@@ -43,7 +43,7 @@ function clicked(clicked_id) {
 function sendCommand() {
 	var game = new String(window.location);
 	game = game.slice(21);
-	console.log(command);
+
 	fetch(game, {
 	    method: 'POST',
 		body: JSON.stringify(command),

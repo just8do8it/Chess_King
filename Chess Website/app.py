@@ -77,6 +77,7 @@ def get_online_players():
         users = db_session.query(User).filter_by(waiting = True).limit(2)
         first_user = users[0]
         second_user = users[1]
+        
         game_id = get_random_string(7)
 
         gameT = GameT(game_id, first_user.id, second_user.id)
@@ -91,10 +92,12 @@ def get_online_players():
         second_user.is_playing = True
 
         db_session.commit()
-        print(current_user)
-        variables = dict(game_id=game_id)
-
-        return variables
+        
+        if current_user.id == gameT.w_player or current_user.id == gameT.b_player:
+            variables = dict(game_id=game_id)
+            return variables
+        else:
+            return abort(405)
     else:
         return abort(405)
 
@@ -103,7 +106,6 @@ def chess(game_id):
     if request.method == "GET":
         return render_template("game.html")
     else:
-        
         py_game = Game([], [], None)       
         variables = {}
 
@@ -122,7 +124,8 @@ def chess(game_id):
 
         before_board = py_game.chess_board.board
         py_game.run(commands)
-        print(command)
+        # print(command)
+        
         after_board = py_game.chess_board.board
         
         w_won_figs = []

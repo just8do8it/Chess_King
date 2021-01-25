@@ -178,8 +178,10 @@ class Game:
 				if command == "exit":
 					break
 				command_counter += 1
+			else:
+				break
 
-			
+			print("Commands: ", external_commands)
 			# else:
 			# 	command = input("Enter a command: ")
 
