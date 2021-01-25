@@ -138,11 +138,13 @@ class Game:
 
 	def run(self, external_commands):
 		command_counter = 0
+		is_moved = None
 		while(1):
 			self.next_positions.clear()
 			curr_player = Player("", [])
 			command = ""
-
+			if command_counter == len(external_commands) - 1:
+				is_moved = 0
 			#subprocess.call("clear")
 			
 			#print("\nWhite's player won figures: ", end="")
@@ -179,6 +181,7 @@ class Game:
 					break
 				command_counter += 1
 			else:
+				print("wrong 5")
 				break
 
 			print("Commands: ", external_commands)
@@ -186,6 +189,7 @@ class Game:
 			# 	command = input("Enter a command: ")
 
 			if len(command) != 5:
+				print("wrong 6")
 				self.ok = 0
 				continue
 
@@ -200,7 +204,7 @@ class Game:
 				dest_letter not in self.chess_board.letters.keys() or \
 				len(command) != 5 or \
 				command[2] != '-':
-					
+					print("wrong 4")
 					self.ok = 0
 					continue
 					#return self.chess_board.board
@@ -212,6 +216,7 @@ class Game:
 
 			if source_fig == None:
 				self.ok = 0
+				print("wrong 3")
 				continue
 				#return self.chess_board.board
 
@@ -225,7 +230,9 @@ class Game:
 						self.chess_board.board[src_number - 1][src_letter] = None
 						self.chess_board.board[dest_number - 1][dest_letter] = source_fig
 						self.passed = 1
+						is_moved = 1
 					else:
+						print("wrong 1")
 						self.ok = 0
 						#pdb.set_trace()
 						#return self.chess_board.board
@@ -255,16 +262,18 @@ class Game:
 							if source_fig.name == figure.name:
 								figure.curr_pos_num = src_number
 								figure.curr_pos_ltr = ord(src_letter)
-						
+						print("wrong 2")
 						self.ok = 0
 					else:
 						self.chess_board.board[src_number - 1][src_letter] = None
 						self.chess_board.board[dest_number - 1][dest_letter] = source_fig
 						self.passed = 1
+						is_moved = 1
 
 			
 
 			if self.ok == 0 or self.passed == 0:
+				print("wrong 10")
 				continue
 
 			self.special_figures = []
@@ -276,7 +285,7 @@ class Game:
 					self.special_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
 
 			self.chess_board.counter += 1
-			return self
+		return is_moved
 			
 # game = Game([], [], None)
 # game.run(["E2-E4"])

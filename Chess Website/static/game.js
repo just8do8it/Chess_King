@@ -63,20 +63,6 @@ function sendCommand() {
 	}).catch(error => {
 		console.error('Error:', error);
 	});
-
-	// $.ajax({
-	// 	type: 'POST',
-	// 	url: game,
-	// 	data: JSON.stringify({command: command}),
-	// 	success: function (response) {
-	// 		alert(response);
-	// 	},
-	// 	error: function (error) {
-	// 		console.log(error);
-	// 	},
-	// 	dataType: "json",
-  	// 	contentType: "application/json"
-	// });
 }
 
 function changeHTML() {

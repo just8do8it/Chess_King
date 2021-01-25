@@ -3,11 +3,11 @@ from init import create_app
 from flask import Flask, jsonify, request, render_template, abort, session, redirect, url_for
 from flask_login import login_required, current_user
 from flask_session import Session
-from sqlalchemy import or_
+from sqlalchemy import or_, and_, update, delete, insert
 from flask_sqlalchemy import SQLAlchemy
 from database import db_session
 from models import User, GameT, gameDetails
-import os
+import os, ast
 import models
 import pdb
 import string, random
@@ -61,6 +61,10 @@ def quit_game():
 def get_in_game():
     game = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id, GameT.b_player == current_user.id)).first()
     if game:
+        if current_user.waiting == 1:
+            current_user.waiting = False
+            current_user.is_playing = True
+            db_session.commit()
         variable = dict(game_id=game.id)
         return variable
     else:
@@ -68,11 +72,7 @@ def get_in_game():
 
 @app.route("/get_online_players", methods=['GET'])
 def get_online_players():
-    # game = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id, GameT.b_player == current_user.id))
-    # if game.count():
-    #     return abort(409)
-
-    count = db_session.query(User).filter_by(waiting = True).count()
+    count = db_session.query(User).filter(and_(User.waiting == True, User.is_playing == False)).count()
     if count >= 2:
         users = db_session.query(User).filter_by(waiting = True).limit(2)
         first_user = users[0]
@@ -114,20 +114,15 @@ def chess(game_id):
             return abort(404)
         
         commands = []
-        game_details = db_session.query(gameDetails).filter_by(game_id = game_id)
-
-        if game_details.count():
-            game_details = game_details.first()
-            commands = game_details.moves.split(',')
-        else:
-            commands.append(command)
-
-        before_board = py_game.chess_board.board
-        py_game.run(commands)
-        # print(command)
+        details_query = db_session.query(gameDetails).filter_by(game_id = game_id)
+        game_details = details_query.first()
+        if game_details.moves != "":
+            commands = ast.literal_eval(game_details.moves)
         
-        after_board = py_game.chess_board.board
-        
+        commands.append(command)
+        print(commands)
+        is_moved = py_game.run(commands)        
+
         w_won_figs = []
         b_won_figs = []
 
@@ -149,14 +144,13 @@ def chess(game_id):
                 name_board[counter][key] = line[key].name
             counter += 1
         
-        if before_board != after_board:
-            commands.append(command)
-            game_details.update({game_details.moves: str(commands), game_details.board: name_board})
-
-        print(command)
+        # print("HEREE")
+        print(is_moved)
+        if is_moved:
+            details_query.update({"moves": str(commands), "board": str(name_board)})
         
         db_session.commit()
-        variables = dict(board=name_board, 
+        variables = dict(board=name_board,
                         all_figures=py_game.special_figures,
                         w_won_figures=w_won_figs,
                         b_won_figures=b_won_figs)
