@@ -4,11 +4,8 @@ var destinationId = "";
 var prevColor = "";
 var command = "";
 var board = [];
-var all_figures, w_won_figures, b_won_figures;
+var all_figures, w_won_figures, b_won_figures, my_turn, can_move = 0;
 waitForOpponent();
-
-// window.onload = function() {
-// }
 
 window.onbeforeunload = function () {
 	quit_game();
@@ -30,6 +27,9 @@ function quit_game(){
 };
 
 function clicked(clicked_id) {
+	if (can_move == 0) {
+		return;
+	}
 	if (count == 0) {
 		prevColor = document.getElementById(clicked_id).style.backgroundColor;
 		sourceId = clicked_id;
@@ -46,8 +46,7 @@ function clicked(clicked_id) {
 
 function waitForOpponent() {
 	setInterval(function() { 
-		if (sendCommand(1) == "OK")
-			return;
+		sendCommand(1);
 	}, 2000);
 }
 
@@ -69,9 +68,17 @@ function sendCommand(update) {
 			all_figures = data["all_figures"];
 			w_won_figures = data["w_won_figures"];
 			b_won_figures = data["b_won_figures"];
-
+			my_turn = data['my_turn'];
 			changeHTML();
-			return "OK";
+
+			if(my_turn == 1) {
+				can_move = 1;
+				document.getElementById("turn").innerHTML = "Your turn";
+			} else if (my_turn == 0) {
+				can_move = 0;
+				document.getElementById("turn").style.left = "100%";
+				document.getElementById("turn").innerHTML = "Opponent's turn";
+			}
 		});
 	}).catch(error => {
 		console.error('Error:', error);

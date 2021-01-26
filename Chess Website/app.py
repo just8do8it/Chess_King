@@ -166,14 +166,29 @@ def chess(game_id):
         
         # print("HEREE")
         # print(is_moved)
+        my_turn = None
+
         if is_moved:
             details_query.update({"moves": str(commands), "board": str(name_board)})
+            
+            curr_game = db_session.query(GameT).filter_by(id = game_id).first()
+            if py_game.curr_player.color == "black":
+                if current_user.id == curr_game.b_player:
+                    my_turn = 1
+                else:
+                    my_turn = 0
+            else:
+                if current_user.id == curr_game.w_player:
+                    my_turn = 1
+                else:
+                    my_turn = 0
         
         db_session.commit()
         variables = dict(board=name_board,
                         all_figures=py_game.special_figures,
                         w_won_figures=w_won_figs,
-                        b_won_figures=b_won_figs)
+                        b_won_figures=b_won_figs,
+                        my_turn=my_turn)
         
         # print("\n")
         # py_game.chess_board.print_board()

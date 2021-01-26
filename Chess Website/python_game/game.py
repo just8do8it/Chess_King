@@ -35,6 +35,7 @@ class Game:
 		self.chess_board = chess_board
 		self.w_player = w_player
 		self.b_player = b_player
+		self.curr_player = None
 		self.next_positions = next_positions
 		self.special_figures = special_figures
 		self.ok = ok
@@ -94,12 +95,12 @@ class Game:
 
 		return w_figures, b_figures
 
-	def win_condition_check(self, curr_player):
+	def win_condition_check(self):
 		check = 0
 		mate = 0
 		max_pos = 0
 
-		for fig in curr_player.figures:
+		for fig in self.curr_player.figures:
 			if fig.name == "K1":
 				for fig_positions in self.next_positions:
 					for f_pos in fig_positions:
@@ -107,7 +108,7 @@ class Game:
 							check = check + 1
 							break
 			
-		for fig in curr_player.figures:
+		for fig in self.curr_player.figures:
 			if fig.name == "K1":
 				max_pos = len(fig.movable_positions)
 				for king_move in fig.movable_positions:
@@ -118,17 +119,17 @@ class Game:
 
 		if check != 0:
 			if mate == max_pos:
-				if curr_player == self.w_player:
+				if self.curr_player == self.w_player:
 					self.w_checkmate = 1
 				else:
 					self.b_checkmate = 1
 			else:
-				if curr_player == self.w_player:
+				if self.curr_player == self.w_player:
 					self.w_check = 1
 				else:
 					self.b_check = 1
 		else:
-			if curr_player == self.w_player:
+			if self.curr_player == self.w_player:
 				self.w_check = 0
 			else:
 				self.b_check = 0
@@ -141,7 +142,7 @@ class Game:
 		is_moved = None
 		while(1):
 			self.next_positions.clear()
-			curr_player = Player("", [])
+			self.curr_player = Player("", [])
 			command = ""
 			if command_counter == len(external_commands) - 1:
 				is_moved = 0
@@ -161,19 +162,19 @@ class Game:
 
 			if self.chess_board.counter % 2 == 0:
 				#print("\nBlack's turn\n\n")
-				curr_player = self.b_player
+				self.curr_player = self.b_player
 				for fig in self.w_player.figures:
 					fig.update_movable_positions(self.w_player.figures)
 					self.next_positions.append(fig.movable_positions)
 			else:
 				#print("\nWhite's turn\n\n")
-				curr_player = self.w_player
+				self.curr_player = self.w_player
 				for fig in self.b_player.figures:
 					fig.update_movable_positions(self.b_player.figures)
 					self.next_positions.append(fig.movable_positions)
 
 			
-			self.win_condition_check(curr_player)
+			self.win_condition_check()
 
 			if command_counter < len(external_commands):
 				command = external_commands[command_counter]
@@ -188,7 +189,7 @@ class Game:
 			# print("Commands: ", external_commands)
 
 			if len(command) != 5:
-				print("wrong 6")
+				#print("wrong 6")
 				self.ok = 0
 				continue
 
@@ -203,7 +204,7 @@ class Game:
 				dest_letter not in self.chess_board.letters.keys() or \
 				len(command) != 5 or \
 				command[2] != '-':
-					print("wrong 4")
+					# print("wrong 4")
 					self.ok = 0
 					continue
 					#return self.chess_board.board
@@ -215,11 +216,11 @@ class Game:
 
 			if source_fig == None:
 				self.ok = 0
-				print("wrong 3")
+				# print("wrong 3")
 				continue
 				#return self.chess_board.board
 
-			if source_fig.player == curr_player.color:
+			if source_fig.player == self.curr_player.color:
 				true = True
 				result = source_fig.move(dest_number, dest_letter, 0)
 
@@ -231,7 +232,7 @@ class Game:
 						self.passed = 1
 						is_moved = 1
 					else:
-						print("wrong 1")
+						# print("wrong 1")
 						self.ok = 0
 						#pdb.set_trace()
 						#return self.chess_board.board
@@ -242,7 +243,7 @@ class Game:
 					
 					killed = 0
 
-					if curr_player.color == "white":
+					if self.curr_player.color == "white":
 						for fig in self.b_player.figures:
 							if fig.curr_pos_num == taken_figure_num and \
 								fig.curr_pos_ltr == taken_figure_ltr:
@@ -257,11 +258,11 @@ class Game:
 									self.b_player.won_figures.append(fig)
 									killed = 1
 					if killed == 0:
-						for figure in curr_player.figures:
+						for figure in self.curr_player.figures:
 							if source_fig.name == figure.name:
 								figure.curr_pos_num = src_number
 								figure.curr_pos_ltr = ord(src_letter)
-						print("wrong 2")
+						# print("wrong 2")
 						self.ok = 0
 					else:
 						self.chess_board.board[src_number - 1][src_letter] = None
@@ -272,7 +273,7 @@ class Game:
 			
 
 			if self.ok == 0 or self.passed == 0:
-				print("wrong 10")
+				# print("wrong 10")
 				continue
 
 			self.special_figures = []
