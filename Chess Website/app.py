@@ -39,11 +39,11 @@ def profile():
 def playroom():
     return render_template('play.html')
 
-@app.route('/start_waiting', methods=['POST'])
-def start_waiting():
-    current_user.waiting = True
-    db_session.commit()
-    return "OK"
+# @app.route('/start_waiting', methods=['POST'])
+# def start_waiting():
+#     current_user.waiting = True
+#     db_session.commit()
+#     return "OK"
 
 @app.route('/end_waiting', methods=['POST'])
 def end_waiting():
@@ -60,7 +60,8 @@ def quit_game():
 
 @app.route("/get_in_game", methods=['GET'])
 def get_in_game():
-    game = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id, GameT.b_player == current_user.id)).first()
+    game = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id, 
+                                            GameT.b_player == current_user.id)).first()
     if game:
         first_player = db_session.query(User).filter_by(id = game.w_player).first()
         second_player = db_session.query(User).filter_by(id = game.b_player).first()
@@ -84,15 +85,16 @@ def get_in_game():
 
 @app.route("/get_online_players", methods=['GET'])
 def get_online_players():
-    count = db_session.query(User).filter(and_(User.waiting == True, User.is_playing == False)).count()
-    if count >= 2:
-        users = db_session.query(User).filter_by(waiting = True).limit(2)
-        first_user = users[0]
-        second_user = users[1]
-        
+    user = db_session.query(User).filter(User.waiting == True)
+    if user.count() >= 1:
+        first_user = current_user
+        second_user = user.first()
+
         created_game = db_session.query(GameT).filter(or_(GameT.w_player == first_user.id, 
                                                         GameT.b_player == first_user.id)).first()
         if created_game:
+            current_user.waiting = 1
+            db_session.commit()
             return abort(405)
         
         game_id = get_random_string(7)
@@ -109,13 +111,12 @@ def get_online_players():
         second_user.is_playing = True
 
         db_session.commit()
-        
-        if current_user.id == gameT.w_player or current_user.id == gameT.b_player:
-            variables = dict(game_id=game_id)
-            return variables
-        else:
-            return abort(405)
+
+        variables = dict(game_id=game_id)
+        return variables
     else:
+        current_user.waiting = 1
+        db_session.commit()
         return abort(405)
 
 

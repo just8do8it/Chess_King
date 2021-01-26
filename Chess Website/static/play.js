@@ -1,19 +1,20 @@
 var username = localStorage.getItem("username");
 var game_id, white_player, black_player;
 
-function start_waiting(){
-	$.ajax({
-		url: '/start_waiting',
-		// data: $('form').serialize(),
-        type: 'POST',
-		success: function(response){
-			console.log(response);
-		},
-		error: function(error){
-			console.log(error);
-		}
-	});
-};
+// function start_waiting(){
+// 	$.ajax({
+// 		url: '/start_waiting',
+// 		// data: $('form').serialize(),
+//         type: 'POST',
+// 		success: function(response){
+			
+// 			console.log(response);
+// 		},
+// 		error: function(error){
+// 			console.log(error);
+// 		}
+// 	});
+// };
 
 function end_waiting(){
 	$.ajax({
@@ -69,15 +70,13 @@ function play() {
 					}).catch(function() {
 						console.log("error");
 					});
-				});
-			}, 2000)
-			console.log("error");
+				});		
+			}, 2000);
 		});
 	});
 }
 
 function multiplayer() {
-	start_waiting();
 	play();
 }
 
