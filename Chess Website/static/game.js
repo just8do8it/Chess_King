@@ -5,6 +5,10 @@ var prevColor = "";
 var command = "";
 var board = [];
 var all_figures, w_won_figures, b_won_figures;
+waitForOpponent();
+
+// window.onload = function() {
+// }
 
 window.onbeforeunload = function () {
 	quit_game();
@@ -37,7 +41,6 @@ function clicked(clicked_id) {
 		count = 0;
 		command = sourceId + "-" + destinationId;
 		sendCommand(0);
-		waitForOpponent();
 	}
 }
 
