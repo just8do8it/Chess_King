@@ -3,6 +3,7 @@ from init import create_app
 from flask import Flask, jsonify, request, render_template, abort, session, redirect, url_for
 from flask_login import login_required, current_user
 from flask_session import Session
+from flask_migrate import Migrate
 from sqlalchemy import or_, and_, update, delete, insert
 from flask_sqlalchemy import SQLAlchemy
 from database import db_session
@@ -170,16 +171,24 @@ def chess(game_id):
         if is_moved:
             details_query.update({"moves": str(commands), "board": str(name_board)})
             
-            if py_game.curr_player.color == "black":
-                if current_user.id == curr_game.b_player:
-                    my_turn = 1
+            if py_game.ended == 1:
+                if py_game.w_checkmate == 1:
+                    my_turn = -1
+                elif py_game.b_checkmate == 1:
+                    my_turn = -2
                 else:
-                    my_turn = 0
+                    my_turn = -3
             else:
-                if current_user.id == curr_game.w_player:
-                    my_turn = 1
+                if py_game.curr_player.color == "black":
+                    if current_user.id == curr_game.b_player:
+                        my_turn = 1
+                    else:
+                        my_turn = 0
                 else:
-                    my_turn = 0
+                    if current_user.id == curr_game.w_player:
+                        my_turn = 1
+                    else:
+                        my_turn = 0
         else:
             if py_game.chess_board.counter == 1:
                 if py_game.curr_player.color == "white":

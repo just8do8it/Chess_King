@@ -4,7 +4,7 @@ var destinationId = "";
 var prevColor = "";
 var command = "";
 var board = [];
-var all_figures, w_won_figures, b_won_figures, my_turn, can_move = 1;
+var all_figures, w_won_figures, b_won_figures, my_turn, can_move = 1, game_ended = 0;
 
 waitForOpponent();
 
@@ -27,7 +27,7 @@ function quit_game(){
 };
 
 function clicked(clicked_id) {
-	if (can_move == 0) {
+	if (can_move == 0 || game_ended == 1) {
 		return;
 	}
 	if (count == 0) {
@@ -80,6 +80,17 @@ function sendCommand(update) {
 				can_move = 0;
 				document.getElementById("turn").style.left = "100%";
 				document.getElementById("turn").innerHTML = "Opponent's turn";
+			} else if (my_turn == -1) {
+				document.getElementById("turn").style.left = "100%";
+				document.getElementById("turn").innerHTML = "Black player wins!";
+				game_ended = 1;
+			} else if (my_turn == -2) {
+				document.getElementById("turn").style.left = "100%";
+				document.getElementById("turn").innerHTML = "White player wins!";
+				game_ended = 1;
+			} else if (my_turn == -3) {
+				document.getElementById("turn").innerHTML = "Draw!";
+				game_ended = 1;
 			}
 		});
 	}).catch(error => {

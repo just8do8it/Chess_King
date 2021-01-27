@@ -45,6 +45,7 @@ class Game:
 		self.w_checkmate = 0
 		self.b_checkmate = 0
 		self.draw = 0
+		self.ended = 0
 
 	def generate_figures(self, chess_board):
 		b_figure_1 = Figure("R1", chess_board.board, 'A', 8, "black")
@@ -121,8 +122,10 @@ class Game:
 			if mate == max_pos:
 				if self.curr_player == self.w_player:
 					self.w_checkmate = 1
+					self.ended = 1
 				else:
 					self.b_checkmate = 1
+					self.ended = 1
 			else:
 				if self.curr_player == self.w_player:
 					self.w_check = 1
@@ -135,12 +138,13 @@ class Game:
 				self.b_check = 0
 			if mate == max_pos and mate != 0:
 				self.draw = 1
+				self.ended = 1
 
 
 	def run(self, external_commands):
 		command_counter = 0
 		is_moved = None
-		while(1):
+		while(1):			
 			self.next_positions.clear()
 			self.curr_player = Player("", [])
 			command = ""
