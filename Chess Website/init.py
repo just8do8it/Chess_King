@@ -1,12 +1,10 @@
 from flask import Flask, jsonify, request, render_template, session
 from flask_login import LoginManager
 from flask_session import Session
-from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData, Table, Column, Integer, String, MetaData
 from database import init_db
 
-migrate = Migrate()
 login_manager = LoginManager()
 app = Flask(__name__)
 #db = SQLAlchemy(app)

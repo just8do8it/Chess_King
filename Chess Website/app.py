@@ -64,24 +64,26 @@ def get_in_game():
     game = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id, 
                                             GameT.b_player == current_user.id)).first()
     if game:
-        first_player = db_session.query(User).filter_by(id = game.w_player).first()
-        second_player = db_session.query(User).filter_by(id = game.b_player).first()
-        opponent = None
-        if current_user == first_player:
-            opponent = second_player
-        else:
-            opponent = first_player
+        game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
+        print("1")
+        if game_details.is_active:
+            print("2")
+            first_player = db_session.query(User).filter_by(id = game.w_player).first()
+            second_player = db_session.query(User).filter_by(id = game.b_player).first()
+            opponent = None
+            if current_user == first_player:
+                opponent = second_player
+            else:
+                opponent = first_player
 
-        if (first_player.waiting == 1 and second_player.waiting == 1) or opponent.is_playing == 1:
-            current_user.waiting = False
-            current_user.is_playing = True
-            db_session.commit()
-            variable = dict(game_id=game.id)
-            return variable
-        else:
-            abort(405)
-    else:
-        return abort(405)
+            if (first_player.waiting == 1 and second_player.waiting == 1) or opponent.is_playing == 1:
+                current_user.waiting = False
+                current_user.is_playing = True
+                db_session.commit()
+                variable = dict(game_id=game.id)
+                return variable
+    
+    return abort(405)
 
 
 @app.route("/get_online_players", methods=['GET'])
@@ -93,7 +95,9 @@ def get_online_players():
 
         created_game = db_session.query(GameT).filter(or_(GameT.w_player == first_user.id, 
                                                         GameT.b_player == first_user.id)).first()
-        if created_game:
+        
+        game_details = db_session.query(gameDetails).filter_by(game_id = created_game.id).first()
+        if created_game and game_details.is_active:
             current_user.waiting = 1
             db_session.commit()
             return abort(405)
@@ -167,17 +171,27 @@ def chess(game_id):
 
         my_turn = None
         curr_game = db_session.query(GameT).filter_by(id = game_id).first()
-
+        # if not game_details.is_active:
+        #     return abort(404)
+        # print("Is moved: ", is_moved)
         if is_moved:
             details_query.update({"moves": str(commands), "board": str(name_board)})
-            
+            winner = None
             if py_game.ended == 1:
                 if py_game.w_checkmate == 1:
                     my_turn = -1
+                    winner = db_session.query(User).filter_by(id = curr_game.b_player).first()
                 elif py_game.b_checkmate == 1:
                     my_turn = -2
+                    winner = db_session.query(User).filter_by(id = curr_game.w_player).first()
                 else:
                     my_turn = -3
+
+                if my_turn > -3:
+                    details_query.update({"is_active": False, "winner": winner.username})
+                else:
+                    details_query.update({"is_active": False, "winner": "draw"})
+                    
             else:
                 if py_game.curr_player.color == "black":
                     if current_user.id == curr_game.b_player:

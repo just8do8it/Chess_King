@@ -144,7 +144,10 @@ class Game:
 	def run(self, external_commands):
 		command_counter = 0
 		is_moved = None
-		while(1):			
+		while(1):
+			# if self.ended:
+			# 	print("ended")
+			# 	return 0
 			self.next_positions.clear()
 			self.curr_player = Player("", [])
 			command = ""
