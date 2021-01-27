@@ -163,15 +163,13 @@ def chess(game_id):
                     continue
                 name_board[counter][key] = line[key].name
             counter += 1
-        
-        # print("HEREE")
-        # print(is_moved)
+
         my_turn = None
+        curr_game = db_session.query(GameT).filter_by(id = game_id).first()
 
         if is_moved:
             details_query.update({"moves": str(commands), "board": str(name_board)})
             
-            curr_game = db_session.query(GameT).filter_by(id = game_id).first()
             if py_game.curr_player.color == "black":
                 if current_user.id == curr_game.b_player:
                     my_turn = 1
@@ -182,6 +180,11 @@ def chess(game_id):
                     my_turn = 1
                 else:
                     my_turn = 0
+        else:
+            if py_game.chess_board.counter == 1:
+                if py_game.curr_player.color == "white":
+                    if current_user.id == curr_game.b_player:
+                        my_turn = 0
         
         db_session.commit()
         variables = dict(board=name_board,

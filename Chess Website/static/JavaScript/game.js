@@ -4,7 +4,8 @@ var destinationId = "";
 var prevColor = "";
 var command = "";
 var board = [];
-var all_figures, w_won_figures, b_won_figures, my_turn, can_move = 0;
+var all_figures, w_won_figures, b_won_figures, my_turn, can_move = 1;
+
 waitForOpponent();
 
 window.onbeforeunload = function () {
@@ -15,7 +16,6 @@ window.onbeforeunload = function () {
 function quit_game(){
 	$.ajax({
 		url: '/quit_game',
-		// data: $('form').serialize(),
         type: 'POST',
 		success: function(response){
 			console.log(response);
@@ -45,7 +45,7 @@ function clicked(clicked_id) {
 }
 
 function waitForOpponent() {
-	setInterval(function() { 
+	setInterval(function() {
 		sendCommand(1);
 	}, 2000);
 }
@@ -55,6 +55,7 @@ function sendCommand(update) {
 	game = game.slice(21);
 	if (update)
 		command = "update";
+	console.log(command);
 	fetch(game, {
 	    method: 'POST',
 		body: JSON.stringify(command),
@@ -64,6 +65,7 @@ function sendCommand(update) {
 	}).then(function (response) {
 		response.json().then(function(data) {
 			console.log(data);
+
 			board = data["board"];
 			all_figures = data["all_figures"];
 			w_won_figures = data["w_won_figures"];

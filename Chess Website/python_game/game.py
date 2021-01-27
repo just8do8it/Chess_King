@@ -271,7 +271,6 @@ class Game:
 						is_moved = 1
 
 			
-
 			if self.ok == 0 or self.passed == 0:
 				# print("wrong 10")
 				continue
