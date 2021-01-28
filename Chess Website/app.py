@@ -36,13 +36,21 @@ def home():
 @app.route('/profile')                   
 def profile():
     stats = db_session.query(userStats).filter_by(user_id = current_user.id).first()
+    
+    if stats.played_games == "":
+        return render_template('profile.html', username=current_user.username,
+                                            game_count=0,
+                                            win_rate=0)
+
     game_ids = ast.literal_eval(stats.played_games)
     game_count = len(game_ids)
     game_desc = []
+    game_dates = []
     win_count = 0
     draw_count = 0
     for id in game_ids:
         game = db_session.query(GameT).filter_by(id = id).first()
+
         opponent = None
         if current_user.id == game.w_player:
             opponent = db_session.query(User).filter_by(id = game.b_player).first()
@@ -53,6 +61,7 @@ def profile():
         game_desc.append("Game with " + opponent)
 
         details = db_session.query(gameDetails).filter_by(game_id = id).first()
+        game_dates.append(str(details.start_date))
         if details.winner == current_user.username:
             win_count += 1
         elif details.winner == "draw":
@@ -66,6 +75,7 @@ def profile():
                                             game_count=game_count,
                                             game_ids=game_ids,
                                             games=game_desc,
+                                            game_dates=game_dates,
                                             win_rate=win_rate)
 
 @app.route('/replay/<string:game_id>', methods=['GET', 'POST'])
@@ -274,7 +284,7 @@ def chess(game_id):
             stats_games = ast.literal_eval(stats.played_games)
         
         if is_moved and game_id not in stats_games:
-            details_query.update({"moves": str(commands), "board": str(name_board)})
+            details_query.update({"moves": str(commands)})
             winner = None
             if py_game.ended == 1:
                 stats_query = db_session.query(userStats).filter_by(user_id = current_user.id)

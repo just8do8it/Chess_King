@@ -1,7 +1,8 @@
 from database import Base
-from sqlalchemy import MetaData, Table, Column, Integer, Float, String, Boolean, ForeignKey, MetaData
+from sqlalchemy import MetaData, Table, Column, Integer, Float, String, Boolean, Text, Date, DateTime, ForeignKey, MetaData
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 class User(Base):
     __tablename__ = 'users'
@@ -58,7 +59,7 @@ class gameDetails(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     game_id = Column(String(120), ForeignKey('games.id'))
     moves = Column(String(3000))
-    board = Column(String(300))
+    start_date = Column(DateTime(timezone=True), server_default=func.now())
     is_active = Column(Boolean)
     winner = Column(String(120))
     game = relationship("GameT")
