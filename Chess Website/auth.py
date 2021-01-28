@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from init import get_app, get_db
 from database import db_session
 from init import login_manager
-from models import User
+from models import User, GameT, gameDetails, userStats
 import pdb
 import os
 import models
@@ -51,6 +51,10 @@ def login_session():
     if db_session.query(User).filter_by(username = username).count() == 1:
         user = db_session.query(User).filter_by(username = username).first()
         if user and user.verify_password(password):
+            if not db_session.query(userStats).filter_by(user_id = user.id).count():
+                user_stats = userStats(user.id)
+                db_session.add(user_stats)
+
             login_user(user, remember=True)
             user.is_logged = True
             db_session.commit()

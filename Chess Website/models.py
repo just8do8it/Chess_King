@@ -1,5 +1,5 @@
 from database import Base
-from sqlalchemy import MetaData, Table, Column, Integer, String, Boolean, ForeignKey, MetaData
+from sqlalchemy import MetaData, Table, Column, Integer, Float, String, Boolean, ForeignKey, MetaData
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import relationship
 
@@ -72,3 +72,18 @@ class gameDetails(Base):
 
     def __repr__(self):
         return '<gameDetails %r>' % (self.id)
+
+class userStats(Base):
+    __tablename__ = 'user_stats'
+    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    played_games = Column(String(5000))
+    win_rate = Column(Float)
+    game = relationship("User")
+
+    def __init__(self, user_id=None):
+        self.user_id = user_id
+        self.played_games = ""
+        self.win_rate = 100
+
+    def __repr__(self):
+        return '<userStats %r>' % (self.user_id)

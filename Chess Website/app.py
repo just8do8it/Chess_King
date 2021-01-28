@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from sqlalchemy import or_, and_, update, delete, insert
 from flask_sqlalchemy import SQLAlchemy
 from database import db_session
-from models import User, GameT, gameDetails
+from models import User, GameT, gameDetails, userStats
 import os, ast
 import models
 import pdb
@@ -32,19 +32,59 @@ def shutdown_session(exception=None):
 def home():
     return render_template('home.html')
 
+
 @app.route('/profile')                   
 def profile():
-    return render_template('profile.html')
+    stats = db_session.query(userStats).filter_by(user_id = current_user.id).first()
+    game_ids = ast.literal_eval(stats.played_games)
+    game_count = len(game_ids)
+    game_desc = []
+    win_count = 0
+    draw_count = 0
+    for id in game_ids:
+        game = db_session.query(GameT).filter_by(id = id).first()
+        opponent = None
+        if current_user.id == game.w_player:
+            opponent = db_session.query(User).filter_by(id = game.b_player).first()
+        else:
+            opponent = db_session.query(User).filter_by(id = game.w_player).first()
+        
+        opponent = opponent.username
+        game_desc.append("Game with " + opponent)
+
+        details = db_session.query(gameDetails).filter_by(game_id = id).first()
+        if details.winner == current_user.username:
+            win_count += 1
+        elif details.winner == "draw":
+            draw_count += 1
+    
+    win_rate = (win_count + (0.5 * draw_count)) / len(game_ids) * 100
+
+    win_rate = float("{:.2f}".format(win_rate))
+    
+    return render_template('profile.html', username=current_user.username,
+                                            game_count=game_count,
+                                            game_ids=game_ids,
+                                            games=game_desc,
+                                            win_rate=win_rate)
+
+@app.route('/replay/<string:game_id>', methods=['GET', 'POST'])
+def replay(game_id):
+    if request.method == "GET":
+        return render_template("replay.html")
+    else:
+        game_details = db_session.query(gameDetails).filter_by(game_id = game_id).first()
+        moves = ast.literal_eval(game_details.moves)
+        py_game = Game([], [], None)
+
+        variables = {}
+
+        return variables
+
 
 @app.route('/play')
 def playroom():
     return render_template('play.html')
-
-# @app.route('/start_waiting', methods=['POST'])
-# def start_waiting():
-#     current_user.waiting = True
-#     db_session.commit()
-#     return "OK"
 
 @app.route('/end_waiting', methods=['POST'])
 def end_waiting():
@@ -177,13 +217,27 @@ def chess(game_id):
 
         my_turn = None
         curr_game = db_session.query(GameT).filter_by(id = game_id).first()
-        # if not game_details.is_active:
-        #     return abort(404)
-        # print("Is moved: ", is_moved)
-        if is_moved:
+        
+        stats = db_session.query(userStats).filter_by(user_id = current_user.id).first()
+        stats_games = []
+        if stats.played_games != "":
+            stats_games = ast.literal_eval(stats.played_games)
+        
+        if is_moved and game_id not in stats_games:
             details_query.update({"moves": str(commands), "board": str(name_board)})
             winner = None
             if py_game.ended == 1:
+                stats_query = db_session.query(userStats).filter_by(user_id = current_user.id)
+                user_stats = stats_query.first()
+                if user_stats.played_games == "":
+                    games = []
+                else:
+                    games = ast.literal_eval(user_stats.played_games)
+                
+                games.append(curr_game.id)
+                stats_query.update({"played_games": str(games)})
+                
+                
                 if py_game.w_checkmate == 1:
                     my_turn = -1
                     winner = db_session.query(User).filter_by(id = curr_game.b_player).first()

@@ -1,3 +1,22 @@
 body {
     background-color: #c49dff !important;
 }
+
+p {
+    margin-top: 2%;
+    margin-left: 4%;
+    color: black;
+}
+
+#game {
+    font-size: 30px;
+    margin-left: 4%;
+}
+
+.game {
+    color: black;
+}
+
+.game:hover {
+    color: rgb(156, 10, 161);
+}

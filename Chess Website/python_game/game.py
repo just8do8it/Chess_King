@@ -145,9 +145,6 @@ class Game:
 		command_counter = 0
 		is_moved = None
 		while(1):
-			# if self.ended:
-			# 	print("ended")
-			# 	return 0
 			self.next_positions.clear()
 			self.curr_player = Player("", [])
 			command = ""
@@ -291,6 +288,10 @@ class Game:
 					self.special_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
 
 			self.chess_board.counter += 1
+
+			if self.ended:
+				print("ended")
+				return 0
 		return is_moved
 			
 # game = Game([], [], None)
