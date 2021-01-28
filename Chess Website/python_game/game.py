@@ -25,9 +25,9 @@ class Game:
 
 		special_figures = []
 		for x in w_figures:
-			special_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.is_alive, x.player])
+			special_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
 		for x in b_figures:
-			special_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.is_alive, x.player])
+			special_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
 
 		w_player = Player("white", w_figures)
 		b_player = Player("black", b_figures)

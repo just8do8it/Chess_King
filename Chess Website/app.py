@@ -73,11 +73,55 @@ def replay(game_id):
     if request.method == "GET":
         return render_template("replay.html")
     else:
+        game = db_session.query(GameT).filter_by(id = game_id).first()
+        w_player = db_session.query(User).filter_by(id = game.w_player).first().username
+        b_player = db_session.query(User).filter_by(id = game.b_player).first().username
+        players = "Whites: " + w_player + "     Blacks: " + b_player
+
         game_details = db_session.query(gameDetails).filter_by(game_id = game_id).first()
         moves = ast.literal_eval(game_details.moves)
+
+        variable = request.get_json()
+        if isinstance(variable, str) != True:
+            return abort(404)
+        
+        move_counter = int(variable)
+
         py_game = Game([], [], None)
 
-        variables = {}
+        if move_counter > len(moves):
+            move_counter = len(moves)
+            py_game.run(moves)
+        else:
+            py_game.run(moves[:move_counter])
+
+        w_won_figs = []
+        b_won_figs = []
+
+        name_board = [{}, {}, {}, {}, {}, {}, {}, {}]
+        
+        
+        for fig in py_game.w_player.won_figures:
+            w_won_figs.append(fig.name)
+
+        for fig in py_game.b_player.won_figures:
+            b_won_figs.append(fig.name)
+        
+        counter = 0
+        for line in py_game.chess_board.board:
+            for key in line:
+                if line[key] == None:
+                    name_board[counter][key] = "  "
+                    continue
+                name_board[counter][key] = line[key].name
+            counter += 1        
+
+        variables = dict(board=name_board,
+                        all_figures=py_game.special_figures,
+                        w_won_figures=w_won_figs,
+                        b_won_figures=b_won_figs,
+                        move_counter=move_counter,
+                        players=players)
 
         return variables
 

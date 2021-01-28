@@ -4,35 +4,32 @@ var destinationId = "";
 var prevColor = "";
 var command = "";
 var board = [];
-var all_figures, w_won_figures, b_won_figures, my_turn, can_move = 1, game_ended = 0;
-
-waitForOpponent();
+var all_figures, w_won_figures, b_won_figures, players, game_ended = 0, move_counter = 0;
+sendCommand();
 
 function previous() {
-    command = "previous";
+    if (move_counter > 0) {
+        move_counter -= 1;
+    }
+    sendCommand();
 }
 
 function next() {
-    command = "next";
+    move_counter++;
+    sendCommand();
 }
 
-function waitForOpponent() {
-	setInterval(function() {
-		sendCommand(1);
-	}, 2000);
-}
-
-function sendCommand(update) {
-	var game = new String(window.location);
-    game = game.slice(27);
-    
+function sendCommand() {
     var url = "/replay/";
+	var game = new String(window.location);
+    game = game.slice(29);
     url = url.concat(game);
-
-	console.log(command);
+    
+    str_move = String(move_counter);
+	console.log(move_counter);
 	fetch(url, {
 	    method: 'POST',
-		body: JSON.stringify(command),
+		body: JSON.stringify(str_move),
 		headers: {
 			'Content-Type': 'application/json'
 		}
@@ -43,29 +40,12 @@ function sendCommand(update) {
 			board = data["board"];
 			all_figures = data["all_figures"];
 			w_won_figures = data["w_won_figures"];
-			b_won_figures = data["b_won_figures"];
-			my_turn = data['my_turn'];
-			changeHTML();
+            b_won_figures = data["b_won_figures"];
+            move_counter = data["move_counter"];
+            players = data["players"];
 
-			if(my_turn == 1) {
-				can_move = 1;
-				document.getElementById("turn").innerHTML = "Your turn";
-			} else if (my_turn == 0) {
-				can_move = 0;
-				document.getElementById("turn").style.left = "100%";
-				document.getElementById("turn").innerHTML = "Opponent's turn";
-			} else if (my_turn == -1) {
-				document.getElementById("turn").style.left = "100%";
-				document.getElementById("turn").innerHTML = "Black player wins!";
-				game_ended = 1;
-			} else if (my_turn == -2) {
-				document.getElementById("turn").style.left = "100%";
-				document.getElementById("turn").innerHTML = "White player wins!";
-				game_ended = 1;
-			} else if (my_turn == -3) {
-				document.getElementById("turn").innerHTML = "Draw!";
-				game_ended = 1;
-			}
+            document.getElementById("players").innerHTML = players;
+			changeHTML();
 		});
 	}).catch(error => {
 		console.error('Error:', error);
@@ -87,7 +67,7 @@ function changeHTML() {
 
 			for (var j = 0; j < all_figures.length; ++j) {
 				currFig = all_figures[j];
-
+                // console.log(currFig[3]);
 				if (String.fromCharCode(currFig[0]) == key && currFig[1] == (i + 1)) {
 					if (currFig[2] == "black") {
 						black = 1;
