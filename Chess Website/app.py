@@ -76,7 +76,8 @@ def replay(game_id):
         game = db_session.query(GameT).filter_by(id = game_id).first()
         w_player = db_session.query(User).filter_by(id = game.w_player).first().username
         b_player = db_session.query(User).filter_by(id = game.b_player).first().username
-        players = "Whites: " + w_player + "     Blacks: " + b_player
+        w_player = "Whites: " + w_player 
+        b_player = "Blacks: " + b_player
 
         game_details = db_session.query(gameDetails).filter_by(game_id = game_id).first()
         moves = ast.literal_eval(game_details.moves)
@@ -114,14 +115,15 @@ def replay(game_id):
                     name_board[counter][key] = "  "
                     continue
                 name_board[counter][key] = line[key].name
-            counter += 1        
+            counter += 1
 
         variables = dict(board=name_board,
                         all_figures=py_game.special_figures,
                         w_won_figures=w_won_figs,
                         b_won_figures=b_won_figs,
                         move_counter=move_counter,
-                        players=players)
+                        w_player=w_player,
+                        b_player=b_player)
 
         return variables
 
@@ -218,7 +220,11 @@ def get_online_players():
 @app.route('/game/<string:game_id>', methods=['GET', 'POST'])
 def chess(game_id):
     if request.method == "GET":
-        return render_template("game.html")
+        game = db_session.query(GameT).filter_by(id = game_id).first()
+        if current_user.id == game.w_player:
+            return render_template("game.html")
+        else:
+            return render_template("b_game.html")
     else:
         py_game = Game([], [], None)       
         variables = {}

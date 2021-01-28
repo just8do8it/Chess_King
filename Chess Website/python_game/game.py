@@ -120,6 +120,8 @@ class Game:
 
 		if check != 0:
 			if mate == max_pos:
+				if self.w_check or self.b_check:
+					return 0
 				if self.curr_player == self.w_player:
 					self.w_checkmate = 1
 					self.ended = 1
@@ -127,6 +129,8 @@ class Game:
 					self.b_checkmate = 1
 					self.ended = 1
 			else:
+				if self.w_check or self.b_check:
+					return 0
 				if self.curr_player == self.w_player:
 					self.w_check = 1
 				else:
@@ -139,6 +143,8 @@ class Game:
 			if mate == max_pos and mate != 0:
 				self.draw = 1
 				self.ended = 1
+		
+		return 1
 
 
 	def run(self, external_commands):
@@ -177,9 +183,6 @@ class Game:
 					fig.update_movable_positions(self.b_player.figures)
 					self.next_positions.append(fig.movable_positions)
 
-			
-			self.win_condition_check()
-
 			if command_counter < len(external_commands):
 				command = external_commands[command_counter]
 				if command == "exit":
@@ -212,7 +215,7 @@ class Game:
 					self.ok = 0
 					continue
 					#return self.chess_board.board
-			
+
 			src_number = int(src_number)
 			dest_number = int(dest_number)
 
@@ -224,6 +227,8 @@ class Game:
 				continue
 				#return self.chess_board.board
 
+			self.win_condition_check()
+
 			if source_fig.player == self.curr_player.color:
 				true = True
 				result = source_fig.move(dest_number, dest_letter, 0)
@@ -231,8 +236,14 @@ class Game:
 				if type(result) == type(true):
 					if source_fig.is_alive == 1 and result == True:
 						#pdb.set_trace()
+						copy = self.chess_board.board[dest_number - 1][dest_letter]
 						self.chess_board.board[src_number - 1][src_letter] = None
 						self.chess_board.board[dest_number - 1][dest_letter] = source_fig
+						if not self.win_condition_check:
+							self.chess_board.board[src_number - 1][src_letter] = source_fig
+							self.chess_board.board[dest_number - 1][dest_letter] = copy
+							print("1")
+							continue
 						self.passed = 1
 						is_moved = 1
 					else:
@@ -269,8 +280,14 @@ class Game:
 						# print("wrong 2")
 						self.ok = 0
 					else:
+						copy = self.chess_board.board[dest_number - 1][dest_letter]
 						self.chess_board.board[src_number - 1][src_letter] = None
 						self.chess_board.board[dest_number - 1][dest_letter] = source_fig
+						if not self.win_condition_check:
+							self.chess_board.board[src_number - 1][src_letter] = source_fig
+							self.chess_board.board[dest_number - 1][dest_letter] = copy
+							print("2")
+							continue
 						self.passed = 1
 						is_moved = 1
 
@@ -288,7 +305,7 @@ class Game:
 					self.special_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
 
 			self.chess_board.counter += 1
-
+			
 			if self.ended:
 				print("ended")
 				return 0

@@ -4,7 +4,7 @@ var destinationId = "";
 var prevColor = "";
 var command = "";
 var board = [];
-var all_figures, w_won_figures, b_won_figures, players, game_ended = 0, move_counter = 0;
+var all_figures, w_won_figures, b_won_figures, w_player, b_player, game_ended = 0, move_counter = 0;
 sendCommand();
 
 function previous() {
@@ -42,9 +42,11 @@ function sendCommand() {
 			w_won_figures = data["w_won_figures"];
             b_won_figures = data["b_won_figures"];
             move_counter = data["move_counter"];
-            players = data["players"];
+            w_player = data["w_player"];
+            b_player = data["b_player"];
 
-            document.getElementById("players").innerHTML = players;
+            document.getElementById("w_player").innerHTML = w_player;
+            document.getElementById("b_player").innerHTML = b_player;
 			changeHTML();
 		});
 	}).catch(error => {
@@ -67,7 +69,6 @@ function changeHTML() {
 
 			for (var j = 0; j < all_figures.length; ++j) {
 				currFig = all_figures[j];
-                // console.log(currFig[3]);
 				if (String.fromCharCode(currFig[0]) == key && currFig[1] == (i + 1)) {
 					if (currFig[2] == "black") {
 						black = 1;
