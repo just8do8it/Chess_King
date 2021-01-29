@@ -84,7 +84,7 @@ class userStats(Base):
     def __init__(self, user_id=None):
         self.user_id = user_id
         self.played_games = ""
-        self.win_rate = 100
+        self.win_rate = 0
 
     def __repr__(self):
         return '<userStats %r>' % (self.user_id)

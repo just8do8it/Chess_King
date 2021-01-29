@@ -35,18 +35,19 @@ def home():
 
 @app.route('/profile')                   
 def profile():
-    stats = db_session.query(userStats).filter_by(user_id = current_user.id).first()
+    stats_query = db_session.query(userStats).filter_by(user_id = current_user.id)
+    stats = stats_query.first()
     
     if stats.played_games == "":
         return render_template('profile.html', username=current_user.username,
                                             game_count=0,
-                                            win_rate=0)
+                                            win_rate=stats_query.win_rate)
 
     game_ids = ast.literal_eval(stats.played_games)
     game_count = len(game_ids)
     game_desc = []
     game_dates = []
-    game_end = ""
+    game_endings = []
     win_count = 0
     draw_count = 0
     for id in game_ids:
@@ -64,24 +65,27 @@ def profile():
         details = db_session.query(gameDetails).filter_by(game_id = id).first()
         game_dates.append(str(details.start_date))
         if details.winner == current_user.username:
-            game_end = "win"
+            game_endings.append("win")
             win_count += 1
         elif details.winner == "draw":
-            game_end = "draw"
+            game_endings.append("draw")
             draw_count += 1
         else:
-            game_end = "loss"
+            game_endings.append("loss")
     
     win_rate = (win_count + (0.5 * draw_count)) / len(game_ids) * 100
-
+    
     win_rate = float("{:.2f}".format(win_rate))
+
+    stats_query.update({"win_rate": win_rate})
+    db_session.commit()
     
     return render_template('profile.html', username=current_user.username,
                                             game_count=game_count,
                                             game_ids=game_ids,
                                             games=game_desc,
                                             game_dates=game_dates,
-                                            game_end=game_end,
+                                            game_endings=game_endings,
                                             win_rate=win_rate)
 
 @app.route('/replay/<string:game_id>', methods=['GET', 'POST'])
