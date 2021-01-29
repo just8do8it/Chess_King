@@ -46,6 +46,7 @@ def profile():
     game_count = len(game_ids)
     game_desc = []
     game_dates = []
+    game_end = ""
     win_count = 0
     draw_count = 0
     for id in game_ids:
@@ -63,9 +64,13 @@ def profile():
         details = db_session.query(gameDetails).filter_by(game_id = id).first()
         game_dates.append(str(details.start_date))
         if details.winner == current_user.username:
+            game_end = "win"
             win_count += 1
         elif details.winner == "draw":
+            game_end = "draw"
             draw_count += 1
+        else:
+            game_end = "loss"
     
     win_rate = (win_count + (0.5 * draw_count)) / len(game_ids) * 100
 
@@ -76,6 +81,7 @@ def profile():
                                             game_ids=game_ids,
                                             games=game_desc,
                                             game_dates=game_dates,
+                                            game_end=game_end,
                                             win_rate=win_rate)
 
 @app.route('/replay/<string:game_id>', methods=['GET', 'POST'])
