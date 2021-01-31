@@ -15,7 +15,7 @@ function end_waiting(){
 	});
 };
 
-function play() {
+function multiplayer() {
 	window.onbeforeunload = function () {
 		end_waiting();
 		return "OK";
@@ -63,10 +63,50 @@ function play() {
 	});
 }
 
-function multiplayer() {
-	play();
-}
-
 function tournament() {
-    window.location = "http://localhost:5000/tournament";
+	window.onbeforeunload = function () {
+		end_waiting();
+		return "OK";
+	}
+
+	document.getElementById("multiplayer").style.display = 'none';
+	document.getElementById("tournament").style.display = 'none';
+	document.getElementById("heading").innerHTML = 'Waiting...';
+
+	localStorage.setItem("waiting", 1);
+
+	fetch('/tournament', {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Accept': 'application/json'
+		}
+	}).then(function (response) {
+		response.json().then(function(data) {
+			console.log(data);
+			// window.onbeforeunload = null;
+			// end_waiting();
+			// game_id = data['game_id'];
+			// window.location = "http://localhost:5000/game/" + game_id;
+		}).catch(function() {
+			setInterval(function() {
+				fetch('/get_in_game', {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'Accept': 'application/json'
+					}
+				}).then(function (response) {
+					response.json().then(function(data) {
+						console.log(data);
+						window.onbeforeunload = null;
+						end_waiting();
+						window.location = "http://localhost:5000/game/" + data['game_id'];
+					}).catch(function() {
+						console.log("error");
+					});
+				});		
+			}, 2000);
+		});
+	});
 }

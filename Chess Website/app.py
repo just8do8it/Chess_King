@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from sqlalchemy import or_, and_, update, delete, insert
 from flask_sqlalchemy import SQLAlchemy
 from database import db_session
-from models import User, GameT, gameDetails, userStats
+from models import User, GameT, gameDetails, userStats, Tournament
 import os, ast
 import models
 import pdb
@@ -165,17 +165,64 @@ def quit_game():
     return "OK"
 
 
+# @app.route('/tournament')
+# def tournament():
+#     tournaments = db_session.query(Tournament).all()
+#     if tournaments != None:
+#         for tournament in tournamnets:
+#             if tournament.semi_final == "" or tournament.final:
+
+    
+    
+#     if user.count() >= 1:
+#         first_user = current_user
+#         second_user = user.first()
+
+#         created_games = db_session.query(GameT).filter(or_(GameT.w_player == first_user.id, 
+#                                                         GameT.b_player == first_user.id)).all()
+        
+#         if created_games != None:
+#             for game in created_games:        
+#                 game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
+#                 if game_details.is_active:
+#                     current_user.waiting = 1
+#                     db_session.commit()
+#                     return abort(405)
+
+#         game_id = get_random_string(7)
+
+#         tournament = Tournament()
+#         db_session.add(tournament)
+
+#         gameT = GameT(game_id, first_user.id, second_user.id, tournament.id)
+#         db_session.add(gameT)
+
+#         game_details = gameDetails(game_id, "", "")
+#         db_session.add(game_details)
+
+#         first_user.waiting = False
+#         first_user.is_playing = True
+#         second_user.waiting = False
+#         second_user.is_playing = True
+
+#         db_session.commit()
+
+#         variables = dict(game_id=game_id)
+#         return variables
+#     else:
+#         current_user.waiting = 1
+#         db_session.commit()
+#         return abort(405)
+
 @app.route("/get_in_game", methods=['GET'])
 def get_in_game():
     games = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id, 
                                             GameT.b_player == current_user.id)).all()
-    print(games)
+    
     if games != None:
         for game in games:
             game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
-            # print("1")
             if game_details.is_active:
-                # print("2")
                 first_player = db_session.query(User).filter_by(id = game.w_player).first()
                 second_player = db_session.query(User).filter_by(id = game.b_player).first()
                 opponent = None
@@ -206,7 +253,7 @@ def get_online_players():
         created_games = db_session.query(GameT).filter(or_(GameT.w_player == first_user.id, 
                                                         GameT.b_player == first_user.id)).all()
         
-        if created_games:
+        if created_games != None:
             for game in created_games:        
                 game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
                 if game_details.is_active:
@@ -215,7 +262,6 @@ def get_online_players():
                     return abort(405)
         
         game_id = get_random_string(7)
-
         gameT = GameT(game_id, first_user.id, second_user.id)
         db_session.add(gameT)
         game_details = gameDetails(game_id, "", "")

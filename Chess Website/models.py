@@ -43,13 +43,16 @@ class GameT(Base):
     id = Column(String(120), primary_key=True, unique=True)
     w_player = Column(Integer, ForeignKey('users.id'))
     b_player = Column(Integer, ForeignKey('users.id'))
+    tournament_id = Column(Integer, ForeignKey('tournaments.id'))
     user_one = relationship("User", foreign_keys=[w_player])
     users_two = relationship("User", foreign_keys=[b_player])
+    tour_id = relationship("Tournament", foreign_keys=[tournament_id])
 
-    def __init__(self, id=None, w_player=None, b_player=None):
+    def __init__(self, id=None, w_player=None, b_player=None, tournament_id=None):
         self.id = id
         self.w_player = w_player
         self.b_player = b_player
+        self.tournament_id = tournament_id
 
     def __repr__(self):
         return '<GameT %r>' % (self.id)
@@ -88,3 +91,22 @@ class userStats(Base):
 
     def __repr__(self):
         return '<userStats %r>' % (self.user_id)
+
+class Tournament(Base):
+    __tablename__ = 'tournaments'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    waiting_users = Column(String(200))
+    quarter_final = Column(String(200))
+    semi_final = Column(String(200))
+    final = Column(String(200))
+    winner = Column(String(200))
+
+    def __init__(self):
+        self.waiting_users = ""
+        self.quarter_final = ""
+        self.semi_final = ""
+        self.final = ""
+        self.winner = ""
+
+    def __repr__(self):
+        return '<Tournament %r>' % (self.id)
