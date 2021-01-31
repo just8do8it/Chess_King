@@ -1,21 +1,6 @@
 var username = localStorage.getItem("username");
 var game_id, white_player, black_player;
 
-// function start_waiting(){
-// 	$.ajax({
-// 		url: '/start_waiting',
-// 		// data: $('form').serialize(),
-//         type: 'POST',
-// 		success: function(response){
-			
-// 			console.log(response);
-// 		},
-// 		error: function(error){
-// 			console.log(error);
-// 		}
-// 	});
-// };
-
 function end_waiting(){
 	$.ajax({
 		url: '/end_waiting',
@@ -39,6 +24,8 @@ function play() {
 	document.getElementById("multiplayer").style.display = 'none';
 	document.getElementById("tournament").style.display = 'none';
 	document.getElementById("heading").innerHTML = 'Waiting...';
+
+	localStorage.setItem("waiting", 1);
 
 	fetch('/get_online_players', {
 		method: 'GET',

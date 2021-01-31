@@ -41,7 +41,7 @@ def profile():
     if stats.played_games == "":
         return render_template('profile.html', username=current_user.username,
                                             game_count=0,
-                                            win_rate=stats_query.win_rate)
+                                            win_rate=stats.win_rate)
 
     game_ids = ast.literal_eval(stats.played_games)
     game_count = len(game_ids)
@@ -169,8 +169,8 @@ def quit_game():
 def get_in_game():
     games = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id, 
                                             GameT.b_player == current_user.id)).all()
-    
-    if games:
+    print(games)
+    if games != None:
         for game in games:
             game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
             # print("1")

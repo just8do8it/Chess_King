@@ -5,13 +5,22 @@ var prevColor = "";
 var command = "";
 var board = [];
 var all_figures, w_won_figures, b_won_figures, my_turn, can_move = 1, game_ended = 0;
-
+localStorage.setItem("waiting", 0);
 waitForOpponent();
 
-window.onbeforeunload = function () {
-	quit_game();
-	return "OK";
-}
+// $(window).on('unload', function() {
+//     $.ajax({
+// 		url: '/quit_game',
+//         type: 'POST',
+// 		success: function(response){
+// 			console.log(response);
+// 		},
+// 		error: function(error){
+// 			console.log(error);
+// 		}
+// 	});
+// 	return "OK";
+// });
 
 function quit_game(){
 	$.ajax({
