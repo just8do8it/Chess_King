@@ -158,6 +158,22 @@ def end_waiting():
     db_session.commit()
     return "OK"
 
+@app.route('/tournament_end_waiting', methods=['POST'])
+def tournament_end_waiting():
+    tour_query = db_session.query(Tournament)
+    tournaments = tour_query.all()
+    for tournament in tournaments:
+        if tournament.waiting_users != "":
+            waiting = ast.literal_eval(tournament.waiting_users)
+            if current_user.username in waiting:
+                waiting.remove(current_user.username)
+                tournament.waiting_users = str(waiting)
+                if len(waiting) == 0:
+                    tour_query.filter_by(id = tournament.id).delete()
+                db_session.commit()
+                return "OK"
+                
+
 @app.route('/quit_game', methods=['POST'])
 def quit_game():
     current_user.is_playing = False
@@ -165,54 +181,61 @@ def quit_game():
     return "OK"
 
 
-# @app.route('/tournament')
-# def tournament():
-#     tournaments = db_session.query(Tournament).all()
-#     if tournaments != None:
-#         for tournament in tournamnets:
-#             if tournament.semi_final == "" or tournament.final:
+@app.route('/tournament_getting_players', methods=['GET'])
+def tournament():
+    tournaments = db_session.query(Tournament).all()
+    curr_tour = None
+    if tournaments != None:
+        for tournament in tournaments:
+            if tournament.waiting_users != "":
+                curr_tour = tournament
+    
+    if tournaments == None or curr_tour == None:
+        tournament = Tournament()
+        db_session.add(tournament)
 
+    waiting = []
+
+    if tournament.waiting_users != "":
+        waiting = ast.literal_eval(tournament.waiting_users)
+        if len(waiting) > 7:
+            return abort(409)
+    
+    current_user.waiting = 1
+    waiting.append(current_user.username)
+    tournament.waiting_users = str(waiting)
+    db_session.commit()
+    return "OK"
     
     
-#     if user.count() >= 1:
-#         first_user = current_user
-#         second_user = user.first()
+@app.route("/start_tournament", methods=['GET'])
+def start_tournament():
+    tournaments = db_session.query(Tournament).all()
+    for tournament in tournaments:
+        if tournament.waiting_users != "":
+            waiting = ast.literal_eval(tournament.waiting_users)
+            if len(waiting) == 4:
+                ids = []
+                for user in waiting:
+                    ids.append(db_session.query(User).filter_by(username = user).first().id)
+                
+                for i in range(0, 4, 2):
+                    game_id = get_random_string(7)
+                    gameT = GameT(game_id, ids[i], ids[i + 1])
+                    db_session.add(gameT)
+                    game_details = gameDetails(game_id, "", "")
+                    db_session.add(game_details)
+                    # db_session.query(User).filter_by(id = ids[i]).update({"waiting": False, "is_playing": True})
+                    # db_session.query(User).filter_by(id = ids[i + 1]).update({"waiting": False, "is_playing": True})
+                tournament.waiting_users = ""
+                tournament.semi_final = str(waiting)
+                db_session.commit()
+                return "OK"
+        # else:
+        #     if tournament.final == "":
+        #         playing = ast.literal_eval(tournament.waiting_users)
 
-#         created_games = db_session.query(GameT).filter(or_(GameT.w_player == first_user.id, 
-#                                                         GameT.b_player == first_user.id)).all()
-        
-#         if created_games != None:
-#             for game in created_games:        
-#                 game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
-#                 if game_details.is_active:
-#                     current_user.waiting = 1
-#                     db_session.commit()
-#                     return abort(405)
-
-#         game_id = get_random_string(7)
-
-#         tournament = Tournament()
-#         db_session.add(tournament)
-
-#         gameT = GameT(game_id, first_user.id, second_user.id, tournament.id)
-#         db_session.add(gameT)
-
-#         game_details = gameDetails(game_id, "", "")
-#         db_session.add(game_details)
-
-#         first_user.waiting = False
-#         first_user.is_playing = True
-#         second_user.waiting = False
-#         second_user.is_playing = True
-
-#         db_session.commit()
-
-#         variables = dict(game_id=game_id)
-#         return variables
-#     else:
-#         current_user.waiting = 1
-#         db_session.commit()
-#         return abort(405)
+    return abort(409)
 
 @app.route("/get_in_game", methods=['GET'])
 def get_in_game():
