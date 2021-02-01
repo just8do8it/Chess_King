@@ -5,7 +5,9 @@ var prevColor = "";
 var command = "";
 var board = [];
 var all_figures, w_won_figures, b_won_figures, my_turn, can_move = 1, game_ended = 0;
+localStorage.setItem("game_ended", 0);
 localStorage.setItem("waiting", 0);
+localStorage.setItem("final", 0);
 waitForOpponent();
 
 $(window).on('beforeunload', function() {
@@ -91,11 +93,63 @@ function sendCommand(update) {
 				document.getElementById("turn").innerHTML = "Draw!";
 				game_ended = 1;
 			}
+
+			if (game_ended)
+				localStorage.setItem("game_ended", 1);
+
+			// alert("Game ended: " + String(localStorage.getItem("game_ended")));
+			// alert("Tournament: " + String(localStorage.getItem("tournament")));
+			// alert("Final: " + String(localStorage.getItem("final")));
+
+			if (localStorage.getItem("game_ended") && 
+				localStorage.getItem("tournament")) {
+				setInterval(function() {
+					fetch('/tournament_matchmaking', {
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json',
+							'Accept': 'application/json'
+						}
+					}).then(function (response) {
+						response.json().then(function(data) {
+							console.log(data);
+							if (typeof(data) != String) {
+								alert(data["winner"]);
+							}
+						}).catch(function() {
+							console.log("error");
+						});
+					});
+					
+
+					if (!localStorage.getItem("final")) {
+						document.getElementById("waiting").style.display = "inline";
+						fetch('/get_in_game', {
+							method: 'GET',
+							headers: {
+								'Content-Type': 'application/json',
+								'Accept': 'application/json'
+							}
+						}).then(function (response) {
+							response.json().then(function(data) {
+								console.log(data);
+								window.onbeforeunload = null;
+								localStorage.setItem("game_ended", 0);
+								localStorage.setItem("final", 1);
+								window.location = "http://localhost:5000/game/" + data['game_id'];
+							}).catch(function() {
+								console.log("error");
+							});
+						});
+					}
+				}, 2000);
+			}
 		});
 	}).catch(error => {
 		console.error('Error:', error);
 	});
 }
+
 
 function changeHTML() {
 	for (var i = 0; i < 8; i++) {

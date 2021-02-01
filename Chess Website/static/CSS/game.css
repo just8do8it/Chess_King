@@ -4,6 +4,15 @@ body {
     padding: 0;
 }
 
+#waiting {
+    display: none;
+    position: absolute;
+    font-size: 30px;
+    top: 45%;
+    left: 6%;
+    padding: 1.5%;
+}
+
 .chessboard {
     border-radius: 2em;
     border-color: black;

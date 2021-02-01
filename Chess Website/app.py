@@ -208,8 +208,8 @@ def tournament():
     return "OK"
     
     
-@app.route("/start_tournament", methods=['GET'])
-def start_tournament():
+@app.route("/tournament_matchmaking", methods=['GET'])
+def tournament_matchmaking():
     tournaments = db_session.query(Tournament).all()
     for tournament in tournaments:
         if tournament.waiting_users != "":
@@ -221,19 +221,67 @@ def start_tournament():
                 
                 for i in range(0, 4, 2):
                     game_id = get_random_string(7)
-                    gameT = GameT(game_id, ids[i], ids[i + 1])
+                    gameT = GameT(game_id, ids[i], ids[i + 1], tournament.id)
                     db_session.add(gameT)
                     game_details = gameDetails(game_id, "", "")
                     db_session.add(game_details)
-                    # db_session.query(User).filter_by(id = ids[i]).update({"waiting": False, "is_playing": True})
-                    # db_session.query(User).filter_by(id = ids[i + 1]).update({"waiting": False, "is_playing": True})
+
                 tournament.waiting_users = ""
                 tournament.semi_final = str(waiting)
                 db_session.commit()
                 return "OK"
-        # else:
-        #     if tournament.final == "":
-        #         playing = ast.literal_eval(tournament.waiting_users)
+        else:
+            if tournament.final == "":
+                finalists = []
+                playing = ast.literal_eval(tournament.semi_final)
+                ids = []
+                for user in playing:
+                    ids.append(db_session.query(User).filter_by(username = user).first().id)
+                
+                games = db_session.query(GameT).all()
+                for game in games:
+                    if game.tournament_id == tournament.id:
+                        game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
+                        if game_details.winner != "":
+                            finalists.append(game_details.winner)
+
+                if len(finalists) < 2:
+                    return abort(409)
+                
+                game_id = get_random_string(7)
+                player_one = db_session.query(User).filter_by(username = finalists[0]).first()
+                player_two = db_session.query(User).filter_by(username = finalists[1]).first()
+                gameT = GameT(game_id, player_one.id, player_two.id, tournament.id)
+                db_session.add(gameT)
+                game_details = gameDetails(game_id, "", "")
+                db_session.add(game_details)
+                
+                tournament.final = str(finalists)
+                db_session.commit()
+                return "OK"
+
+            elif tournament.winner == "":
+                finalists = ast.literal_eval(tournament.final)
+                ids = []
+                for username in finalists:
+                    ids.append(db_session.query(User).filter_by(username = username).first().id)
+                
+                games = db_session.query(GameT).all()
+                for game in games:
+                    if game.tournament_id == tournament.id and \
+                        (ids[0] == game.w_player or ids[0] == game.b_player) and \
+                        (ids[1] == game.w_player or ids[1] == game.b_player):
+                        game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
+                        if game_details.winner != "":
+                            tournament.winner = game_details.winner
+                            db_session.commit()
+                            variable = dict(winner="The winner is " + tournament.winner + "!")
+                            return variable
+                        else:
+                            return abort(409)
+            elif tournament.winner != "":
+                variable = dict(winner="The winner is " + tournament.winner + "!")
+                return variable
 
     return abort(409)
 

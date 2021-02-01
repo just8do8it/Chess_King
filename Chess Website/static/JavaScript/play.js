@@ -98,13 +98,9 @@ function tournament() {
 	}).then(function (response) {
 		response.json().then(function(data) {
 			console.log(data);
-			// window.onbeforeunload = null;
-			// end_waiting();
-			// game_id = data['game_id'];
-			// window.location = "http://localhost:5000/game/" + game_id;
 		}).catch(function() {
 			setInterval(function() {
-				fetch('/start_tournament', {
+				fetch('/tournament_matchmaking', {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',
