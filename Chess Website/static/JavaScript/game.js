@@ -113,8 +113,10 @@ function sendCommand(update) {
 					}).then(function (response) {
 						response.json().then(function(data) {
 							console.log(data);
-							if (typeof(data) != String) {
+							if (typeof(data) != typeof("string")) {
+								localStorage.setItem("tournament", 0);
 								alert(data["winner"]);
+								window.location = "http://localhost:5000/play";
 							}
 						}).catch(function() {
 							console.log("error");

@@ -183,14 +183,18 @@ def quit_game():
 
 @app.route('/tournament_getting_players', methods=['GET'])
 def tournament():
-    tournaments = db_session.query(Tournament).all()
+    tour_query = db_session.query(Tournament)
+    tournaments = tour_query.all()
     curr_tour = None
     if tournaments != None:
         for tournament in tournaments:
-            if tournament.waiting_users != "":
+            if tournament.semi_final == "":
+                # if tournament.waiting_users == "":
+                #     tour_query.filter_by(id = tournament.id).delete()
                 curr_tour = tournament
     
     if tournaments == None or curr_tour == None:
+        print(len(tournaments))
         tournament = Tournament()
         db_session.add(tournament)
 

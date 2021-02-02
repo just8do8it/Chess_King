@@ -109,8 +109,6 @@ function tournament() {
 				}).then(function (response) {
 					response.json().then(function(data) {
 						console.log(data);
-						window.onbeforeunload = null;
-						end_waiting();
 					}).catch(function() {
 						console.log("error");
 					});
@@ -126,7 +124,6 @@ function tournament() {
 					response.json().then(function(data) {
 						console.log(data);
 						window.onbeforeunload = null;
-						end_waiting();
 						window.location = "http://localhost:5000/game/" + data['game_id'];
 					}).catch(function() {
 						console.log("error");
