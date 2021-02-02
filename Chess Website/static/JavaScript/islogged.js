@@ -2,11 +2,9 @@ window.onload = function() {
 	$.ajax({
 		url: '/islogged',
 		type: 'GET',
-		// dataType: 'text',
-  		// contentType: "application/json",
 		success: function(response){
-			if (window.location == "http://localhost:5000/login" || window.location == "http://localhost:5000/signUp")
-				window.location = "http://localhost:5000/logout";
+			if (String(window.location).substring(0, 27) == "http://localhost:5000/login" || window.location == "http://localhost:5000/signUp")
+				window.location = "http://localhost:5000/home";
 
 			if (window.location == "http://localhost:5000/home") {
 				$('#login').attr("href", "http://localhost:5000/logout");

@@ -6,13 +6,13 @@ function login(){
 		data: $('form').serialize(),
 		type: 'POST',
 		success: function(response){
-			location.reload();
 			localStorage.setItem("username", username);
 			window.location = "http://localhost:5000/home";
 			$('#login').attr("href", "http://localhost:5000/logout");
 			document.getElementById('login').innerHTML = "Logout";
 			alert("Welcome, " + username + "!");
 			console.log(response);
+			location.reload();
 		},
 		error: function(error){
 			console.log(error);

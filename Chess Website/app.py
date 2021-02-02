@@ -50,28 +50,30 @@ def profile():
     game_endings = []
     win_count = 0
     draw_count = 0
-    for id in game_ids:
-        game = db_session.query(GameT).filter_by(id = id).first()
+    
+    if game_count > 0:
+        for id in game_ids:
+            game = db_session.query(GameT).filter_by(id = id).first()
 
-        opponent = None
-        if current_user.id == game.w_player:
-            opponent = db_session.query(User).filter_by(id = game.b_player).first()
-        else:
-            opponent = db_session.query(User).filter_by(id = game.w_player).first()
-        
-        opponent = opponent.username
-        game_desc.append("Game with " + opponent)
+            opponent = None
+            if current_user.id == game.w_player:
+                opponent = db_session.query(User).filter_by(id = game.b_player).first()
+            else:
+                opponent = db_session.query(User).filter_by(id = game.w_player).first()
+            
+            opponent = opponent.username
+            game_desc.append("Game with " + opponent)
 
-        details = db_session.query(gameDetails).filter_by(game_id = id).first()
-        game_dates.append(str(details.start_date))
-        if details.winner == current_user.username:
-            game_endings.append("win")
-            win_count += 1
-        elif details.winner == "draw":
-            game_endings.append("draw")
-            draw_count += 1
-        else:
-            game_endings.append("loss")
+            details = db_session.query(gameDetails).filter_by(game_id = id).first()
+            game_dates.append(str(details.start_date))
+            if details.winner == current_user.username:
+                game_endings.append("win")
+                win_count += 1
+            elif details.winner == "draw":
+                game_endings.append("draw")
+                draw_count += 1
+            else:
+                game_endings.append("loss")
     
     win_rate = (win_count + (0.5 * draw_count)) / len(game_ids) * 100
     
