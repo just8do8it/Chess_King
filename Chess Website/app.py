@@ -178,6 +178,16 @@ def tournament_end_waiting():
 
 @app.route('/quit_game', methods=['POST'])
 def quit_game():
+    game = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id,
+                                                GameT.b_player == current_user.id)).first()
+    
+    game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
+    if game_details.is_active:
+        user_stats = db_session.query(userStats).filter_by(user_id = current_user.id).first()
+        games = ast.literal_eval(user_stats.played_games)
+        games.remove(game.id)
+        user_stats.played_games = str(games)
+
     current_user.is_playing = False
     db_session.commit()
     return "OK"
@@ -191,10 +201,16 @@ def tournament():
     if tournaments != None:
         for tournament in tournaments:
             if tournament.semi_final == "":
-                # if tournament.waiting_users == "":
-                #     tour_query.filter_by(id = tournament.id).delete()
                 curr_tour = tournament
-    
+            else:
+                if tournament.winner == "":
+                    if tournament.final != "":
+                        if current_user.username in ast.literal_eval(tournament.final):
+                            return abort(409)
+                    elif tournament.semi_final != "":
+                        if current_user.username in ast.literal_eval(tournament.semi_final):
+                            return abort(409)
+                
     if tournaments == None or curr_tour == None:
         print(len(tournaments))
         tournament = Tournament()
@@ -224,7 +240,6 @@ def tournament_matchmaking():
                 ids = []
                 for user in waiting:
                     ids.append(db_session.query(User).filter_by(username = user).first().id)
-                
                 for i in range(0, 4, 2):
                     game_id = get_random_string(7)
                     gameT = GameT(game_id, ids[i], ids[i + 1], tournament.id)

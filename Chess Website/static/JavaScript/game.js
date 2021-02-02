@@ -4,7 +4,7 @@ var destinationId = "";
 var prevColor = "";
 var command = "";
 var board = [];
-var all_figures, w_won_figures, b_won_figures, my_turn, can_move = 1, game_ended = 0;
+var all_figures, w_won_figures, b_won_figures, my_turn, can_move = 1, game_ended = 0, stop = 0;
 localStorage.setItem("game_ended", 0);
 localStorage.setItem("waiting", 0);
 localStorage.setItem("final", 0);
@@ -47,7 +47,8 @@ function clicked(clicked_id) {
 
 function waitForOpponent() {
 	setInterval(function() {
-		sendCommand(1);
+		if (!stop)
+			sendCommand(1);
 	}, 2000);
 }
 
@@ -94,15 +95,18 @@ function sendCommand(update) {
 				game_ended = 1;
 			}
 
-			if (game_ended)
+			if (game_ended) {
+				stop = 1;
 				localStorage.setItem("game_ended", 1);
+			}
 
 			// alert("Game ended: " + String(localStorage.getItem("game_ended")));
 			// alert("Tournament: " + String(localStorage.getItem("tournament")));
 			// alert("Final: " + String(localStorage.getItem("final")));
 
-			if (localStorage.getItem("game_ended") && 
-				localStorage.getItem("tournament")) {
+			if (localStorage.getItem("game_ended") == "1" && 
+				localStorage.getItem("tournament") == "1" &&
+				localStorage.getItem("final") == "0") {
 				setInterval(function() {
 					fetch('/tournament_matchmaking', {
 						method: 'GET',
@@ -122,28 +126,25 @@ function sendCommand(update) {
 							console.log("error");
 						});
 					});
-					
 
-					if (!localStorage.getItem("final")) {
-						document.getElementById("waiting").style.display = "inline";
-						fetch('/get_in_game', {
-							method: 'GET',
-							headers: {
-								'Content-Type': 'application/json',
-								'Accept': 'application/json'
-							}
-						}).then(function (response) {
-							response.json().then(function(data) {
-								console.log(data);
-								window.onbeforeunload = null;
-								localStorage.setItem("game_ended", 0);
-								localStorage.setItem("final", 1);
-								window.location = "http://localhost:5000/game/" + data['game_id'];
-							}).catch(function() {
-								console.log("error");
-							});
+					document.getElementById("waiting").style.display = "inline";
+					fetch('/get_in_game', {
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json',
+							'Accept': 'application/json'
+						}
+					}).then(function (response) {
+						response.json().then(function(data) {
+							console.log(data);
+							window.onbeforeunload = null;
+							localStorage.setItem("game_ended", 0);
+							localStorage.setItem("final", 1);
+							window.location = "http://localhost:5000/game/" + data['game_id'];
+						}).catch(function() {
+							console.log("error");
 						});
-					}
+					});
 				}, 2000);
 			}
 		});
