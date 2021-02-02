@@ -6,6 +6,7 @@ function login(){
 		data: $('form').serialize(),
 		type: 'POST',
 		success: function(response){
+			location.reload();
 			localStorage.setItem("username", username);
 			window.location = "http://localhost:5000/home";
 			$('#login').attr("href", "http://localhost:5000/logout");

@@ -2,6 +2,8 @@ window.onload = function() {
 	$.ajax({
 		url: '/islogged',
 		type: 'GET',
+		// dataType: 'text',
+  		// contentType: "application/json",
 		success: function(response){
 			if (window.location == "http://localhost:5000/login" || window.location == "http://localhost:5000/signUp")
 				window.location = "http://localhost:5000/logout";
@@ -27,7 +29,9 @@ window.onload = function() {
 			}
 		},
 		error: function(error){
-			if (window.location != "http://localhost:5000/signUp")
+			if (window.location != "http://localhost:5000/signUp" && 
+				window.location != "http://localhost:5000/login" &&
+				window.location != "http://localhost:5000/home")
 				window.location = "http://localhost:5000/login";
 
 			if (window.location != "http://localhost:5000/home") {
