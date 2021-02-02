@@ -105,28 +105,29 @@ function sendCommand(update) {
 			// alert("Final: " + String(localStorage.getItem("final")));
 
 			if (localStorage.getItem("game_ended") == "1" && 
-				localStorage.getItem("tournament") == "1" &&
-				localStorage.getItem("final") == "0") {
-				setInterval(function() {
-					fetch('/tournament_matchmaking', {
-						method: 'GET',
-						headers: {
-							'Content-Type': 'application/json',
-							'Accept': 'application/json'
+				localStorage.getItem("tournament") == "1")
+				// localStorage.getItem("final") == "0")
+				{
+				fetch('/tournament_matchmaking', {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'Accept': 'application/json'
+					}
+				}).then(function (response) {
+					response.json().then(function(data) {
+						console.log(data);
+						if (typeof(data) != typeof("string")) {
+							localStorage.setItem("tournament", 0);
+							alert(data["winner"]);
+							window.location = "http://localhost:5000/play";
 						}
-					}).then(function (response) {
-						response.json().then(function(data) {
-							console.log(data);
-							if (typeof(data) != typeof("string")) {
-								localStorage.setItem("tournament", 0);
-								alert(data["winner"]);
-								window.location = "http://localhost:5000/play";
-							}
-						}).catch(function() {
-							console.log("error");
-						});
+					}).catch(function() {
+						console.log("error");
 					});
+				});
 
+				setInterval(function() {
 					document.getElementById("waiting").style.display = "inline";
 					fetch('/get_in_game', {
 						method: 'GET',

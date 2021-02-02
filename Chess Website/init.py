@@ -4,6 +4,7 @@ from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData, Table, Column, Integer, String, MetaData
 from database import init_db
+import os
 
 login_manager = LoginManager()
 app = Flask(__name__)
@@ -12,6 +13,9 @@ app = Flask(__name__)
 def create_app():
     app.secret_key = 'Str0ng_Super_Secret_Key'
     app.config['SESSION_TYPE'] = 'filesystem'
+    
+    # Get environment variables
+    CHESS_DATABASE = os.getenv('CHESS_DATABASE')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:\\TUES\\Github\\TUES\\Chess Website\\chess.db'
 
     sess = Session()
@@ -25,5 +29,5 @@ def create_app():
 def get_app():
     return app
 
-def get_db():
-    return db
+# def get_db():
+#     return db

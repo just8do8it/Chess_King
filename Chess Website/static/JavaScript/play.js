@@ -96,24 +96,21 @@ function tournament() {
 			'Accept': 'application/json'
 		}
 	}).then(function (response) {
-		response.json().then(function(data) {
-			console.log(data);
-		}).catch(function() {
-			setInterval(function() {
-				fetch('/tournament_matchmaking', {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						'Accept': 'application/json'
-					}
-				}).then(function (response) {
-					response.json().then(function(data) {
-						console.log(data);
-					}).catch(function() {
-						console.log("error");
-					});
+			fetch('/tournament_matchmaking', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Accept': 'application/json'
+				}
+			}).then(function (response) {
+				response.json().then(function(data) {
+					console.log(data);
+				}).catch(function() {
+					console.log("error");
 				});
-				
+			});
+
+			setInterval(function() {
 				fetch('/get_in_game', {
 					method: 'GET',
 					headers: {
@@ -130,6 +127,7 @@ function tournament() {
 					});
 				});
 			}, 2000);
+		}).catch(function() {
+
 		});
-	});
 }
