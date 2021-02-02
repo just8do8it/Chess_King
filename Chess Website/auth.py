@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request, render_template, redirect, url_for, a
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from flask_api import status
 from werkzeug.security import generate_password_hash, check_password_hash
-from init import get_app, get_db
+from init import get_app
 from database import db_session
 from init import login_manager
 from models import User, GameT, gameDetails, userStats

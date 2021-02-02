@@ -14,9 +14,7 @@ def create_app():
     app.secret_key = 'Str0ng_Super_Secret_Key'
     app.config['SESSION_TYPE'] = 'filesystem'
     
-    # Get environment variables
-    CHESS_DATABASE = os.getenv('CHESS_DATABASE')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:\\TUES\\Github\\TUES\\Chess Website\\chess.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('CHESS_DATABASE')
 
     sess = Session()
     sess.init_app(app)
@@ -28,6 +26,3 @@ def create_app():
 
 def get_app():
     return app
-
-# def get_db():
-#     return db
