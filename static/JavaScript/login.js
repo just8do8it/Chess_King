@@ -7,7 +7,7 @@ function login(){
 		type: 'POST',
 		success: function(response){
 			localStorage.setItem("username", username);
-			window.location = "http://localhost:5000/home";
+			window.location = "http://localhost:5000/";
 			$('#login').attr("href", "http://localhost:5000/logout");
 			document.getElementById('login').innerHTML = "Logout";
 			alert("Welcome, " + username + "!");

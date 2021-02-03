@@ -4,9 +4,9 @@ window.onload = function() {
 		type: 'GET',
 		success: function(response){
 			if (String(window.location).substring(0, 27) == "http://localhost:5000/login" || window.location == "http://localhost:5000/signUp")
-				window.location = "http://localhost:5000/home";
+				window.location = "http://localhost:5000/";
 
-			if (window.location == "http://localhost:5000/home") {
+			if (window.location == "http://localhost:5000/") {
 				$('#login').attr("href", "http://localhost:5000/logout");
 				document.getElementById('login').innerHTML = "Logout";
 			}
@@ -29,10 +29,10 @@ window.onload = function() {
 		error: function(error){
 			if (window.location != "http://localhost:5000/signUp" && 
 				window.location != "http://localhost:5000/login" &&
-				window.location != "http://localhost:5000/home")
+				window.location != "http://localhost:5000/")
 				window.location = "http://localhost:5000/login";
 
-			if (window.location != "http://localhost:5000/home") {
+			if (window.location != "http://localhost:5000/") {
 				$('#login').attr("href", "http://localhost:5000/login");
 				document.getElementById('login').innerHTML = "Login";
 			}

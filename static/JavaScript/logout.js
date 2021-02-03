@@ -7,7 +7,7 @@ function logout(){
 			localStorage.clear();
 			$('#login').attr("href", "http://localhost:5000/login");
 			document.getElementById('login').innerHTML = "Login";
-			window.location = "http://localhost:5000/home";
+			window.location = "http://localhost:5000/";
 			alert("Now you can login with another profile.");
 			console.log(response);
 		},

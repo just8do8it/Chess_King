@@ -27,7 +27,7 @@ def get_random_string(length):
 def shutdown_session(exception=None):
     db_session.remove()
 
-@app.route('/home')
+@app.route('/')
 def home():
     return render_template('home.html')
 
