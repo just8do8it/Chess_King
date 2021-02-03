@@ -1,5 +1,5 @@
-import sys
-sys.path.append('/mnt/c/TUES/Github/TUES/Chess Website/python_game')
+import sys, os
+sys.path.append(os.getenv('PYTHON_GAME'))
 import pdb
 import subprocess
 import time
