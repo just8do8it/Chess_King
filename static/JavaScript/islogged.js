@@ -3,6 +3,8 @@ window.onload = function() {
 		url: '/islogged',
 		type: 'GET',
 		success: function(response){
+			document.getElementById('profile').style.display = "inline";
+			
 			if (String(window.location).substring(0, 27) == "http://localhost:5000/login" || window.location == "http://localhost:5000/signUp")
 				window.location = "http://localhost:5000/";
 
@@ -27,6 +29,8 @@ window.onload = function() {
 			}
 		},
 		error: function(error){
+			document.getElementById('profile').style.display = "none";
+
 			if (window.location != "http://localhost:5000/signUp" && 
 				window.location != "http://localhost:5000/login" &&
 				window.location != "http://localhost:5000/")
