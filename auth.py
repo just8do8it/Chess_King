@@ -72,10 +72,7 @@ def logout_session():
 
 @app.route('/islogged', methods=['GET'])
 def is_logged():
-    if hasattr(current_user, 'is_logged'):
-        if not current_user.is_logged:
-            return abort(401)
-        else:
-            return "OK"
+    if hasattr(current_user, 'id'):
+        return "OK"
     else:
         return abort(401)

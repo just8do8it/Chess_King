@@ -34,6 +34,11 @@ def home():
 
 @app.route('/profile')                   
 def profile():
+    if not hasattr(current_user, 'id'):
+        return render_template('profile.html', username="Nobody",
+                                            game_count=0,
+                                            win_rate=0)
+    
     stats_query = db_session.query(userStats).filter_by(user_id = current_user.id)
     stats = stats_query.first()
     

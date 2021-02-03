@@ -3,5 +3,6 @@ body {
 }
 
 p {
+    margin: 4%;
     font-size: 3em;
 }
