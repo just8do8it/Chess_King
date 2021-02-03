@@ -50,8 +50,9 @@ $ pip install Werkzeug
 След това отивате на най-долния ред на файла и създавате две променливи – „CHESS_DATABASE“ и „PYTHON_GAME“, като те ще съдържат пътищата до съответните файлови ресурси. Последната папка “TUES” в примерните пътища е папката на Github репозиторито. Пътищата могат да варират в зависимост от ситемата Ви, така че показания по-долу пример е само образец.
 
 export CHESS_DATABASE='sqlite:///C:\\TUES\\Github\\TUES\\chess.db'
-                                                                                                                    
-                                                                                                                    export PYTHON_GAME='/mnt/c/TUES/Github/TUES/python_game'
+
+export PYTHON_GAME='/mnt/c/TUES/Github/TUES/python_game'
+                                                                                                                 
 
 След това запишете файла с командите Ctrl+X, Y, Enter.
 За да се сигурни, че променливите са запазени трайно в системата изпълнете следната команда в терминала:
