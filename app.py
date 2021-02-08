@@ -65,7 +65,7 @@ def profile():
 
             details = db_session.query(gameDetails).filter_by(game_id = id).first()
             game_dates.append(str(details.start_date))
-            if details.winner == current_user.username:
+            if details.winner == current_user.id:
                 game_endings.append("win")
                 win_count += 1
             elif details.winner == "draw":
@@ -155,7 +155,7 @@ def playroom():
 
 @app.route('/end_waiting', methods=['POST'])
 def end_waiting():
-    current_user.waiting = False
+    current_user.is_waiting= False
     db_session.commit()
     return "OK"
 
@@ -166,8 +166,8 @@ def tournament_end_waiting():
     for tournament in tournaments:
         if tournament.waiting_users != "":
             waiting = ast.literal_eval(tournament.waiting_users)
-            if current_user.username in waiting:
-                waiting.remove(current_user.username)
+            if current_user.id in waiting:
+                waiting.remove(current_user.id)
                 tournament.waiting_users = str(waiting)
                 if len(waiting) == 0:
                     tour_query.filter_by(id = tournament.id).delete()
@@ -202,12 +202,12 @@ def tournament():
             if tournament.semi_final == "":
                 curr_tour = tournament
             else:
-                if tournament.winner == "":
+                if tournament.winner == None:
                     if tournament.final != "":
-                        if current_user.username in ast.literal_eval(tournament.final):
+                        if current_user.id in ast.literal_eval(tournament.final):
                             return abort(409)
                     elif tournament.semi_final != "":
-                        if current_user.username in ast.literal_eval(tournament.semi_final):
+                        if current_user.id in ast.literal_eval(tournament.semi_final):
                             return abort(409)
                 
     if tournaments == None or curr_tour == None:
@@ -222,8 +222,8 @@ def tournament():
         if len(waiting) > 7:
             return abort(409)
     
-    current_user.waiting = 1
-    waiting.append(current_user.username)
+    current_user.is_waiting= 1
+    waiting.append(current_user.id)
     tournament.waiting_users = str(waiting)
     db_session.commit()
     return "OK"
@@ -236,14 +236,11 @@ def tournament_matchmaking():
         if tournament.waiting_users != "":
             waiting = ast.literal_eval(tournament.waiting_users)
             if len(waiting) == 4:
-                ids = []
-                for user in waiting:
-                    ids.append(db_session.query(User).filter_by(username = user).first().id)
                 for i in range(0, 4, 2):
                     game_id = get_random_string(7)
-                    gameT = GameT(game_id, ids[i], ids[i + 1], tournament.id)
+                    gameT = GameT(game_id, waiting[i], waiting[i + 1], tournament.id)
                     db_session.add(gameT)
-                    game_details = gameDetails(game_id, "", "")
+                    game_details = gameDetails(game_id)
                     db_session.add(game_details)
 
                 tournament.waiting_users = ""
@@ -253,54 +250,48 @@ def tournament_matchmaking():
         else:
             if tournament.final == "":
                 finalists = []
-                playing = ast.literal_eval(tournament.semi_final)
-                ids = []
-                for user in playing:
-                    ids.append(db_session.query(User).filter_by(username = user).first().id)
-                
                 games = db_session.query(GameT).all()
                 for game in games:
                     if game.tournament_id == tournament.id:
                         game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
-                        if game_details.winner != "":
+                        if game_details.winner != None:
                             finalists.append(game_details.winner)
 
                 if len(finalists) < 2:
                     return abort(409)
                 
                 game_id = get_random_string(7)
-                player_one = db_session.query(User).filter_by(username = finalists[0]).first()
-                player_two = db_session.query(User).filter_by(username = finalists[1]).first()
+                player_one = db_session.query(User).filter_by(id = finalists[0]).first()
+                player_two = db_session.query(User).filter_by(id = finalists[1]).first()
                 gameT = GameT(game_id, player_one.id, player_two.id, tournament.id)
                 db_session.add(gameT)
-                game_details = gameDetails(game_id, "", "")
+                game_details = gameDetails(game_id)
                 db_session.add(game_details)
                 
                 tournament.final = str(finalists)
                 db_session.commit()
                 return "OK"
 
-            elif tournament.winner == "":
+            elif tournament.winner == None:
                 finalists = ast.literal_eval(tournament.final)
-                ids = []
-                for username in finalists:
-                    ids.append(db_session.query(User).filter_by(username = username).first().id)
-                
+
                 games = db_session.query(GameT).all()
                 for game in games:
                     if game.tournament_id == tournament.id and \
-                        (ids[0] == game.w_player or ids[0] == game.b_player) and \
-                        (ids[1] == game.w_player or ids[1] == game.b_player):
+                        (finalists[0] == game.w_player or finalists[0] == game.b_player) and \
+                        (finalists[1] == game.w_player or finalists[1] == game.b_player):
                         game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
-                        if game_details.winner != "":
+                        if game_details.winner != None:
                             tournament.winner = game_details.winner
                             db_session.commit()
-                            variable = dict(winner="The winner is " + tournament.winner + "!")
+                            winner = db_session.query(User).filter_by(id = tournament.winner).first()
+                            variable = dict(winner="The winner is " + winner.username + "!")
                             return variable
                         else:
                             return abort(409)
-            elif tournament.winner != "":
-                variable = dict(winner="The winner is " + tournament.winner + "!")
+            elif tournament.winner != None:
+                winner = db_session.query(User).filter_by(id = tournament.winner).first()
+                variable = dict(winner="The winner is " + winner.username + "!")
                 return variable
 
     return abort(409)
@@ -322,8 +313,8 @@ def get_in_game():
                 else:
                     opponent = first_player
 
-                if (first_player.waiting == 1 and second_player.waiting == 1) or opponent.is_playing == 1:
-                    current_user.waiting = False
+                if (first_player.is_waiting== 1 and second_player.is_waiting== 1) or opponent.is_playing == 1:
+                    current_user.is_waiting= False
                     current_user.is_playing = True
                     db_session.commit()
                     variable = dict(game_id=game.id)
@@ -336,7 +327,7 @@ def get_in_game():
 
 @app.route("/get_online_players", methods=['GET'])
 def get_online_players():
-    user = db_session.query(User).filter(User.waiting == True)
+    user = db_session.query(User).filter(User.is_waiting== True)
     if user.count() >= 1:
         first_user = current_user
         second_user = user.first()
@@ -348,20 +339,20 @@ def get_online_players():
             for game in created_games:        
                 game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
                 if game_details.is_active:
-                    current_user.waiting = 1
+                    current_user.is_waiting= 1
                     db_session.commit()
                     return abort(405)
         
         game_id = get_random_string(7)
         gameT = GameT(game_id, first_user.id, second_user.id)
         db_session.add(gameT)
-        game_details = gameDetails(game_id, "", "")
+        game_details = gameDetails(game_id)
         db_session.add(game_details)
 
-        first_user.waiting = False
+        first_user.is_waiting = False
         first_user.is_playing = True
         
-        second_user.waiting = False
+        second_user.is_waiting = False
         second_user.is_playing = True
 
         db_session.commit()
@@ -369,7 +360,7 @@ def get_online_players():
         variables = dict(game_id=game_id)
         return variables
     else:
-        current_user.waiting = 1
+        current_user.is_waiting= 1
         db_session.commit()
         return abort(405)
 
@@ -455,7 +446,7 @@ def chess(game_id):
                     my_turn = -3
 
                 if my_turn > -3:
-                    details_query.update({"is_active": False, "winner": winner.username})
+                    details_query.update({"is_active": False, "winner": winner.id})
                 else:
                     details_query.update({"is_active": False, "winner": "draw"})
                     

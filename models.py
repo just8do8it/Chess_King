@@ -10,14 +10,14 @@ class User(Base):
     username = Column(String(120), unique=True)
     password = Column(String(120), unique=True)
     is_logged = Column(Boolean)
-    waiting = Column(Boolean)
+    is_waiting = Column(Boolean)
     is_playing = Column(Boolean)
 
     def __init__(self, username=None, password=None):
         self.username = username
         self.password = password
         self.is_logged = False
-        self.waiting = False
+        self.is_waiting = False
         self.is_playing = False
 
     def verify_password(self, pwd):
@@ -64,15 +64,15 @@ class gameDetails(Base):
     moves = Column(String(3000))
     start_date = Column(DateTime(timezone=True), server_default=func.now())
     is_active = Column(Boolean)
-    winner = Column(String(120))
+    winner = Column(Integer, ForeignKey('users.id'))
+    user = relationship("User")
     game = relationship("GameT")
 
-    def __init__(self, game_id=None, moves=None, board=None):
+    def __init__(self, game_id=None):
         self.game_id = game_id
-        self.moves = moves
-        self.board = board
+        self.moves = ""
         self.is_active = True
-        self.winner = ""
+        self.winner = None
 
     def __repr__(self):
         return '<gameDetails %r>' % (self.id)
@@ -82,7 +82,7 @@ class userStats(Base):
     user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
     played_games = Column(String(5000))
     win_rate = Column(Float)
-    game = relationship("User")
+    user = relationship("User")
 
     def __init__(self, user_id=None):
         self.user_id = user_id
@@ -99,14 +99,15 @@ class Tournament(Base):
     quarter_final = Column(String(200))
     semi_final = Column(String(200))
     final = Column(String(200))
-    winner = Column(String(200))
+    winner = Column(Integer, ForeignKey("users.id"))
+    user = relationship("User")
 
     def __init__(self):
         self.waiting_users = ""
         self.quarter_final = ""
         self.semi_final = ""
         self.final = ""
-        self.winner = ""
+        self.winner = None
 
     def __repr__(self):
         return '<Tournament %r>' % (self.id)
