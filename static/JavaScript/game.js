@@ -15,6 +15,19 @@ $(window).on('beforeunload', function() {
 	return "OK";
 });
 
+function chatTrigger() {
+	var state = document.getElementById("chat").style.display;
+	if (state == "none") {
+		document.getElementById("chat").style.display = "inline";
+		document.getElementById("message").style.display = "inline";
+		document.getElementById("chatButton").innerHTML = "Hide chat";
+	} else {
+		document.getElementById("chat").style.display = "none";
+		document.getElementById("message").style.display = "none";
+		document.getElementById("chatButton").innerHTML = "Show chat";
+	}
+}
+
 function quit_game(){
 	$.ajax({
 		url: '/quit_game',
@@ -60,6 +73,30 @@ function refreshMessages() {
 	}, 5000);
 }
 
+function getMessages() {
+	var game_id = new String(window.location.pathname);
+	var url = game_id + "/messages";
+	fetch(url, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Accept': 'application/json'
+		}
+	}).then(function (response) {
+		response.json().then(function(data) {
+			console.log(data);
+			data = data['chat'];
+			var chat = "";
+			for (var i = data.length - 1; i >= 0; --i) {
+				chat += data[i] + "<br><br>";
+			}
+			document.getElementById("chat").innerHTML = chat;
+		}).catch(function() {
+			console.log("error");
+		});
+	});
+}
+
 function sendMessage(event) {
 	event.preventDefault();
 	var message = $('#message').val();
@@ -78,32 +115,6 @@ function sendMessage(event) {
 	});
 }
 
-function getMessages() {
-	var game_id = new String(window.location.pathname);
-	var url = game_id + "/messages";
-	fetch(url, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-			'Accept': 'application/json'
-		}
-	}).then(function (response) {
-		response.json().then(function(data) {
-			console.log(data);
-			data = data['chat'];
-			var chat = "";
-			for (var i = 0; i < data.length; ++i) {
-				chat += data[i] + "<br><br>";
-			}
-			document.getElementById("chat").innerHTML = chat;
-			setTimeout(function () {
-				$('#chat').scrollTop($('#chat').height());
-			}, 100);
-		}).catch(function() {
-			console.log("error");
-		});
-	});
-}
 
 function sendCommand(update) {
 	if (update)

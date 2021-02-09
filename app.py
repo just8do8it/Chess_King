@@ -97,7 +97,9 @@ def message(game_id):
         for message, user in db_session.query(Message, User).filter(and_(Message.user_id == User.id, 
                                                             Message.game_id == game_id)).all():
 
-            chat.append(str(user.username) + ": " + str(message.text) + "(" + str(message.time) + ")")
+            time = str(message.time)
+            time = time[11:16]
+            chat.append("(" + time + ") " + user.username + ": " + message.text)
         
         return dict(chat=chat)
     

@@ -4,19 +4,28 @@ body {
     padding: 0;
 }
 
+#chatButton {
+    position: absolute;
+    bottom: 61%;
+    left: 2.5%;
+    font-size: 1.5em;
+}
+
 #chat {
     background-color: white;
     width: 20%;
     height: 30%;
     position: absolute;
-    bottom: 20%;
+    bottom: 30%;
+    left: 2.5%;
     overflow-y: auto;
 }
 
 input {
     width: 20%;
     position: absolute;
-    bottom: 17%;
+    bottom: 27%;
+    left: 2.5%;
 }
 
 #waiting {
