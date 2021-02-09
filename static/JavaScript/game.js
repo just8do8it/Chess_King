@@ -69,7 +69,8 @@ function waitForOpponent() {
 function refreshMessages() {
 	getMessages();
 	setInterval(function () {
-		getMessages();
+		if (!stop)
+			getMessages();
 	}, 5000);
 }
 
@@ -88,7 +89,15 @@ function getMessages() {
 			data = data['chat'];
 			var chat = "";
 			for (var i = data.length - 1; i >= 0; --i) {
-				chat += data[i] + "<br><br>";
+				for (var j = 0; j < data[i].length; ++j) {
+					if (data[i][j - 1] == ")") {
+						chat += "<strong>";
+					} else if (data[i][j - 1] == ":") {
+						chat += "</strong>";
+					}
+					chat += data[i][j];
+				}
+				chat += "<br><br>";
 			}
 			document.getElementById("chat").innerHTML = chat;
 		}).catch(function() {
@@ -98,6 +107,9 @@ function getMessages() {
 }
 
 function sendMessage(event) {
+	if (stop) {
+		return;
+	}
 	event.preventDefault();
 	var message = $('#message').val();
 	$('#message').val("");
