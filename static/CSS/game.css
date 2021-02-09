@@ -4,6 +4,21 @@ body {
     padding: 0;
 }
 
+#chat {
+    background-color: white;
+    width: 20%;
+    height: 30%;
+    position: absolute;
+    bottom: 20%;
+    overflow-y: auto;
+}
+
+input {
+    width: 20%;
+    position: absolute;
+    bottom: 17%;
+}
+
 #waiting {
     display: none;
     position: absolute;

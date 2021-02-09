@@ -110,3 +110,21 @@ class Tournament(Base):
 
     def __repr__(self):
         return '<Tournament %r>' % (self.id)
+
+class Message(Base):
+    __tablename__ = 'messages'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    game_id = Column(String(120), ForeignKey('games.id'))
+    text = Column(String(200))
+    time = Column(DateTime(timezone=True), server_default=func.now())
+    user = relationship("User")
+    game = relationship("GameT")
+
+    def __init__(self, user_id, game_id, text):
+        self.user_id = user_id
+        self.game_id = game_id
+        self.text = text
+
+    def __repr__(self):
+        return '<Message %r>' % (self.id)

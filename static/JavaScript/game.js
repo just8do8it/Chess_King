@@ -9,6 +9,7 @@ localStorage.setItem("game_ended", 0);
 localStorage.setItem("waiting", 0);
 localStorage.setItem("final", 0);
 waitForOpponent();
+refreshMessages();
 
 $(window).on('beforeunload', function() {
 	return "OK";
@@ -52,13 +53,64 @@ function waitForOpponent() {
 	}, 2000);
 }
 
+function refreshMessages() {
+	getMessages();
+	setInterval(function () {
+		getMessages();
+	}, 5000);
+}
+
+function sendMessage(event) {
+	event.preventDefault();
+	var message = $('#message').val();
+	$('#message').val("");
+	var game_id = new String(window.location.pathname);
+	var url = game_id + "/messages";
+	fetch(url, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Accept': 'application/json'
+		},
+		body: JSON.stringify(message)
+	}).then(function() {
+		getMessages();
+	});
+}
+
+function getMessages() {
+	var game_id = new String(window.location.pathname);
+	var url = game_id + "/messages";
+	fetch(url, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Accept': 'application/json'
+		}
+	}).then(function (response) {
+		response.json().then(function(data) {
+			console.log(data);
+			data = data['chat'];
+			var chat = "";
+			for (var i = 0; i < data.length; ++i) {
+				chat += data[i] + "<br><br>";
+			}
+			document.getElementById("chat").innerHTML = chat;
+			setTimeout(function () {
+				$('#chat').scrollTop($('#chat').height());
+			}, 100);
+		}).catch(function() {
+			console.log("error");
+		});
+	});
+}
+
 function sendCommand(update) {
-	var game = new String(window.location);
-	game = game.slice(21);
 	if (update)
 		command = "update";
+	var game_id = new String(window.location.pathname);
 	console.log(command);
-	fetch(game, {
+	fetch(game_id, {
 	    method: 'POST',
 		body: JSON.stringify(command),
 		headers: {

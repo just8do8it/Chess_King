@@ -6,7 +6,7 @@ from flask_session import Session
 from sqlalchemy import or_, and_, update, delete, insert
 from flask_sqlalchemy import SQLAlchemy
 from database import db_session
-from models import User, GameT, gameDetails, userStats, Tournament
+from models import User, GameT, gameDetails, userStats, Tournament, Message
 import os, ast
 import models
 import pdb
@@ -88,6 +88,25 @@ def profile():
                                             game_dates=game_dates,
                                             game_endings=game_endings,
                                             win_rate=win_rate)
+
+
+@app.route('/game/<string:game_id>/messages', methods=['GET', 'POST'])
+def message(game_id):
+    if request.method == "GET":
+        chat = []
+        for message, user in db_session.query(Message, User).filter(and_(Message.user_id == User.id, 
+                                                            Message.game_id == game_id)).all():
+
+            chat.append(str(user.username) + ": " + str(message.text) + "(" + str(message.time) + ")")
+        
+        return dict(chat=chat)
+    
+    text = request.get_json()
+    message = Message(current_user.id, game_id, text)
+    db_session.add(message)
+    db_session.commit()
+    return "OK"
+
 
 @app.route('/replay/<string:game_id>', methods=['GET', 'POST'])
 def replay(game_id):
@@ -305,6 +324,7 @@ def get_in_game():
         for game in games:
             game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
             if game_details.is_active:
+                print("IN")
                 first_player = db_session.query(User).filter_by(id = game.w_player).first()
                 second_player = db_session.query(User).filter_by(id = game.b_player).first()
                 opponent = None
@@ -313,7 +333,7 @@ def get_in_game():
                 else:
                     opponent = first_player
 
-                if (first_player.is_waiting== 1 and second_player.is_waiting== 1) or opponent.is_playing == 1:
+                if (first_player.is_waiting == 1 and second_player.is_waiting == 1) or opponent.is_playing == 1:
                     current_user.is_waiting= False
                     current_user.is_playing = True
                     db_session.commit()
