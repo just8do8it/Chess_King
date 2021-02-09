@@ -59,8 +59,7 @@ class GameT(Base):
 
 class gameDetails(Base):
     __tablename__ = 'game_details'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    game_id = Column(String(120), ForeignKey('games.id'))
+    game_id = Column(String(120), ForeignKey('games.id'), primary_key=True)
     moves = Column(String(3000))
     start_date = Column(DateTime(timezone=True), server_default=func.now())
     is_active = Column(Boolean)
