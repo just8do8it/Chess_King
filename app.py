@@ -326,7 +326,6 @@ def get_in_game():
         for game in games:
             game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
             if game_details.is_active:
-                print("IN")
                 first_player = db_session.query(User).filter_by(id = game.w_player).first()
                 second_player = db_session.query(User).filter_by(id = game.b_player).first()
                 opponent = None
