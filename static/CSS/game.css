@@ -31,9 +31,9 @@ input {
 #waiting {
     display: none;
     position: absolute;
-    font-size: 30px;
+    font-size: 3em;
     top: 45%;
-    left: 6%;
+    left: 2%;
     padding: 1.5%;
 }
 

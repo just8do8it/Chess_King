@@ -6,9 +6,7 @@ from init import get_app
 from database import db_session
 from init import login_manager
 from models import User, GameT, gameDetails, userStats
-import pdb
-import os
-import models
+import pdb, os, models
 
 app = get_app()
 

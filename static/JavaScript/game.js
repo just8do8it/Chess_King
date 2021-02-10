@@ -179,32 +179,9 @@ function sendCommand(update) {
 			// alert("Tournament: " + String(localStorage.getItem("tournament")));
 			// alert("Final: " + String(localStorage.getItem("final")));
 
-			if (localStorage.getItem("game_ended") == "1" && 
-				localStorage.getItem("tournament") == "1")
-				// localStorage.getItem("final") == "0")
-				{
-				fetch('/tournament_matchmaking', {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						'Accept': 'application/json'
-					}
-				}).then(function (response) {
-					response.json().then(function(data) {
-						console.log(data);
-						if (typeof(data) != typeof("string")) {
-							localStorage.setItem("tournament", 0);
-							alert(data["winner"]);
-							window.location = "http://localhost:5000/play";
-						}
-					}).catch(function() {
-						console.log("error");
-					});
-				});
-
-				setInterval(function() {
-					document.getElementById("waiting").style.display = "inline";
-					fetch('/get_in_game', {
+			if (localStorage.getItem("game_ended") == "1") {
+				if (localStorage.getItem("tournament") == "1") {
+					fetch('/tournament_matchmaking', {
 						method: 'GET',
 						headers: {
 							'Content-Type': 'application/json',
@@ -213,15 +190,43 @@ function sendCommand(update) {
 					}).then(function (response) {
 						response.json().then(function(data) {
 							console.log(data);
-							window.onbeforeunload = null;
-							localStorage.setItem("game_ended", 0);
-							localStorage.setItem("final", 1);
-							window.location = "http://localhost:5000/game/" + data['game_id'];
+							if (typeof(data) != typeof("string")) {
+								localStorage.setItem("tournament", 0);
+								alert(data["winner"]);
+								window.location = "http://localhost:5000/play";
+							}
 						}).catch(function() {
 							console.log("error");
 						});
 					});
-				}, 2000);
+	
+					setInterval(function() {
+						document.getElementById("waiting").style.display = "inline";
+						fetch('/get_in_game', {
+							method: 'GET',
+							headers: {
+								'Content-Type': 'application/json',
+								'Accept': 'application/json'
+							}
+						}).then(function (response) {
+							response.json().then(function(data) {
+								console.log(data);
+								window.onbeforeunload = null;
+								localStorage.setItem("game_ended", 0);
+								localStorage.setItem("final", 1);
+								window.location = "http://localhost:5000/game/" + data['game_id'];
+							}).catch(function() {
+								console.log("error");
+							});
+						});
+					}, 2000);
+				} else {
+					setTimeout(function () {
+						alert("The game has ended. You'll be redirected to the Play page.");
+						window.onbeforeunload = null;
+						window.location = "http://localhost:5000/play";
+					}, 2000);
+				}
 			}
 		});
 	}).catch(error => {
