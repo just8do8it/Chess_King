@@ -4,7 +4,7 @@ from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData, Table, Column, Integer, String, MetaData
 from database import init_db
-import os
+import os, string, random
 
 login_manager = LoginManager()
 app = Flask(__name__)

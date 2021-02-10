@@ -182,49 +182,48 @@ function sendCommand(update) {
 								localStorage.setItem("tournament", 0);
 								alert(data["winner"]);
 								window.location = "http://localhost:5000/play";
-							} else {
-								window.onbeforeunload = null;
-								str = "";
-								if (winner_is_me == 0) {
-									str = "You lose!";
-								} else if (winner_is_me == 1) {
-									str = "You win!";
-								} else {
-									str = "Draw!";
-								}
-								
-								if (str != "You win!") {
-									alert(str + " You'll be redirected to the Play page.");
-									setTimeout(function () {
-										window.location = "http://localhost:5000/play";
-									}, 2000);
-								}
 							}
 						}).catch(function() {
 							console.log("error");
 						});
 					});
-	
-					setInterval(function() {
-						document.getElementById("waiting").style.display = "inline";
-						fetch('/get_in_game', {
-							method: 'GET',
-							headers: {
-								'Content-Type': 'application/json',
-								'Accept': 'application/json'
-							}
-						}).then(function (response) {
-							response.json().then(function(data) {
-								console.log(data);
-								window.onbeforeunload = null;
-								localStorage.setItem("game_ended", 0);
-								localStorage.setItem("final", 1);
-								window.location = "http://localhost:5000/game/" + data['game_id'];
-							}).catch(function() {
-								console.log("error");
+
+					window.onbeforeunload = null;
+					str = "";
+					if (winner_is_me == 0) {
+						str = "You lose!";
+					} else if (winner_is_me == 1) {
+						str = "You win!";
+						setInterval(function() {
+							document.getElementById("waiting").style.display = "inline";
+							fetch('/get_in_game', {
+								method: 'GET',
+								headers: {
+									'Content-Type': 'application/json',
+									'Accept': 'application/json'
+								}
+							}).then(function (response) {
+								response.json().then(function(data) {
+									console.log(data);
+									alert(str + " Proceed to the next game.");
+									localStorage.setItem("game_ended", 0);
+									localStorage.setItem("final", 1);
+									window.location = "http://localhost:5000/game/" + data['game_id'];
+								}).catch(function() {
+									console.log("error");
+								});
 							});
-						});
-					}, 2000);
+						}, 2000);
+					} else {
+						str = "Draw!";
+					}
+					
+					if (str != "You win!") {
+						alert(str + " You'll be redirected to the Play page.");
+						setTimeout(function () {
+							window.location = "http://localhost:5000/play";
+						}, 2000);
+					}
 				} else {
 					window.onbeforeunload = null;
 					str = "";

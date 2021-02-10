@@ -124,9 +124,9 @@ def tournament_matchmaking():
                             return variable
                         else:
                             return abort(409)
-            elif tournament.winner != None:
-                winner = db_session.query(User).filter_by(id = tournament.winner).first()
-                variable = dict(winner="The winner is " + winner.username + "!")
-                return variable
+            # elif tournament.winner != None:
+            #     winner = db_session.query(User).filter_by(id = tournament.winner).first()
+            #     variable = dict(winner="The winner is " + winner.username + "!")
+            #     return variable
 
     return abort(409)
