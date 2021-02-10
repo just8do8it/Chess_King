@@ -65,6 +65,7 @@ def chess(game_id):
         if isinstance(command, str) != True:
             return abort(404)
         
+        winner_is_me = None
         commands = []
         details_query = db_session.query(gameDetails).filter_by(game_id = game_id)
         game_details = details_query.first()
@@ -109,6 +110,7 @@ def chess(game_id):
             details_query.update({"moves": str(commands)})
             winner = None
             if py_game.ended == 1:
+                my_turn = -1
                 stats_query = db_session.query(userStats).filter_by(user_id = current_user.id)
                 user_stats = stats_query.first()
                 if user_stats.played_games == "":
@@ -121,18 +123,21 @@ def chess(game_id):
                 
                 
                 if py_game.w_checkmate == 1:
-                    my_turn = -1
                     winner = db_session.query(User).filter_by(id = curr_game.b_player).first()
                 elif py_game.b_checkmate == 1:
-                    my_turn = -2
                     winner = db_session.query(User).filter_by(id = curr_game.w_player).first()
                 else:
-                    my_turn = -3
+                    my_turn = -2
 
-                if my_turn > -3:
+                if my_turn == -1:
+                    if winner == current_user:
+                        winner_is_me = 1
+                    else:
+                        winner_is_me = 0
                     details_query.update({"is_active": False, "winner": winner.id})
                 else:
-                    details_query.update({"is_active": False, "winner": "draw"})
+                    winner_is_me = 2
+                    details_query.update({"is_active": False, "winner": -1})
                     
             else:
                 if py_game.curr_player.color == "black":
@@ -156,10 +161,7 @@ def chess(game_id):
                         all_figures=py_game.special_figures,
                         w_won_figures=w_won_figs,
                         b_won_figures=b_won_figs,
-                        my_turn=my_turn)
-        
-        # print("\n")
-        # py_game.chess_board.print_board()
-        # print("\n")
+                        my_turn=my_turn,
+                        winner_is_me=winner_is_me)
 
         return variables

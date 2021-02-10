@@ -4,16 +4,16 @@ var destinationId = "";
 var prevColor = "";
 var command = "";
 var board = [];
-var all_figures, w_won_figures, b_won_figures, my_turn, can_move = 1, game_ended = 0, stop = 0;
+var all_figures, w_won_figures, b_won_figures, my_turn, winner_is_me, can_move = 1, game_ended = 0, stop = 0;
 localStorage.setItem("game_ended", 0);
 localStorage.setItem("waiting", 0);
 localStorage.setItem("final", 0);
 waitForOpponent();
 refreshMessages();
 
-$(window).on('beforeunload', function() {
+window.onbeforeunload = function() {
 	return "OK";
-});
+};
 
 function chatTrigger() {
 	var state = document.getElementById("chat").style.display;
@@ -148,6 +148,7 @@ function sendCommand(update) {
 			w_won_figures = data["w_won_figures"];
 			b_won_figures = data["b_won_figures"];
 			my_turn = data['my_turn'];
+			winner_is_me = data['winner_is_me'];
 			changeHTML();
 
 			if(my_turn == 1) {
@@ -158,15 +159,6 @@ function sendCommand(update) {
 				document.getElementById("turn").style.left = "100%";
 				document.getElementById("turn").innerHTML = "Opponent's turn";
 			} else if (my_turn == -1) {
-				document.getElementById("turn").style.left = "100%";
-				document.getElementById("turn").innerHTML = "Black player wins!";
-				game_ended = 1;
-			} else if (my_turn == -2) {
-				document.getElementById("turn").style.left = "100%";
-				document.getElementById("turn").innerHTML = "White player wins!";
-				game_ended = 1;
-			} else if (my_turn == -3) {
-				document.getElementById("turn").innerHTML = "Draw!";
 				game_ended = 1;
 			}
 
@@ -174,10 +166,6 @@ function sendCommand(update) {
 				stop = 1;
 				localStorage.setItem("game_ended", 1);
 			}
-
-			// alert("Game ended: " + String(localStorage.getItem("game_ended")));
-			// alert("Tournament: " + String(localStorage.getItem("tournament")));
-			// alert("Final: " + String(localStorage.getItem("final")));
 
 			if (localStorage.getItem("game_ended") == "1") {
 				if (localStorage.getItem("tournament") == "1") {
@@ -194,6 +182,23 @@ function sendCommand(update) {
 								localStorage.setItem("tournament", 0);
 								alert(data["winner"]);
 								window.location = "http://localhost:5000/play";
+							} else {
+								window.onbeforeunload = null;
+								str = "";
+								if (winner_is_me == 0) {
+									str = "You lose!";
+								} else if (winner_is_me == 1) {
+									str = "You win!";
+								} else {
+									str = "Draw!";
+								}
+								
+								if (str != "You win!") {
+									alert(str + " You'll be redirected to the Play page.");
+									setTimeout(function () {
+										window.location = "http://localhost:5000/play";
+									}, 2000);
+								}
 							}
 						}).catch(function() {
 							console.log("error");
@@ -221,11 +226,20 @@ function sendCommand(update) {
 						});
 					}, 2000);
 				} else {
+					window.onbeforeunload = null;
+					str = "";
+					if (winner_is_me == 0) {
+						str = "You lose!";
+					} else if (winner_is_me == 1) {
+						str = "You win!";
+					} else {
+						str = "Draw!";
+					}
+
+					alert(str + " You'll be redirected to the Play page.");
 					setTimeout(function () {
-						alert("The game has ended. You'll be redirected to the Play page.");
-						window.onbeforeunload = null;
 						window.location = "http://localhost:5000/play";
-					}, 2000);
+					}, 1500);
 				}
 			}
 		});
