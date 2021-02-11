@@ -1,8 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+import os
 
-engine = create_engine('sqlite:///C:\\TUES\\Github\\TUES\\Chess Website\\chess.db', convert_unicode=True)
+engine = create_engine(os.getenv('CHESS_DATABASE'), convert_unicode=True)
 
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,

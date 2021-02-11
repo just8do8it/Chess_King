@@ -17,7 +17,9 @@ app = get_app()
 def quit_game():
     game = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id,
                                                 GameT.b_player == current_user.id)).first()
-    
+    if game == None:
+        return abort(404)
+
     game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
     if game_details.is_active:
         user_stats = db_session.query(userStats).filter_by(user_id = current_user.id).first()
