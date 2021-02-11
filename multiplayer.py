@@ -11,11 +11,6 @@ import auth, game_base
 
 app = get_app()
 
-def get_random_string(length):
-    letters = string.ascii_letters
-    result_str = ''.join(random.choice(letters) for i in range(length))
-    return result_str
-
 @app.route("/get_in_game", methods=['GET'])
 def get_in_game():
     games = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id, 

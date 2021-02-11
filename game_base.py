@@ -158,7 +158,7 @@ def chess(game_id):
         
         db_session.commit()
         variables = dict(board=name_board,
-                        all_figures=py_game.special_figures,
+                        all_figures=py_game.all_figures,
                         w_won_figures=w_won_figs,
                         b_won_figures=b_won_figs,
                         my_turn=my_turn,
