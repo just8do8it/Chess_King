@@ -102,12 +102,7 @@ def chess(game_id):
         my_turn = None
         curr_game = db_session.query(GameT).filter_by(id = game_id).first()
         
-        stats = db_session.query(userStats).filter_by(user_id = current_user.id).first()
-        stats_games = []
-        if stats.played_games != "":
-            stats_games = ast.literal_eval(stats.played_games)
-        
-        if is_moved and game_id not in stats_games:
+        if is_moved:
             details_query.update({"moves": str(commands)})
             winner = None
             if py_game.ended == 1:
