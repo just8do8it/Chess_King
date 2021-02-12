@@ -26,7 +26,7 @@ def playroom():
 
 @app.route('/end_waiting', methods=['POST'])
 def end_waiting():
-    current_user.is_waiting= False
+    current_user.is_waiting = False
     db_session.commit()
     return "OK"
 
