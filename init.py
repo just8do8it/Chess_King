@@ -1,14 +1,12 @@
 from flask import Flask, jsonify, request, render_template, session
 from flask_login import LoginManager
 from flask_session import Session
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData, Table, Column, Integer, String, MetaData
 from database import init_db
 import os, string, random
 
 login_manager = LoginManager()
 app = Flask(__name__)
-#db = SQLAlchemy(app)
 
 def create_app():
     app.secret_key = 'Str0ng_Super_Secret_Key'
