@@ -41,7 +41,8 @@ def get_in_game():
 
 @app.route("/get_online_players", methods=['GET'])
 def get_online_players():
-    user = db_session.query(User).filter(User.is_waiting== True)
+    user = db_session.query(User).filter(User.is_waiting == True)
+    aborting = 0
     if user.count() >= 1:
         first_user = current_user
         second_user = user.first()
@@ -53,27 +54,26 @@ def get_online_players():
             for game in created_games:        
                 game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
                 if game_details.is_active:
-                    current_user.is_waiting= 1
-                    db_session.commit()
-                    return abort(405)
+                    aborting = 1
         
-        game_id = get_random_string(7)
-        gameT = GameT(game_id, first_user.id, second_user.id)
-        db_session.add(gameT)
-        game_details = gameDetails(game_id)
-        db_session.add(game_details)
+        if not aborting:
+            game_id = get_random_string(7)
+            gameT = GameT(game_id, first_user.id, second_user.id)
+            db_session.add(gameT)
+            game_details = gameDetails(game_id)
+            db_session.add(game_details)
 
-        first_user.is_waiting = False
-        first_user.is_playing = True
-        
-        second_user.is_waiting = False
-        second_user.is_playing = True
+            first_user.is_waiting = False
+            first_user.is_playing = True
+            
+            second_user.is_waiting = False
+            second_user.is_playing = True
 
-        db_session.commit()
+            db_session.commit()
 
-        variables = dict(game_id=game_id)
-        return variables
-    else:
-        current_user.is_waiting= 1
-        db_session.commit()
-        return abort(405)
+            variables = dict(game_id=game_id)
+            return variables
+    
+    current_user.is_waiting = 1
+    db_session.commit()
+    return abort(405)
