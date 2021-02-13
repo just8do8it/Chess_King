@@ -82,14 +82,14 @@ def tournament_matchmaking():
                 db_session.commit()
                 return "OK"
         else:
+            games = db_session.query(GameT).filter_by(tournament_id = tournament.id).all()
+
             if tournament.final == "":
                 finalists = []
-                games = db_session.query(GameT).all()
                 for game in games:
-                    if game.tournament_id == tournament.id:
-                        game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
-                        if game_details.winner != None:
-                            finalists.append(game_details.winner)
+                    game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
+                    if game_details.winner != None:
+                        finalists.append(game_details.winner)
 
                 if len(finalists) < 2:
                     return abort(409)
@@ -108,12 +108,11 @@ def tournament_matchmaking():
 
             elif tournament.winner == None:
                 finalists = ast.literal_eval(tournament.final)
-
-                games = db_session.query(GameT).all()
+                
                 for game in games:
-                    if game.tournament_id == tournament.id and \
-                        (finalists[0] == game.w_player or finalists[0] == game.b_player) and \
+                    if (finalists[0] == game.w_player or finalists[0] == game.b_player) and \
                         (finalists[1] == game.w_player or finalists[1] == game.b_player):
+
                         game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
                         if game_details.winner != None:
                             tournament.winner = game_details.winner
@@ -123,9 +122,10 @@ def tournament_matchmaking():
                             return variable
                         else:
                             return abort(409)
+
             # elif tournament.winner != None:
             #     winner = db_session.query(User).filter_by(id = tournament.winner).first()
             #     variable = dict(winner="The winner is " + winner.username + "!")
             #     return variable
-
+    
     return abort(409)
