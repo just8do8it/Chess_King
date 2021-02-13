@@ -55,6 +55,7 @@ def get_online_players():
                 game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
                 if game_details.is_active:
                     aborting = 1
+                    break
         
         if not aborting:
             game_id = get_random_string(7)
