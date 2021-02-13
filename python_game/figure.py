@@ -26,6 +26,7 @@ class Figure:
 				
 				# Checking if the figure that is about to call the move() method is one 
 				# of the current player's figures (if it is then we skip it)
+				
 				for fig in figures:
 					if fig.curr_pos_num == num + 1 and fig.curr_pos_ltr == ord(ltr):
 						skip = 1
@@ -34,9 +35,6 @@ class Figure:
 					continue
 				
 				result = self.move(num + 1, ltr, 1)
-
-				# if self.name == "Q1" and self.player == "black":
-				# 	print(print(num + 1, ltr, result))
 
 				if result == True:
 					self.movable_positions.append((num + 1, ltr))

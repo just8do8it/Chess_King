@@ -12,6 +12,7 @@ waitForOpponent();
 refreshMessages();
 
 window.onbeforeunload = function() {
+	quit_game();
 	return "OK";
 };
 
