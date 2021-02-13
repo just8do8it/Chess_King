@@ -27,7 +27,7 @@ def tournament_end_waiting():
 
 
 @app.route('/tournament_getting_players', methods=['GET'])
-def tournament():
+def tournament_getting_players():
     tour_query = db_session.query(Tournament)
     tournaments = tour_query.all()
     curr_tour = None
@@ -35,6 +35,7 @@ def tournament():
         for tournament in tournaments:
             if tournament.semi_final == "":
                 curr_tour = tournament
+                break
             else:
                 if tournament.winner == None:
                     if tournament.final != "":
@@ -45,7 +46,6 @@ def tournament():
                             return abort(409)
                 
     if tournaments == None or curr_tour == None:
-        print(len(tournaments))
         tournament = Tournament()
         db_session.add(tournament)
 
@@ -56,7 +56,7 @@ def tournament():
         if len(waiting) > 7:
             return abort(409)
     
-    current_user.is_waiting= 1
+    current_user.is_waiting = 1
     waiting.append(current_user.id)
     tournament.waiting_users = str(waiting)
     db_session.commit()
