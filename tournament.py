@@ -44,6 +44,9 @@ def tournament_getting_players():
                     elif tournament.semi_final != "":
                         if current_user.id in ast.literal_eval(tournament.semi_final):
                             return abort(409)
+                    elif tournament.quarter_final != "":
+                        if current_user.id in ast.literal_eval(tournament.quarter_final):
+                            return abort(409)
                 
     if tournaments == None or curr_tour == None:
         tournament = Tournament()
@@ -69,8 +72,8 @@ def tournament_matchmaking():
     for tournament in tournaments:
         if tournament.waiting_users != "":
             waiting = ast.literal_eval(tournament.waiting_users)
-            if len(waiting) == 4:
-                for i in range(0, 4, 2):
+            if len(waiting) == 8:
+                for i in range(0, 8, 2):
                     game_id = get_random_string(7)
                     gameT = GameT(game_id, waiting[i], waiting[i + 1], tournament.id)
                     db_session.add(gameT)
@@ -78,20 +81,51 @@ def tournament_matchmaking():
                     db_session.add(game_details)
 
                 tournament.waiting_users = ""
-                tournament.semi_final = str(waiting)
+                tournament.quarter_final = str(waiting)
                 db_session.commit()
                 return "OK"
         else:
             games = db_session.query(GameT).filter_by(tournament_id = tournament.id).all()
-
-            if tournament.final == "":
-                finalists = []
+            
+            if tournament.semi_final == "":
+                semi_finalists = []
                 for game in games:
                     game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
                     if game_details.winner != None:
-                        finalists.append(game_details.winner)
+                        semi_finalists.append(game_details.winner)
+
+                if len(semi_finalists) < 4:
+                    return abort(409)
+                
+                for i in range(0, 4, 2):
+                    game_id = get_random_string(7)
+                    player_one = db_session.query(User).filter_by(id = semi_finalists[i]).first()
+                    player_two = db_session.query(User).filter_by(id = semi_finalists[i + 1]).first()
+                    gameT = GameT(game_id, player_one.id, player_two.id, tournament.id)
+                    db_session.add(gameT)
+                    game_details = gameDetails(game_id)
+                    db_session.add(game_details)
+                
+                tournament.semi_final = str(semi_finalists)
+                db_session.commit()
+                return "OK"
+            
+            elif tournament.final == "":
+                semi_finalists = ast.literal_eval(tournament.semi_final)
+                winners = []
+                finalists = []
+                for game in games:
+                    game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
+                    if game_details.winner in semi_finalists:
+                        winners.append(game_details.winner)
+
+                for winner in winners:
+                    num_of_games = db_session.query(gameDetails).filter_by(winner = winner).count()
+                    if num_of_games > 1 and winner not in finalists:
+                        finalists.append(winner)
 
                 if len(finalists) < 2:
+                    # print(finalists)
                     return abort(409)
                 
                 game_id = get_random_string(7)

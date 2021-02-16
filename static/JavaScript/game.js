@@ -195,6 +195,7 @@ function sendCommand(update) {
 						str = "You lose!";
 					} else if (winner_is_me == 1) {
 						str = "You win!";
+						alert("You win! Wait to get matched for the next game.");
 						setInterval(function() {
 							document.getElementById("waiting").style.display = "inline";
 							fetch('/get_in_game', {
@@ -205,11 +206,15 @@ function sendCommand(update) {
 								}
 							}).then(function (response) {
 								response.json().then(function(data) {
-									console.log(data);
-									alert(str + " Proceed to the next game.");
-									localStorage.setItem("game_ended", 0);
-									localStorage.setItem("final", 1);
-									window.location = "http://localhost:5000/game/" + data['game_id'];
+									if (localStorage.getItem("game_ended") == "1") {
+										console.log(data);
+										alert(str + " Proceed to the next game.");
+										localStorage.setItem("game_ended", 0);
+										localStorage.setItem("final", 1);
+										setTimeout(function () {
+											window.location = "http://localhost:5000/game/" + data['game_id'];
+										}, 2000);
+									}
 								}).catch(function() {
 									console.log("error");
 								});
@@ -223,7 +228,7 @@ function sendCommand(update) {
 						alert(str + " You'll be redirected to the Play page.");
 						setTimeout(function () {
 							window.location = "http://localhost:5000/play";
-						}, 2000);
+						}, 1500);
 					}
 				} else {
 					window.onbeforeunload = null;
