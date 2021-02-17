@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, render_template, redirect, url_for, \
             abort, redirect, url_for, session
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from flask_api import status
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -55,7 +55,7 @@ def login_session():
                 user_stats = userStats(user.id)
                 db_session.add(user_stats)
             session.permanent = True
-            app.permanent_session_lifetime = datetime.timedelta(days=5)
+            app.permanent_session_lifetime = timedelta(days=5)
             session.modified = True
             login_user(user, remember=True)
             user.is_logged = True
