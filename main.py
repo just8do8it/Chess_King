@@ -1,8 +1,7 @@
 from python_game.game import Game
 from init import create_app
-from flask import Flask, jsonify, request, render_template, abort, session, redirect, url_for
+from flask import Flask, jsonify, request, render_template, abort, redirect, url_for
 from flask_login import login_required, current_user
-from flask_session import Session
 from sqlalchemy import or_, and_, update, delete, insert
 from database import db_session
 from models import User, GameT, gameDetails, userStats, Tournament, Message
