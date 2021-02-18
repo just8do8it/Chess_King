@@ -55,9 +55,9 @@ def chess(game_id):
     if request.method == "GET":
         game = db_session.query(GameT).filter_by(id = game_id).first()
         if current_user.id == game.w_player:
-            return render_template("game.html")
+            return render_template("game.html", html_page="game.html")
         else:
-            return render_template("b_game.html")
+            return render_template("b_game.html", html_page="b_game.html")
     else:
         py_game = Game([], [], None)       
         variables = {}

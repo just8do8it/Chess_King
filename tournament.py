@@ -148,11 +148,8 @@ def start_final(tournament, games):
         
         if num_of_games > 1 and winner not in finalists:
             finalists.append(winner)
-        
-        print(winner, " | ", num_of_games)
 
     if len(finalists) < 2:
-        # print(finalists)
         return abort(409)
     
     game_id = get_random_string(7)

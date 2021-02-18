@@ -25,9 +25,9 @@ class Game:
 
 		all_figures = []
 		for x in w_figures:
-			all_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
+			all_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player, x.is_alive])
 		for x in b_figures:
-			all_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
+			all_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player, x.is_alive])
 
 		w_player = Player("white", w_figures)
 		b_player = Player("black", b_figures)
@@ -259,11 +259,9 @@ class Game:
 
 			self.all_figures = []
 			for x in self.w_player.figures:
-				if (x.is_alive == 1):
-					self.all_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
+				self.all_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player, x.is_alive])
 			for x in self.b_player.figures:
-				if (x.is_alive == 1):
-					self.all_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
+				self.all_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player, x.is_alive])
 
 			self.chess_board.counter += 1
 		return is_moved

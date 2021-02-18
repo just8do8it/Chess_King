@@ -28,11 +28,31 @@ input {
     left: 2.5%;
 }
 
+#htmlPage {
+    display: none;
+}
+
+#yourWonFigures {
+    position: absolute;
+    font-size: 2em;
+    top: 10%;
+    right: 4%;
+    padding: 1.5%;
+}
+
+#opponentsWonFigures {
+    position: absolute;
+    font-size: 2em;
+    top: 30%;
+    right: 1%;
+    padding: 1.5%;
+}
+
 #waiting {
     display: none;
     position: absolute;
     font-size: 2em;
-    top: 45%;
+    top: 55%;
     right: 2%;
     padding: 1.5%;
 }
