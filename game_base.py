@@ -76,19 +76,9 @@ def chess(game_id):
         if command != "update":
             commands.append(command)
         # print(commands)
-        is_moved = py_game.run(commands)        
-
-        w_won_figs = []
-        b_won_figs = []
+        is_moved = py_game.run(commands)
 
         name_board = [{}, {}, {}, {}, {}, {}, {}, {}]
-        
-        
-        for fig in py_game.w_player.won_figures:
-            w_won_figs.append(fig.name)
-
-        for fig in py_game.b_player.won_figures:
-            b_won_figs.append(fig.name)
         
         counter = 0
         for line in py_game.chess_board.board:
@@ -151,13 +141,14 @@ def chess(game_id):
                 if py_game.curr_player.color == "white":
                     if current_user.id == curr_game.b_player:
                         my_turn = 0
+
+        taken_figures = py_game.w_player.won_figures + py_game.b_player.won_figures
         
         db_session.commit()
-        variables = dict(board=name_board,
-                        all_figures=py_game.all_figures,
-                        w_won_figures=w_won_figs,
-                        b_won_figures=b_won_figs,
-                        my_turn=my_turn,
-                        winner_is_me=winner_is_me)
+        variables = dict(board = name_board,
+                        alive_figures = py_game.alive_figures,
+                        taken_figures = taken_figures,
+                        my_turn = my_turn,
+                        winner_is_me = winner_is_me)
 
         return variables

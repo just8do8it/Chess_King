@@ -43,7 +43,7 @@ input {
 #opponentsWonFigures {
     position: absolute;
     font-size: 2em;
-    top: 30%;
+    top: 40%;
     right: 1%;
     padding: 1.5%;
 }
@@ -52,7 +52,7 @@ input {
     display: none;
     position: absolute;
     font-size: 2em;
-    top: 55%;
+    top: 70%;
     right: 2%;
     padding: 1.5%;
 }

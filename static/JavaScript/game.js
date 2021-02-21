@@ -4,7 +4,7 @@ var destinationId = "";
 var prevColor = "";
 var command = "";
 var board = [];
-var all_figures, w_won_figures, b_won_figures, my_turn, winner_is_me, can_move = 1, game_ended = 0, stop = 0;
+var alive_figures, taken_figures, my_turn, winner_is_me, can_move = 1, game_ended = 0, stop = 0;
 localStorage.setItem("game_ended", 0);
 localStorage.setItem("waiting", 0);
 localStorage.setItem("final", 0);
@@ -148,12 +148,12 @@ function sendCommand(update) {
 			console.log(data);
 
 			board = data["board"];
-			all_figures = data["all_figures"];
-			w_won_figures = data["w_won_figures"];
-			b_won_figures = data["b_won_figures"];
+			alive_figures = data["alive_figures"];
+			taken_figures = data['taken_figures'];
 			my_turn = data['my_turn'];
 			winner_is_me = data['winner_is_me'];
-			changeHTML();
+			updateTakenFigures();
+			updateBoard();
 
 			if(my_turn == 1) {
 				can_move = 1;
@@ -162,7 +162,7 @@ function sendCommand(update) {
 				can_move = 0;
 				document.getElementById("turn").style.left = "100%";
 				document.getElementById("turn").innerHTML = "Opponent's turn";
-			} else if (my_turn == -1) {
+			} else if (my_turn < 0) {
 				game_ended = 1;
 			}
 
@@ -256,8 +256,11 @@ function sendCommand(update) {
 	});
 }
 
+function updateTakenFigures() {
+	if (taken_figures.length == 0) {
+		return
+	}
 
-function changeHTML() {
 	var myColor = "";
 	var page = document.getElementById("htmlPage").innerHTML;
 	if (page == "game.html") {
@@ -266,9 +269,105 @@ function changeHTML() {
 		myColor = "black";
 	}
 
-	document.getElementById("yourWonFigures").innerHTML = "Your won figures:<br>";
-	document.getElementById("opponentsWonFigures").innerHTML = "Opponent's won figures:<br>";
+	document.getElementById("yourWonFigures").innerHTML = "Your won figures:<br><br>";
+	document.getElementById("opponentsWonFigures").innerHTML = "Opponent's won figures:<br><br>";
+	var currFig, black, w_first = 0, w_second = 0, b_first = 0, b_second = 0;
+	
+	for (var j = 0; j < taken_figures.length; ++j) {
+		newline = 0;
+		currFig = taken_figures[j];
+		black = 0;
+		if (currFig[3] == "black") {
+			black = 1;
+		}
 
+		var special_id = "";
+		if (black) {
+			if (myColor == "white") {
+				w_first++;
+				special_id = "yourWonFigures";
+			} else {
+				w_second++;
+				special_id = "opponentsWonFigures";
+			}
+		} else {
+			if (myColor == "black") {
+				b_first++;
+				special_id = "yourWonFigures";
+			} else {
+				b_second++;
+				special_id = "opponentsWonFigures";
+			}
+		}
+
+
+		if ((w_first % 7 == 0 && w_first > 0) || 
+			(w_second % 7 == 0 && w_second > 0) || 
+			(b_first % 7 == 0 && b_first > 0) || 
+			(b_second % 7 == 0 && b_second > 0)) {
+				newline = 1;
+		}
+
+		addTakenFigure(black, currFig[0], special_id, newline);
+	}
+}
+
+
+function addTakenFigure(black, figure, special_id, newline) {
+	if (figure == "R1" || figure == "R2") {
+		if (black) {
+			document.getElementById(special_id).innerHTML += "&#9820; ";
+		} else {
+			document.getElementById(special_id).innerHTML += "&#9814; ";
+		}
+	} 
+
+	else if (figure == "H1" || figure == "H2") {
+		if (black) {
+			document.getElementById(special_id).innerHTML += "&#9822; ";
+		} else {
+			document.getElementById(special_id).innerHTML += "&#9816; ";
+		}
+	} 
+
+	else if (figure == "B1" || figure == "B2") {
+		if (black) {
+			document.getElementById(special_id).innerHTML += "&#9821; ";
+		} else {
+			document.getElementById(special_id).innerHTML += "&#9815; ";
+		}
+	} 
+
+	else if (figure == "Q1") {
+		if (black) {
+			document.getElementById(special_id).innerHTML += "&#9819; ";
+		} else {
+			document.getElementById(special_id).innerHTML += "&#9813; ";
+		}
+	}
+
+	else if (figure == "K1") {
+		if (black) {
+			document.getElementById(special_id).innerHTML += "&#9818; ";
+		} else {
+			document.getElementById(special_id).innerHTML += "&#9812; ";
+		}
+	}
+
+	else if (figure[0] == "P") {
+		if (black) {
+			document.getElementById(special_id).innerHTML += "&#9823; ";
+		} else {
+			document.getElementById(special_id).innerHTML += "&#9817; ";
+		}
+	}
+
+	if (newline) {
+		document.getElementById(special_id).innerHTML += "<br>";
+	}
+}
+
+function updateBoard() {
 	for (var i = 0; i < 8; i++) {
 		var currLine = board[i];
 
@@ -279,55 +378,31 @@ function changeHTML() {
 			}
 
 			var currFig;
-			var special_id = "";
-			var black = 0, taken = 0;
+			var black = 0;
 
-			for (var j = 0; j < all_figures.length; ++j) {
-				currFig = all_figures[j];
+			for (var j = 0; j < alive_figures.length; ++j) {
+				currFig = alive_figures[j];
 
 				if (String.fromCharCode(currFig[0]) == key && currFig[1] == (i + 1)) {
 					if (currFig[2] == "black") {
 						black = 1;
 					}
-					if (currFig[3] == 0) {
-						taken = 1;
-						if (black) {
-							if (myColor == "white") {
-								special_id = "yourWonFigures";
-							} else {
-								special_id = "opponentsWonFigures";
-							}
-						} else {
-							if (myColor == "black") {
-								special_id = "yourWonFigures";
-							} else {
-								special_id = "opponentsWonFigures";
-							}
-						}
-					}
-					determineFigure(black, taken, currLine, key, special_id, i);
+
+					determineFigure(black, currLine, key, i);
 				}
 			}
 		}
 	}
 }
 
-function determineFigure(black, taken, currLine, key, special_id, i) {
+function determineFigure(black, currLine, key, i) {
 	var figure = currLine[key];
 
 	if (figure == "R1" || figure == "R2") {
-		if (taken) {
-			if (black) {
-				document.getElementById(special_id).innerHTML += "&#9820; ";
-			} else {
-				document.getElementById(special_id).innerHTML += "&#9814; ";
-			}
-		} else {
-			if (black)
-				document.getElementById(key + String(i + 1)).innerHTML = "&#9820;";
-			else
-				document.getElementById(key + String(i + 1)).innerHTML = "&#9814;";
-		}
+		if (black)
+			document.getElementById(key + String(i + 1)).innerHTML = "&#9820;";
+		else
+			document.getElementById(key + String(i + 1)).innerHTML = "&#9814;";
 	} 
 
 	else if (figure == "H1" || figure == "H2") {
@@ -359,17 +434,10 @@ function determineFigure(black, taken, currLine, key, special_id, i) {
 	}
 
 	else if (figure[0] == "P") {
-		if (taken) {
-			if (black) {
-				document.getElementById(special_id).innerHTML += "&#9823; ";
-			} else {
-				document.getElementById(special_id).innerHTML += "&#9817; ";
-			}
-		} else {
-			if (black)
-				document.getElementById(key + String(i + 1)).innerHTML = "&#9823;";
-			else
-				document.getElementById(key + String(i + 1)).innerHTML = "&#9817;";
-		}
+		if (black)
+			document.getElementById(key + String(i + 1)).innerHTML = "&#9823;";
+		else
+			document.getElementById(key + String(i + 1)).innerHTML = "&#9817;";
 	}
 }
+

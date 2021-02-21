@@ -23,11 +23,11 @@ class Game:
 		
 		chess_board.change_board(w_figures, b_figures)
 
-		all_figures = []
+		alive_figures = []
 		for x in w_figures:
-			all_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player, x.is_alive])
+			alive_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
 		for x in b_figures:
-			all_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player, x.is_alive])
+			alive_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
 
 		w_player = Player("white", w_figures)
 		b_player = Player("black", b_figures)
@@ -37,7 +37,7 @@ class Game:
 		self.b_player = b_player
 		self.curr_player = None
 		self.next_positions = next_positions
-		self.all_figures = all_figures
+		self.alive_figures = alive_figures
 		self.ok = ok
 		self.passed = passed
 		self.w_check = 0
@@ -229,17 +229,21 @@ class Game:
 
 					if self.curr_player.color == "white":
 						for fig in self.b_player.figures:
+							fig_details = [fig.name, fig.curr_pos_ltr, fig.curr_pos_num, fig.player]
 							if fig.curr_pos_num == taken_figure_num and \
-								fig.curr_pos_ltr == taken_figure_ltr:
+								fig.curr_pos_ltr == taken_figure_ltr and \
+								fig_details not in self.w_player.won_figures:
 									fig.is_alive = 0
-									self.w_player.won_figures.append(fig)
+									self.w_player.won_figures.append(fig_details)
 									killed = 1
 					else:
 						for fig in self.w_player.figures:
+							fig_details = [fig.name, fig.curr_pos_ltr, fig.curr_pos_num, fig.player]
 							if fig.curr_pos_num == taken_figure_num and \
-									fig.curr_pos_ltr == taken_figure_ltr:
+								fig.curr_pos_ltr == taken_figure_ltr and \
+								fig_details not in self.b_player.won_figures:
 									fig.is_alive = 0
-									self.b_player.won_figures.append(fig)
+									self.b_player.won_figures.append(fig_details)
 									killed = 1
 					if killed == 0:
 						for figure in self.curr_player.figures:
@@ -257,13 +261,16 @@ class Game:
 			if self.ok == 0 or self.passed == 0:
 				continue
 
-			self.all_figures = []
+			self.alive_figures = []
 			for x in self.w_player.figures:
-				self.all_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player, x.is_alive])
+				if x.is_alive:
+					self.alive_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
 			for x in self.b_player.figures:
-				self.all_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player, x.is_alive])
+				if x.is_alive:
+					self.alive_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
 
 			self.chess_board.counter += 1
+
 		return is_moved
 			
 # game = Game([], [], None)
