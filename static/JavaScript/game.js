@@ -263,7 +263,7 @@ function updateTakenFigures() {
 
 	var myColor = "";
 	var page = document.getElementById("htmlPage").innerHTML;
-	if (page == "game.html") {
+	if (page == "whites_game.html") {
 		myColor = "white";
 	} else {
 		myColor = "black";

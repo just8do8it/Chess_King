@@ -81,9 +81,9 @@ def replay(game_id):
     if request.method == "GET":
         game = db_session.query(GameT).filter_by(id = game_id).first()
         if current_user.id == game.w_player:
-            return render_template("replay.html")
+            return render_template("whites_replay.html")
         else:
-            return render_template("b_replay.html")
+            return render_template("blacks_replay.html")
     else:
         game = db_session.query(GameT).filter_by(id = game_id).first()
         w_player = db_session.query(User).filter_by(id = game.w_player).first().username

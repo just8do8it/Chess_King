@@ -64,7 +64,7 @@ function updateTakenFigures() {
 
 	var myColor = "";
 	var page = document.getElementById("htmlPage").innerHTML;
-	if (page == "replay.html") {
+	if (page == "whites_replay.html") {
 		myColor = "white";
 	} else {
 		myColor = "black";
