@@ -1,10 +1,3 @@
-body {
-    background-color: #c49dff !important;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-}
-
 #chatButton {
     position: absolute;
     bottom: 61%;
@@ -29,10 +22,6 @@ input {
     left: 2.5%;
 }
 
-#htmlPage {
-    display: none;
-}
-
 #yourWonFigures {
     position: absolute;
     font-size: 2em;
@@ -44,7 +33,7 @@ input {
 #opponentsWonFigures {
     position: absolute;
     font-size: 2em;
-    top: 40%;
+    top: 30%;
     right: 1%;
     padding: 1.5%;
 }
@@ -53,64 +42,9 @@ input {
     display: none;
     position: absolute;
     font-size: 2em;
-    top: 70%;
+    top: 65%;
     right: 2%;
     padding: 1.5%;
-}
-
-.chessboard {
-    border-radius: 2em;
-    border-color: black;
-    width: 48%;
-    height: 5.2em;
-    margin: auto;
-    cursor: pointer;
-    display: grid;
-    grid-template-columns: repeat(9, 1fr);
-    grid-template-rows: repeat(9, 1fr);
-}
-
-.number {
-    font-size: 1.5em;
-    margin: auto;
-    margin-right: 30%;
-    font-weight: bold;
-}
-
-.letter {
-    display: inline;
-    vertical-align: middle;
-    font-size: 1.5em;
-    margin: auto;
-    margin-top: 20%;
-    font-weight: bold;
-    height: inherit;
-}
-
-.black {
-    height: inherit;
-    background-color: #999;
-    font-size: 4em;
-    text-align: center;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.white {
-    height: inherit;
-    background-color: #fff;
-    font-size: 4em;
-    text-align: center;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.black:hover {
-	background-color: #5c5c5c;
-}
-
-.white:hover {
-	background-color: #5c5c5c;
 }
 
 #turn {

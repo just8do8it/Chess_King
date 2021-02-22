@@ -79,7 +79,11 @@ def profile():
 @app.route('/replay/<string:game_id>', methods=['GET', 'POST'])
 def replay(game_id):
     if request.method == "GET":
-        return render_template("replay.html")
+        game = db_session.query(GameT).filter_by(id = game_id).first()
+        if current_user.id == game.w_player:
+            return render_template("replay.html")
+        else:
+            return render_template("b_replay.html")
     else:
         game = db_session.query(GameT).filter_by(id = game_id).first()
         w_player = db_session.query(User).filter_by(id = game.w_player).first().username
@@ -125,13 +129,14 @@ def replay(game_id):
                 name_board[counter][key] = line[key].name
             counter += 1
 
-        variables = dict(board=name_board,
-                        all_figures=py_game.alive_figures,
-                        w_won_figures=w_won_figs,
-                        b_won_figures=b_won_figs,
-                        move_counter=move_counter,
-                        w_player=w_player,
-                        b_player=b_player)
+        taken_figures = py_game.w_player.won_figures + py_game.b_player.won_figures
+
+        variables = dict(board = name_board,
+                        alive_figures = py_game.alive_figures,
+                        taken_figures = taken_figures,
+                        move_counter = move_counter,
+                        w_player = w_player,
+                        b_player = b_player)
 
         return variables
 

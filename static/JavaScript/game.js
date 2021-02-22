@@ -269,8 +269,8 @@ function updateTakenFigures() {
 		myColor = "black";
 	}
 
-	document.getElementById("yourWonFigures").innerHTML = "Your won figures:<br><br>";
-	document.getElementById("opponentsWonFigures").innerHTML = "Opponent's won figures:<br><br>";
+	document.getElementById("yourWonFigures").innerHTML = "Your won figures:<br>";
+	document.getElementById("opponentsWonFigures").innerHTML = "Opponent's won figures:<br>";
 	var currFig, black, w_first = 0, w_second = 0, b_first = 0, b_second = 0;
 	
 	for (var j = 0; j < taken_figures.length; ++j) {

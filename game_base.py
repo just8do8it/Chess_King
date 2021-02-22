@@ -162,8 +162,6 @@ def update_win_rate():
 
     game_ids = ast.literal_eval(stats.played_games)
     game_count = len(game_ids)
-    game_desc = []
-    game_dates = []
     game_endings = []
     win_count = 0
     draw_count = 0
