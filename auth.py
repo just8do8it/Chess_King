@@ -23,6 +23,18 @@ def sign_up():
         return redirect(url_for('home'))
     return render_template('signUp.html')
 
+@app.route('/signupDB', methods=['POST'])
+def signup_session():
+    username = request.form.get('username')
+    password = request.form.get('password')
+    if db_session.query(User).filter_by(username = username).count() == 0:
+        user = User(username, generate_password_hash(password, method='sha256'))
+        db_session.add(user)
+        db_session.commit()
+        return "OK"
+    
+    return abort(409)
+
 @app.route('/login')
 def login():
     if current_user.is_authenticated:
@@ -64,17 +76,6 @@ def logout_session():
     logout_user()
     return "OK"
 
-@app.route('/signupDB', methods=['POST'])
-def signup_session():
-    username = request.form.get('username')
-    password = request.form.get('password')
-    if db_session.query(User).filter_by(username = username).count() == 0:
-        user = User(username, generate_password_hash(password, method='sha256'))
-        db_session.add(user)
-        db_session.commit()
-        return "OK"
-    
-    return abort(409)
 
 @login_manager.unauthorized_handler
 def unauthorized():
