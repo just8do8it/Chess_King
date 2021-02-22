@@ -124,6 +124,8 @@ def chess(game_id):
                 else:
                     winner_is_me = 2
                     details_query.update({"is_active": False, "winner": -1})
+                
+                update_win_rate()
                     
             else:
                 if py_game.curr_player.color == "black":
@@ -152,3 +154,33 @@ def chess(game_id):
                         winner_is_me = winner_is_me)
 
         return variables
+
+
+def update_win_rate():
+    stats_query = db_session.query(userStats).filter_by(user_id = current_user.id)
+    stats = stats_query.first()
+
+    game_ids = ast.literal_eval(stats.played_games)
+    game_count = len(game_ids)
+    game_desc = []
+    game_dates = []
+    game_endings = []
+    win_count = 0
+    draw_count = 0
+    
+    if game_count > 0:
+        for id in game_ids:
+            details = db_session.query(gameDetails).filter_by(game_id = id).first()
+            
+            if details.winner == current_user.id:
+                game_endings.append("win")
+                win_count += 1
+            elif details.winner == "draw":
+                draw_count += 1
+    
+    win_rate = (win_count + (0.5 * draw_count)) / len(game_ids) * 100
+    
+    win_rate = float("{:.2f}".format(win_rate))
+
+    stats_query.update({"win_rate": win_rate})
+    db_session.commit()

@@ -43,8 +43,6 @@ def profile():
     game_desc = []
     game_dates = []
     game_endings = []
-    win_count = 0
-    draw_count = 0
     
     if game_count > 0:
         for id in game_ids:
@@ -61,21 +59,13 @@ def profile():
 
             details = db_session.query(gameDetails).filter_by(game_id = id).first()
             game_dates.append(str(details.start_date))
+
             if details.winner == current_user.id:
                 game_endings.append("win")
-                win_count += 1
             elif details.winner == "draw":
                 game_endings.append("draw")
-                draw_count += 1
             else:
                 game_endings.append("loss")
-    
-    win_rate = (win_count + (0.5 * draw_count)) / len(game_ids) * 100
-    
-    win_rate = float("{:.2f}".format(win_rate))
-
-    stats_query.update({"win_rate": win_rate})
-    db_session.commit()
     
     return render_template('profile.html', username=current_user.username,
                                             game_count=game_count,
@@ -83,7 +73,7 @@ def profile():
                                             games=game_desc,
                                             game_dates=game_dates,
                                             game_endings=game_endings,
-                                            win_rate=win_rate)
+                                            win_rate=stats.win_rate)
 
 
 @app.route('/replay/<string:game_id>', methods=['GET', 'POST'])
@@ -121,10 +111,10 @@ def replay(game_id):
         
         
         for fig in py_game.w_player.won_figures:
-            w_won_figs.append(fig.name)
+            w_won_figs.append(fig[0])
 
         for fig in py_game.b_player.won_figures:
-            b_won_figs.append(fig.name)
+            b_won_figs.append(fig[0])
         
         counter = 0
         for line in py_game.chess_board.board:
@@ -136,7 +126,7 @@ def replay(game_id):
             counter += 1
 
         variables = dict(board=name_board,
-                        all_figures=py_game.all_figures,
+                        all_figures=py_game.alive_figures,
                         w_won_figures=w_won_figs,
                         b_won_figures=b_won_figs,
                         move_counter=move_counter,
