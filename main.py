@@ -16,19 +16,27 @@ def shutdown_session(exception=None):
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    button = "Login"
+    url = "http://localhost:5000/login"
+    if current_user.is_authenticated:
+        button = "Logout"
+        url = "http://localhost:5000/logout"
+    return render_template('home.html', url = url, button = button)
 
 @app.route('/play')
+@login_required
 def playroom():
     return render_template('play.html')
 
 @app.route('/end_waiting', methods=['POST'])
+@login_required
 def end_waiting():
     current_user.is_waiting = False
     db_session.commit()
     return "OK"
 
-@app.route('/profile')                   
+@app.route('/profile')
+@login_required                
 def profile():
     stats_query = db_session.query(userStats).filter_by(user_id = current_user.id)
     stats = stats_query.first()
@@ -77,6 +85,7 @@ def profile():
 
 
 @app.route('/replay/<string:game_id>', methods=['GET', 'POST'])
+@login_required
 def replay(game_id):
     if request.method == "GET":
         game = db_session.query(GameT).filter_by(id = game_id).first()

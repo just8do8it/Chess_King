@@ -30,11 +30,10 @@
 <p style="font-size: 30px;">Games played: {{game_count}}</p>
 <p style="font-size: 30px;">Win rate: {{win_rate}}%</p> <br>
 <p style="font-size: 30px;"><strong>Game history</strong></p>
+
 {% for i in range(game_count) %}
     <br><li id="game"><a class="game" href="/replay/{{game_ids[i]}}">{{game_dates[i]}} - {{ games[i] }} ({{game_endings[i]}})</a></li>
 {% endfor %}
-
-<script src="../static/JavaScript/islogged.js"></script>
 
 </body>
 </html>

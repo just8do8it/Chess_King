@@ -11,6 +11,7 @@ import auth, game_base
 app = get_app()
 
 @app.route("/get_in_game", methods=['GET'])
+@login_required
 def get_in_game():
     games = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id, 
                                             GameT.b_player == current_user.id)).all()
@@ -40,6 +41,7 @@ def get_in_game():
 
 
 @app.route("/get_online_players", methods=['GET'])
+@login_required
 def get_online_players():
     user = db_session.query(User).filter(User.is_waiting == True)
     aborting = 0

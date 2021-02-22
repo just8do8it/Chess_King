@@ -11,6 +11,7 @@ import auth, game_base
 app = get_app()
 
 @app.route('/tournament_end_waiting', methods=['POST'])
+@login_required
 def tournament_end_waiting():
     tour_query = db_session.query(Tournament)
     tournaments = tour_query.all()
@@ -27,6 +28,7 @@ def tournament_end_waiting():
 
 
 @app.route('/tournament_getting_players', methods=['GET'])
+@login_required
 def tournament_getting_players():
     tour_query = db_session.query(Tournament)
     tournaments = tour_query.all()
@@ -67,6 +69,7 @@ def tournament_getting_players():
     
     
 @app.route("/tournament_matchmaking", methods=['GET'])
+@login_required
 def tournament_matchmaking():
     tournaments = db_session.query(Tournament).all()
     for tournament in tournaments:

@@ -35,7 +35,7 @@ function chatTrigger() {
 function quit_game(){
 	$.ajax({
 		url: '/quit_game',
-        type: 'POST',
+		type: 'POST',
 		success: function(response){
 			console.log(response);
 		},
@@ -43,6 +43,7 @@ function quit_game(){
 			console.log(error);
 		}
 	});
+	localStorage.setItem("waiting", 0);
 };
 
 function clicked(clicked_id) {

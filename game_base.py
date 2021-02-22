@@ -13,6 +13,7 @@ import auth
 app = get_app()
 
 @app.route('/quit_game', methods=['POST'])
+@login_required
 def quit_game():
     game = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id,
                                                 GameT.b_player == current_user.id)).first()
@@ -32,6 +33,7 @@ def quit_game():
 
 
 @app.route('/game/<string:game_id>/messages', methods=['GET', 'POST'])
+@login_required
 def message(game_id):
     if request.method == "GET":
         chat = []
@@ -51,6 +53,7 @@ def message(game_id):
     return "OK"
 
 @app.route('/game/<string:game_id>', methods=['GET', 'POST'])
+@login_required
 def chess(game_id):
     if request.method == "GET":
         game = db_session.query(GameT).filter_by(id = game_id).first()
