@@ -2,6 +2,7 @@ body {
     background-color: #c49dff !important;
     margin: 0;
     padding: 0;
+    overflow: hidden;
 }
 
 #chatButton {
@@ -60,30 +61,47 @@ input {
 .chessboard {
     border-radius: 2em;
     border-color: black;
-    width: 50%;
-    height: 50%;
+    width: 48%;
+    height: 5.2em;
     margin: auto;
     cursor: pointer;
     display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(8, 1fr);
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(9, 1fr);
+}
+
+.number {
+    font-size: 1.5em;
+    margin: auto;
+    margin-right: 30%;
+    font-weight: bold;
+}
+
+.letter {
+    display: inline;
+    vertical-align: middle;
+    font-size: 1.5em;
+    margin: auto;
+    margin-top: 20%;
+    font-weight: bold;
+    height: inherit;
 }
 
 .black {
-    float: left;
+    height: inherit;
     background-color: #999;
     font-size: 4em;
     text-align: center;
-    display: table-cell;
+    display: inline-block;
     vertical-align: middle;
 }
 
 .white {
-    float: left;
+    height: inherit;
     background-color: #fff;
     font-size: 4em;
     text-align: center;
-    display: table-cell;
+    display: inline-block;
     vertical-align: middle;
 }
 
