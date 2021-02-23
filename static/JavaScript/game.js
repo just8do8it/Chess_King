@@ -247,7 +247,7 @@ function sendCommand(update) {
 
 					alert(str + " You'll be redirected to the Play page.");
 					setTimeout(function () {
-						window.location = "http://localhost:5000/play";
+						//window.location = "http://localhost:5000/play";
 					}, 1500);
 				}
 			}

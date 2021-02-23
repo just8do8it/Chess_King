@@ -95,11 +95,8 @@ class Game:
 
 		return w_figures, b_figures
 
-	def win_condition_check(self):
-		check = 0
-		mate = 0
-		max_pos = 0
 
+	def determine_check(self, curr_player, opponent, board, check):
 		for fig in self.curr_player.figures:
 			if fig.name == "K1":
 				for fig_positions in self.opponent.next_positions:
@@ -108,6 +105,16 @@ class Game:
 							check += 1
 							break
 				break
+		
+		return check
+
+
+	def win_condition_check(self):
+		check = 0
+		mate = 0
+		max_pos = 0
+
+		check = self.determine_check(self.curr_player, self.opponent, self.chess_board, 0)
 			
 		for fig in self.curr_player.figures:
 			if fig.name == "K1":
@@ -119,39 +126,81 @@ class Game:
 								mate += 1
 
 		############################################################
+		if check and mate:
+			curr_player_copy = copy.deepcopy(self.curr_player)
+			opponent_copy = copy.deepcopy(self.opponent)
 
-		curr_player_copy = copy.deepcopy(self.curr_player)
-		opponent_copy = copy.deepcopy(self.opponent)
+			for fig in curr_player_copy.figures:
+				for pos in fig.movable_positions:
+					board_copy = copy.deepcopy(self.chess_board)
+					opponent_copy.next_positions.clear()
 
-		for fig in curr_player_copy.figures:
-			for pos in fig.movable_positions:
-				board_copy = copy.deepcopy(self.chess_board)
-				opponent_copy.next_positions.clear()
+					for opponent_fig in opponent_copy.figures:
+						opponent_fig.update_movable_positions(opponent_copy.figures)
+						opponent_copy.next_positions.append(opponent_fig.movable_positions)
 
-				for fig in opponent_copy.figures:
-					fig.update_movable_positions(opponent_copy.figures)
-					opponent_copy.next_positions.append(fig.movable_positions)
+					source_fig = board_copy.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)]
+					
 
-				source_fig = board_copy.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)]
-				# print(source_fig.move(pos[0], pos[1], 0))
-				board_copy.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)] = None
-				board_copy.board[pos[0] - 1][pos[1]] = source_fig
-				
-				special_check = 0
+					source_fig.move(pos[0], pos[1], 0)
 
-				for fig in curr_player_copy.figures:
-					if fig.name == "K1":
-						for fig_positions in opponent_copy.next_positions:
-							for f_pos in fig_positions:
-								if fig.curr_pos_num == f_pos[0] and chr(fig.curr_pos_ltr) == f_pos[1]:
-									special_check += 1
-									break
-						break
+					# for opponent_fig in opponent_copy.figures:
+					# 	opponent_fig.update_movable_positions(opponent_copy.figures)
+					# 	opponent_copy.next_positions.append(opponent_fig.movable_positions)
+					# 	if opponent_fig.name == "Q1":
+					# 		print(opponent_fig.movable_positions)
+					
+					# for line in board_copy.board:
+					# 	for key in line:
+					# 		opponent_fig = line[key]
+					# 		if opponent_fig != None:
+					# 			if opponent_fig.player == opponent_copy.color:
+					# 				opponent_fig.update_movable_positions(opponent_copy.figures)
+					# 				if opponent_fig.name == "Q1":
+					# 					print(opponent_fig.movable_positions)
 
-				# print("Special check: ", special_check, "  Check: ", check)
-				
-				if special_check < check:
-					mate -= 1
+					board_copy.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)] = None
+					board_copy.board[pos[0] - 1][pos[1]] = source_fig
+					
+					# if fig.name == "P7":
+					# 	for line in board_copy.board:
+					# 		for key in line:
+					# 			print(key)
+					# 			if line[key] != None:
+					# 				print(line[key].name)
+					# 			print("\n")
+					
+					special_check = 0
+					# special_check = self.determine_check(curr_player_copy, opponent_copy, board_copy, 0)
+					for line in board_copy.board:
+						for key in line:
+							figure = line[key]
+							if figure != None:
+								if figure.player == curr_player_copy.color:
+									if figure.name == "K1":
+										king = figure
+										for line in board_copy.board:
+											for key in line:
+												opponent_fig = line[key]
+												if opponent_fig != None:
+													if opponent_fig.player == opponent_copy.color:
+														opponent_fig.update_movable_positions(opponent_copy.figures)
+														for f_pos in opponent_fig.movable_positions:
+															if king.curr_pos_num == f_pos[0] and chr(king.curr_pos_ltr) == f_pos[1]:
+																print("Черна овца")
+																special_check += 1
+																break
+															else:
+																if source_fig.name == "P4":
+																	print(opponent_fig.movable_positions)
+																# print(source_fig.name, source_fig.curr_pos_num, chr(source_fig.curr_pos_ltr))
+																# print(source_fig.name, source_fig.curr_pos_num, chr(source_fig.curr_pos_ltr))
+													break
+					
+					print("Special check: ", special_check, "Check: ", check, "Mate: ", mate)
+					if special_check < check:
+						if mate != 0:
+							mate -= 1
 
 		############################################################
 
