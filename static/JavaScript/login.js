@@ -1,4 +1,5 @@
-function login(){
+function login(event){
+	event.preventDefault();
 	var username = $('#inputUsername').val();
 	$.ajax({
 		url: '/loginDB',
@@ -7,14 +8,12 @@ function login(){
 		success: function(response){
 			localStorage.setItem("username", username);
 			window.location = "http://localhost:5000/";
-			// $('#login').attr("href", "http://localhost:5000/logout");
-			// document.getElementById('login').innerHTML = "Logout";
 			alert("Welcome, " + username + "!");
 			console.log(response);
 			location.reload();
 		},
 		error: function(error){
-			console.log(error);
+			alert("Wrong credentials, try again.");
 		}
 	});
 }

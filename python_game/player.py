@@ -3,3 +3,4 @@ class Player:
 		self.color = color
 		self.figures = figures
 		self.won_figures = []
+		self.next_positions = []

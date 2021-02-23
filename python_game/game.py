@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, copy
 sys.path.append(os.getenv('PYTHON_GAME'))
 import pdb
 import subprocess
@@ -14,8 +14,7 @@ class Game:
 		chess_board = ChessBoard()
 		ok = 1
 		passed = -1
-		next_positions = []
-		
+
 		if w_figs == [] and b_figs == [] and board == None:
 			w_figures, b_figures = self.generate_figures(chess_board)
 		else:
@@ -36,7 +35,7 @@ class Game:
 		self.w_player = w_player
 		self.b_player = b_player
 		self.curr_player = None
-		self.next_positions = next_positions
+		self.opponent = None
 		self.alive_figures = alive_figures
 		self.ok = ok
 		self.passed = passed
@@ -103,20 +102,58 @@ class Game:
 
 		for fig in self.curr_player.figures:
 			if fig.name == "K1":
-				for fig_positions in self.next_positions:
+				for fig_positions in self.opponent.next_positions:
 					for f_pos in fig_positions:
 						if fig.curr_pos_num == f_pos[0] and chr(fig.curr_pos_ltr) == f_pos[1]:
-							check = check + 1
+							check += 1
 							break
+				break
 			
 		for fig in self.curr_player.figures:
 			if fig.name == "K1":
 				max_pos = len(fig.movable_positions)
 				for king_move in fig.movable_positions:
-					for fig_positions in self.next_positions:
+					for fig_positions in self.opponent.next_positions:
 						for f_pos in fig_positions:
 							if king_move[0] == f_pos[0] and king_move[1] == f_pos[1]:
-								mate = mate + 1
+								mate += 1
+
+		############################################################
+
+		curr_player_copy = copy.deepcopy(self.curr_player)
+		opponent_copy = copy.deepcopy(self.opponent)
+
+		for fig in curr_player_copy.figures:
+			for pos in fig.movable_positions:
+				board_copy = copy.deepcopy(self.chess_board)
+				opponent_copy.next_positions.clear()
+
+				for fig in opponent_copy.figures:
+					fig.update_movable_positions(opponent_copy.figures)
+					opponent_copy.next_positions.append(fig.movable_positions)
+
+				source_fig = board_copy.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)]
+				# print(source_fig.move(pos[0], pos[1], 0))
+				board_copy.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)] = None
+				board_copy.board[pos[0] - 1][pos[1]] = source_fig
+				
+				special_check = 0
+
+				for fig in curr_player_copy.figures:
+					if fig.name == "K1":
+						for fig_positions in opponent_copy.next_positions:
+							for f_pos in fig_positions:
+								if fig.curr_pos_num == f_pos[0] and chr(fig.curr_pos_ltr) == f_pos[1]:
+									special_check += 1
+									break
+						break
+
+				# print("Special check: ", special_check, "  Check: ", check)
+				
+				if special_check < check:
+					mate -= 1
+
+		############################################################
 
 		if check != 0:
 			if mate == max_pos:
@@ -140,12 +177,10 @@ class Game:
 				self.draw = 1
 				self.ended = 1
 
-
 	def run(self, external_commands):
 		command_counter = 0
 		is_moved = None
 		while(1):
-			self.next_positions.clear()
 			self.curr_player = Player("", [])
 			command = ""
 			if command_counter == len(external_commands) - 1:
@@ -159,16 +194,17 @@ class Game:
 			if self.chess_board.counter % 2 == 0:
 				#print("\nBlack's turn\n\n")
 				self.curr_player = self.b_player
-				for fig in self.w_player.figures:
-					fig.update_movable_positions(self.w_player.figures)
-					self.next_positions.append(fig.movable_positions)
+				self.opponent = self.w_player
 			else:
 				#print("\nWhite's turn\n\n")
 				self.curr_player = self.w_player
-				for fig in self.b_player.figures:
-					fig.update_movable_positions(self.b_player.figures)
-					self.next_positions.append(fig.movable_positions)
+				self.opponent = self.b_player
 
+			self.opponent.next_positions.clear()
+			
+			for fig in self.opponent.figures:
+				fig.update_movable_positions(self.opponent.figures)
+				self.opponent.next_positions.append(fig.movable_positions)
 			
 			self.win_condition_check()
 
@@ -227,24 +263,15 @@ class Game:
 					
 					killed = 0
 
-					if self.curr_player.color == "white":
-						for fig in self.b_player.figures:
-							fig_details = [fig.name, fig.curr_pos_ltr, fig.curr_pos_num, fig.player]
-							if fig.curr_pos_num == taken_figure_num and \
-								fig.curr_pos_ltr == taken_figure_ltr and \
-								fig_details not in self.w_player.won_figures:
-									fig.is_alive = 0
-									self.w_player.won_figures.append(fig_details)
-									killed = 1
-					else:
-						for fig in self.w_player.figures:
-							fig_details = [fig.name, fig.curr_pos_ltr, fig.curr_pos_num, fig.player]
-							if fig.curr_pos_num == taken_figure_num and \
-								fig.curr_pos_ltr == taken_figure_ltr and \
-								fig_details not in self.b_player.won_figures:
-									fig.is_alive = 0
-									self.b_player.won_figures.append(fig_details)
-									killed = 1
+					for fig in self.opponent.figures:
+						fig_details = [fig.name, fig.curr_pos_ltr, fig.curr_pos_num, fig.player]
+						if fig.curr_pos_num == taken_figure_num and \
+							fig.curr_pos_ltr == taken_figure_ltr and \
+							fig_details not in self.curr_player.won_figures:
+								fig.is_alive = 0
+								self.curr_player.won_figures.append(fig_details)
+								killed = 1
+					
 					if killed == 0:
 						for figure in self.curr_player.figures:
 							if source_fig.name == figure.name:

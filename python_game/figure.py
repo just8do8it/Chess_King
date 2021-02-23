@@ -24,9 +24,6 @@ class Figure:
 			for ltr in letters:
 				skip = 0
 				
-				# Checking if the figure that is about to call the move() method is one 
-				# of the current player's figures (if it is then we skip it)
-				
 				for fig in figures:
 					if fig.curr_pos_num == num + 1 and fig.curr_pos_ltr == ord(ltr):
 						skip = 1
@@ -42,7 +39,7 @@ class Figure:
 
 	def move(self, new_pos_num, new_pos_ltr, test):
 		new_ltr = ord(new_pos_ltr)
-
+		
 		if self.name == "P1" or self.name == "P2" or \
 			self.name == "P3" or self.name == "P4" or \
 			self.name == "P5" or self.name == "P6" or \
