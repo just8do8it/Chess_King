@@ -34,6 +34,7 @@ class Game:
 		self.chess_board = chess_board
 		self.w_player = w_player
 		self.b_player = b_player
+		self.command_counter = None
 		self.curr_player = None
 		self.opponent = None
 		self.alive_figures = alive_figures
@@ -47,66 +48,21 @@ class Game:
 		self.ended = 0
 
 	def generate_figures(self, chess_board):
-		b_figure_1 = Figure("R1", chess_board.board, 'A', 8, "black")
-		b_figure_2 = Figure("H1", chess_board.board, 'B', 8, "black")
-		b_figure_3 = Figure("B1", chess_board.board, 'C', 8, "black")
-		b_figure_4 = Figure("Q1", chess_board.board, 'D', 8, "black")
-		b_figure_5 = Figure("K1", chess_board.board, 'E', 8, "black")
-		b_figure_6 = Figure("B2", chess_board.board, 'F', 8, "black")
-		b_figure_7 = Figure("H2", chess_board.board, 'G', 8, "black")
-		b_figure_8 = Figure("R2", chess_board.board, 'H', 8, "black")
-		b_figure_9 = Figure("P1", chess_board.board, 'A', 7, "black")
-		b_figure_10 = Figure("P2", chess_board.board, 'B', 7, "black")
-		b_figure_11 = Figure("P3", chess_board.board, 'C', 7, "black")
-		b_figure_12 = Figure("P4", chess_board.board, 'D', 7, "black")
-		b_figure_13 = Figure("P5", chess_board.board, 'E', 7, "black")
-		b_figure_14 = Figure("P6", chess_board.board, 'F', 7, "black")
-		b_figure_15 = Figure("P7", chess_board.board, 'G', 7, "black")
-		b_figure_16 = Figure("P8", chess_board.board, 'H', 7, "black")
+		w_figures = []
+		b_figures = []
+		
+		names = ["R1", "H1", "B1", "Q1", "K1", "B2", "H2", "R2"]
 
-		w_figure_1 = Figure("R1", chess_board.board, 'A', 1, "white")
-		w_figure_2 = Figure("H1", chess_board.board, 'B', 1, "white")
-		w_figure_3 = Figure("B1", chess_board.board, 'C', 1, "white")
-		w_figure_4 = Figure("Q1", chess_board.board, 'D', 1, "white")
-		w_figure_5 = Figure("K1", chess_board.board, 'E', 1, "white")
-		w_figure_6 = Figure("B2", chess_board.board, 'F', 1, "white")
-		w_figure_7 = Figure("H2", chess_board.board, 'G', 1, "white")
-		w_figure_8 = Figure("R2", chess_board.board, 'H', 1, "white")
-		w_figure_9 = Figure("P1", chess_board.board, 'A', 2, "white")
-		w_figure_10 = Figure("P2", chess_board.board, 'B', 2, "white")
-		w_figure_11 = Figure("P3", chess_board.board, 'C', 2, "white")
-		w_figure_12 = Figure("P4", chess_board.board, 'D', 2, "white")
-		w_figure_13 = Figure("P5", chess_board.board, 'E', 2, "white")
-		w_figure_14 = Figure("P6", chess_board.board, 'F', 2, "white")
-		w_figure_15 = Figure("P7", chess_board.board, 'G', 2, "white")
-		w_figure_16 = Figure("P8", chess_board.board, 'H', 2, "white")
+		for i in range(8):
+			w_figures.append(Figure(names[i], chess_board.board, chr(ord('A') + i), 1, "white"))
+			b_figures.append(Figure(names[i], chess_board.board, chr(ord('A') + i), 8, "black"))
 
-		w_figures = [w_figure_1, w_figure_2, w_figure_3,
-					w_figure_4, w_figure_5, w_figure_6, 
-					w_figure_7, w_figure_8, w_figure_9, 
-					w_figure_10, w_figure_11, w_figure_12, 
-					w_figure_13, w_figure_14, w_figure_15, w_figure_16]
-
-		b_figures = [b_figure_1, b_figure_2, b_figure_3,
-					b_figure_4, b_figure_5, b_figure_6,
-					b_figure_7, b_figure_8, b_figure_9,
-					b_figure_10, b_figure_11, b_figure_12,
-					b_figure_13, b_figure_14, b_figure_15, b_figure_16]
+		for i in range(8):
+			w_figures.append(Figure("P" + str(i + 1), chess_board.board, chr(ord('A') + i), 2, "white"))
+			b_figures.append(Figure("P" + str(i + 1), chess_board.board, chr(ord('A') + i), 7, "black"))
+			
 
 		return w_figures, b_figures
-
-
-	def determine_check(self, curr_player, opponent, board, check):
-		for fig in self.curr_player.figures:
-			if fig.name == "K1":
-				for fig_positions in self.opponent.next_positions:
-					for f_pos in fig_positions:
-						if fig.curr_pos_num == f_pos[0] and chr(fig.curr_pos_ltr) == f_pos[1]:
-							check += 1
-							break
-				break
-		
-		return check
 
 	def make_board_copy(self, curr_player_copy):
 		board_copy = copy.deepcopy(self.chess_board)
@@ -125,23 +81,37 @@ class Game:
 		return board_copy, curr_figures, opponent_figures
 
 	
-	def win_condition_check(self):
+	def win_condition_check(self, command_passed):
 		check = 0
 		mate = 0
 		max_pos = 0
-
-		check = self.determine_check(self.curr_player, self.opponent, self.chess_board, 0)
+		
+		
+		for fig in self.curr_player.figures:
+			if fig.name == "K1":
+				for fig_positions in self.opponent.next_positions:
+					for f_pos in fig_positions:
+						if fig.curr_pos_num == f_pos[0] and chr(fig.curr_pos_ltr) == f_pos[1]:
+							check += 1
+							break
+				break
 			
 		for fig in self.curr_player.figures:
 			if fig.name == "K1":
 				max_pos = len(fig.movable_positions)
+				# print(fig.movable_positions)
 				for king_move in fig.movable_positions:
 					for fig_positions in self.opponent.next_positions:
 						for f_pos in fig_positions:
 							if king_move[0] == f_pos[0] and king_move[1] == f_pos[1]:
 								mate += 1
 
-		############################################################
+		# if self.command_counter == 5:
+		# 	print(self.curr_player.color)
+		# 	print(check, mate)
+		# 	self.chess_board.print_board()
+		
+			############################################################
 		if check and mate:
 			curr_player_copy = copy.deepcopy(self.curr_player)
 
@@ -160,14 +130,6 @@ class Game:
 					board_copy.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)] = None
 					board_copy.board[pos[0] - 1][pos[1]] = source_fig
 					
-					# if fig.name == "P7":
-					# 	for line in board_copy.board:
-					# 		for key in line:
-					# 			print(key)
-					# 			if line[key] != None:
-					# 				print(line[key].name)
-					# 			print("\n")
-					
 					special_check = 0
 
 					for figure in curr_figures:
@@ -179,29 +141,26 @@ class Game:
 									if king.curr_pos_num == f_pos[0] and chr(king.curr_pos_ltr) == f_pos[1]:
 										special_check += 1
 										break
-									else:
-										if source_fig.name == "P4":
-											pass
-											# print(opponent_fig.name, "\n", opponent_fig.movable_positions, "\n")
-										# print(source_fig.name, source_fig.curr_pos_num, chr(source_fig.curr_pos_ltr))
-										# print(source_fig.name, source_fig.curr_pos_num, chr(source_fig.curr_pos_ltr))
-								break
-					
-					print("Special check: ", special_check, "Check: ", check, "Mate: ", mate)
+							break
+
 					if special_check < check:
-						if mate != 0:
-							mate -= 1
+						mate = 0
 
 		############################################################
-
 		if check != 0:
 			if mate == max_pos:
 				if self.curr_player == self.w_player:
-					print("CHECKMATE")
-					self.w_checkmate = 1
+					if command_passed:
+						self.b_checkmate = 1
+					else:
+						self.w_checkmate = 1
 					self.ended = 1
 				else:
-					self.b_checkmate = 1
+					if command_passed:
+						self.w_checkmate = 1
+					else:
+						print("CHECKMATE")
+						self.b_checkmate = 1
 					self.ended = 1
 			else:
 				if self.curr_player == self.w_player:
@@ -216,21 +175,23 @@ class Game:
 			if mate == max_pos and mate != 0:
 				self.draw = 1
 				self.ended = 1
+		
+		# print("in win check")
 
 	def run(self, external_commands):
-		command_counter = 0
+		self.command_counter = 0
 		is_moved = None
 		while(1):
 			self.curr_player = Player("", [])
 			command = ""
-			if command_counter == len(external_commands) - 1:
+			if self.command_counter == len(external_commands) - 1:
 				is_moved = 0
 
 			if self.ok == 0 or self.passed == 0:
 				# print("Not a valid command. Try again\n")
 				self.ok = 1
 			self.passed = 0
-
+			
 			if self.chess_board.counter % 2 == 0:
 				#print("\nBlack's turn\n\n")
 				self.curr_player = self.b_player
@@ -242,17 +203,20 @@ class Game:
 
 			self.opponent.next_positions.clear()
 			
+			for fig in self.curr_player.figures:
+				fig.update_movable_positions(self.opponent.figures)
+				self.curr_player.next_positions.append(fig.movable_positions)
 			for fig in self.opponent.figures:
 				fig.update_movable_positions(self.opponent.figures)
 				self.opponent.next_positions.append(fig.movable_positions)
 			
-			self.win_condition_check()
+			self.win_condition_check(0)
 
-			if command_counter < len(external_commands):
-				command = external_commands[command_counter]
+			if self.command_counter < len(external_commands):
+				command = external_commands[self.command_counter]
 				if command == "exit":
 					break
-				command_counter += 1
+				self.command_counter += 1
 			# else:
 			# 	command = input("Enter a command: ")
 			else:
@@ -288,7 +252,6 @@ class Game:
 			if source_fig.player == self.curr_player.color:
 				true = True
 				result = source_fig.move(dest_number, dest_letter, 0)
-
 				if type(result) == type(true):
 					if source_fig.is_alive == 1 and result == True:
 						self.chess_board.board[src_number - 1][src_letter] = None
@@ -327,9 +290,10 @@ class Game:
 			
 			if self.ok == 0 or self.passed == 0:
 				continue
+			else:
+				self.win_condition_check(1)
+				
 			
-			self.win_condition_check()
-
 			self.alive_figures = []
 			for x in self.w_player.figures:
 				if x.is_alive:
@@ -339,7 +303,7 @@ class Game:
 					self.alive_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
 
 			self.chess_board.counter += 1
-
+			
 		return is_moved
 			
 # game = Game([], [], None)

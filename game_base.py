@@ -7,7 +7,7 @@ from flask_session import Session
 from sqlalchemy import or_, and_, update, delete, insert
 from database import db_session
 from models import User, GameT, gameDetails, userStats, Tournament, Message
-import os, ast, models, pdb, string, random
+import os, ast, models, pdb, string, random, time
 import auth
 
 app = get_app()
