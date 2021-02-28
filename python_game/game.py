@@ -35,6 +35,7 @@ class Game:
 		self.w_player = w_player
 		self.b_player = b_player
 		self.command_counter = None
+		self.is_moved = None
 		self.curr_player = None
 		self.opponent = None
 		self.alive_figures = alive_figures
@@ -64,8 +65,7 @@ class Game:
 
 		return w_figures, b_figures
 
-	def make_board_copy(self, curr_player_copy):
-		board_copy = copy.deepcopy(self.chess_board)
+	def make_board_copy(self, curr_player_copy, board_copy):
 		curr_figures = []
 		opponent_figures = []
 
@@ -78,57 +78,76 @@ class Game:
 					else:
 						opponent_figures.append(figure)
 		
-		return board_copy, curr_figures, opponent_figures
+		return curr_figures, opponent_figures
 
 	
-	def win_condition_check(self, command_passed):
+	def win_condition_check(self, command_passed, chess_board_copy, curr_figures, curr_player_copy, opponent_copy):
 		check = 0
 		mate = 0
 		max_pos = 0
+		curr_player_copy.next_positions.clear()
+		opponent_copy.next_positions.clear()
+
+		for fig in curr_player_copy.figures:
+			fig.update_movable_positions(chess_board_copy.board)
+			print("\n\nCurr_player: ", fig.name, fig.movable_positions)
+			curr_player_copy.next_positions.append(fig.movable_positions)
 		
+		for fig in opponent_copy.figures:
+			fig.update_movable_positions(chess_board_copy.board)
+			print("\n\nOpponent: ", fig.name, fig.movable_positions)
+			opponent_copy.next_positions.append(fig.movable_positions)
+
 		
-		for fig in self.curr_player.figures:
+		for fig in curr_figures:
 			if fig.name == "K1":
-				for fig_positions in self.opponent.next_positions:
+				fig.update_movable_positions(chess_board_copy.board)
+				for fig_positions in opponent_copy.next_positions:
 					for f_pos in fig_positions:
 						if fig.curr_pos_num == f_pos[0] and chr(fig.curr_pos_ltr) == f_pos[1]:
 							check += 1
 							break
 				break
 			
-		for fig in self.curr_player.figures:
+		
+		for fig in curr_figures:
 			if fig.name == "K1":
+				fig.update_movable_positions(chess_board_copy.board)
+				print(fig.movable_positions)
 				max_pos = len(fig.movable_positions)
-				# print(fig.movable_positions)
 				for king_move in fig.movable_positions:
-					for fig_positions in self.opponent.next_positions:
+					for fig_positions in opponent_copy.next_positions:
 						for f_pos in fig_positions:
 							if king_move[0] == f_pos[0] and king_move[1] == f_pos[1]:
 								mate += 1
-
-		# if self.command_counter == 5:
-		# 	print(self.curr_player.color)
-		# 	print(check, mate)
-		# 	self.chess_board.print_board()
+				break
 		
-			############################################################
-		if check and mate:
-			curr_player_copy = copy.deepcopy(self.curr_player)
+		
+		print(check, mate, max_pos)
 
-			board_copy, curr_figures, opponent_figures = self.make_board_copy(curr_player_copy)
+		if not command_passed and check:
+			self.ended = -1
+		else:
+			if self.ended == -1:
+				if check or (check and mate == max_pos):
+					self.is_moved = 0
+					self.ended = 0
+
+		if check and mate:
+			curr_figures, opponent_figures = self.make_board_copy(curr_player_copy, chess_board_copy)
 			
 			for fig in curr_figures:
 				for pos in fig.movable_positions:
-					board_copy, curr_figures, opponent_figures = self.make_board_copy(curr_player_copy)
+					curr_figures, opponent_figures = self.make_board_copy(curr_player_copy, chess_board_copy)
 
 					for figure in opponent_figures:
-						figure.update_movable_positions(opponent_figures)
+						figure.update_movable_positions(chess_board_copy.board)
 
-					source_fig = board_copy.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)]
+					source_fig = chess_board_copy.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)]
 					source_fig.move(pos[0], pos[1], 0)
 
-					board_copy.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)] = None
-					board_copy.board[pos[0] - 1][pos[1]] = source_fig
+					chess_board_copy.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)] = None
+					chess_board_copy.board[pos[0] - 1][pos[1]] = source_fig
 					
 					special_check = 0
 
@@ -136,31 +155,23 @@ class Game:
 						if figure.name == "K1":
 							king = figure
 							for opponent_fig in opponent_figures:
-								opponent_fig.update_movable_positions(opponent_figures)
+								opponent_fig.update_movable_positions(chess_board_copy.board)
 								for f_pos in opponent_fig.movable_positions:
 									if king.curr_pos_num == f_pos[0] and chr(king.curr_pos_ltr) == f_pos[1]:
 										special_check += 1
 										break
 							break
-
+					print("Special: ", special_check, " Check", check)
 					if special_check < check:
 						mate = 0
-
-		############################################################
+		
 		if check != 0:
-			if mate == max_pos:
+			if mate == max_pos and mate != 0:
 				if self.curr_player == self.w_player:
-					if command_passed:
-						self.b_checkmate = 1
-					else:
-						self.w_checkmate = 1
+					self.w_checkmate = 1
 					self.ended = 1
 				else:
-					if command_passed:
-						self.w_checkmate = 1
-					else:
-						print("CHECKMATE")
-						self.b_checkmate = 1
+					self.b_checkmate = 1
 					self.ended = 1
 			else:
 				if self.curr_player == self.w_player:
@@ -176,52 +187,43 @@ class Game:
 				self.draw = 1
 				self.ended = 1
 		
-		# print("in win check")
 
 	def run(self, external_commands):
 		self.command_counter = 0
-		is_moved = None
+		self.is_moved = None
 		while(1):
-			self.curr_player = Player("", [])
-			command = ""
-			if self.command_counter == len(external_commands) - 1:
-				is_moved = 0
-
 			if self.ok == 0 or self.passed == 0:
 				# print("Not a valid command. Try again\n")
 				self.ok = 1
 			self.passed = 0
+
+			self.curr_player = Player("", [])
+			command = ""
+			if self.command_counter == len(external_commands) - 1:
+				self.is_moved = 0
 			
 			if self.chess_board.counter % 2 == 0:
-				#print("\nBlack's turn\n\n")
 				self.curr_player = self.b_player
 				self.opponent = self.w_player
 			else:
-				#print("\nWhite's turn\n\n")
 				self.curr_player = self.w_player
 				self.opponent = self.b_player
-
-			self.opponent.next_positions.clear()
 			
-			for fig in self.curr_player.figures:
-				fig.update_movable_positions(self.opponent.figures)
-				self.curr_player.next_positions.append(fig.movable_positions)
-			for fig in self.opponent.figures:
-				fig.update_movable_positions(self.opponent.figures)
-				self.opponent.next_positions.append(fig.movable_positions)
-			
-			self.win_condition_check(0)
-
 			if self.command_counter < len(external_commands):
 				command = external_commands[self.command_counter]
 				if command == "exit":
 					break
-				self.command_counter += 1
-			# else:
-			# 	command = input("Enter a command: ")
 			else:
+				self.win_condition_check(0, copy.deepcopy(self.chess_board), 
+											copy.deepcopy(self.curr_player.figures),
+											copy.deepcopy(self.curr_player), 
+											copy.deepcopy(self.opponent))
 				break
-
+			
+			self.win_condition_check(0, copy.deepcopy(self.chess_board), 
+											copy.deepcopy(self.curr_player.figures),
+											copy.deepcopy(self.curr_player), 
+											copy.deepcopy(self.opponent))
 			if len(command) != 5:
 				self.ok = 0
 				continue
@@ -257,7 +259,7 @@ class Game:
 						self.chess_board.board[src_number - 1][src_letter] = None
 						self.chess_board.board[dest_number - 1][dest_letter] = source_fig
 						self.passed = 1
-						is_moved = 1
+						self.is_moved = 1
 					else:
 						self.ok = 0
 				else:
@@ -285,15 +287,16 @@ class Game:
 						self.chess_board.board[src_number - 1][src_letter] = None
 						self.chess_board.board[dest_number - 1][dest_letter] = source_fig
 						self.passed = 1
-						is_moved = 1
+						self.is_moved = 1
 
 			
 			if self.ok == 0 or self.passed == 0:
 				continue
-			else:
-				self.win_condition_check(1)
-				
-			
+			else:				
+				self.win_condition_check(0, copy.deepcopy(self.chess_board), 
+											copy.deepcopy(self.curr_player.figures),
+											copy.deepcopy(self.curr_player), 
+											copy.deepcopy(self.opponent))
 			self.alive_figures = []
 			for x in self.w_player.figures:
 				if x.is_alive:
@@ -303,8 +306,9 @@ class Game:
 					self.alive_figures.append([x.curr_pos_ltr, x.curr_pos_num, x.player])
 
 			self.chess_board.counter += 1
+			self.command_counter += 1
 			
-		return is_moved
+		return self.is_moved
 			
 # game = Game([], [], None)
 # game.run(["E2-E4"])

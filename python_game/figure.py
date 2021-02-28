@@ -13,28 +13,39 @@ class Figure:
 		self.is_alive = 1
 
 
-	def update_movable_positions(self, figures):
+	def update_movable_positions(self, board):
 		self.movable_positions.clear()
 		if self.is_alive == 0:
 			return
-		numbers = [0, 1, 2, 3, 4, 5, 6, 7]
+
+		i = 0
+		num = None
+		ltr = None
 		letters = ["A", "B", "C", "D", "E", "F", "G", "H"]
 
-		for num in numbers:
-			for ltr in letters:
-				skip = 0
-				
-				for fig in figures:
-					if fig.curr_pos_num == num + 1 and fig.curr_pos_ltr == ord(ltr):
-						skip = 1
-				
-				if skip == 1:
-					continue
-				
-				result = self.move(num + 1, ltr, 1)
+		for line in board:
+			z = 0
+			for key in line:
+				figure = line[key]
 
-				if result == True:
-					self.movable_positions.append((num + 1, ltr))
+				if figure == None:
+					num = i + 1
+					ltr = letters[z]
+				else:
+					if figure.player == self.player or figure.is_alive == 0:
+						# if self.name == "P4":
+						# 	print("check")
+						continue
+					num = figure.curr_pos_num
+					ltr = chr(figure.curr_pos_ltr)
+
+				result = self.move(num, ltr, 1)
+				if (type(result) == bool and result == True) or (type(result) != bool and result[0] == True):					
+					self.movable_positions.append((num, ltr))
+				
+				z += 1
+			i += 1
+
 
 
 	def move(self, new_pos_num, new_pos_ltr, test):
@@ -45,7 +56,7 @@ class Figure:
 			self.name == "P5" or self.name == "P6" or \
 			self.name == "P7" or self.name == "P8":
 				return self.move_pawn(new_pos_num, new_pos_ltr, test, new_ltr)
-
+		
 		elif self.name == "R1" or self.name == "R2":
 			return self.move_rook(new_pos_num, new_pos_ltr, test, new_ltr)
 
@@ -67,7 +78,7 @@ class Figure:
 			self.player == "white" and new_ltr == self.curr_pos_ltr and new_pos_num == self.curr_pos_num + 1 or \
 			self.player == "white" and new_ltr == self.curr_pos_ltr + 1 and new_pos_num == self.curr_pos_num + 1 or \
 			self.player == "white" and new_ltr == self.curr_pos_ltr - 1 and new_pos_num == self.curr_pos_num + 1 or \
-			self.player == "black" and self.curr_pos_num == self.start_pos_num and new_pos_num == self.curr_pos_num - 2 or \
+			self.player == "black" and new_ltr == self.curr_pos_ltr and self.curr_pos_num == self.start_pos_num and new_pos_num == self.curr_pos_num - 2 or \
 			self.player == "black" and new_ltr == self.curr_pos_ltr and new_pos_num == self.curr_pos_num - 1 or \
 			self.player == "black" and new_ltr == self.curr_pos_ltr + 1 and new_pos_num == self.curr_pos_num - 1 or \
 			self.player == "black" and new_ltr == self.curr_pos_ltr - 1 and new_pos_num == self.curr_pos_num - 1:
@@ -293,3 +304,32 @@ class Figure:
 			return True, new_pos_num, new_ltr
 		else:
 			return True
+
+
+
+
+
+		# figures = []
+		# for line in board:
+		# 	for key in line:
+		# 		if line[key] != None and line[key].player != self.player:
+		# 			figures.append(line[key])
+		
+		# numbers = [0, 1, 2, 3, 4, 5, 6, 7]
+		# letters = ["A", "B", "C", "D", "E", "F", "G", "H"]		
+
+		# for num in numbers:
+		# 	for ltr in letters:
+		# 		skip = 0
+				
+		# 		for fig in figures:
+		# 			if fig.curr_pos_num == num + 1 and fig.curr_pos_ltr == ord(ltr):
+		# 				skip = 1
+				
+		# 		if skip == 1:
+		# 			continue
+				
+		# 		result = self.move(num + 1, ltr, 1)
+
+		# 		if result == True:
+		# 			self.movable_positions.append((num + 1, ltr))
