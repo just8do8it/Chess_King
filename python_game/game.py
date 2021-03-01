@@ -90,14 +90,10 @@ class Game:
 
 		for fig in curr_player_copy.figures:
 			fig.update_movable_positions(chess_board_copy.board)
-			if self.command_counter == 4:
-				print("\n\nCurr_player: ", fig.name, fig.movable_positions)
 			curr_player_copy.next_positions.append(fig.movable_positions)
 		
 		for fig in opponent_copy.figures:
 			fig.update_movable_positions(chess_board_copy.board)
-			if self.command_counter == 4:
-				print("\n\nOpponent: ", fig.name, fig.movable_positions)
 			opponent_copy.next_positions.append(fig.movable_positions)
 
 		
@@ -115,7 +111,7 @@ class Game:
 		for fig in curr_figures:
 			if fig.name == "K1":
 				fig.update_movable_positions(chess_board_copy.board)
-				print(fig.movable_positions)
+				# print(fig.movable_positions)
 				max_pos = len(fig.movable_positions)
 				for king_move in fig.movable_positions:
 					for fig_positions in opponent_copy.next_positions:
@@ -125,7 +121,7 @@ class Game:
 				break
 		
 		
-		print(check, mate, max_pos)
+		# print(check, mate, max_pos)
 
 		if not command_passed and check:
 			self.ended = -1
@@ -137,19 +133,28 @@ class Game:
 
 		if check and mate:
 			curr_figures, opponent_figures = self.make_board_copy(curr_player_copy, chess_board_copy)
-			
+
 			for fig in curr_figures:
+				fig.update_movable_positions(chess_board_copy.board)
+				curr_player_copy.next_positions.append(fig.movable_positions)
+			
+			for fig in opponent_figures:
+				fig.update_movable_positions(chess_board_copy.board)
+				opponent_copy.next_positions.append(fig.movable_positions)
+
+			final_chess_board = chess_board_copy
+
+			for fig in curr_figures:
+				# print(fig.name, fig.curr_pos_num, chr(fig.curr_pos_ltr))
+				# final_chess_board.print_board()
 				for pos in fig.movable_positions:
-					curr_figures, opponent_figures = self.make_board_copy(curr_player_copy, chess_board_copy)
+					chess_board = copy.deepcopy(final_chess_board)
+					curr_figures, opponent_figures = self.make_board_copy(curr_player_copy, final_chess_board)
 
-					for figure in opponent_figures:
-						figure.update_movable_positions(chess_board_copy.board)
-
-					source_fig = chess_board_copy.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)]
+					source_fig = chess_board.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)]
+					chess_board.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)] = None
+					chess_board.board[pos[0] - 1][pos[1]] = source_fig
 					source_fig.move(pos[0], pos[1], 0)
-
-					chess_board_copy.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)] = None
-					chess_board_copy.board[pos[0] - 1][pos[1]] = source_fig
 					
 					special_check = 0
 
@@ -157,7 +162,7 @@ class Game:
 						if figure.name == "K1":
 							king = figure
 							for opponent_fig in opponent_figures:
-								opponent_fig.update_movable_positions(chess_board_copy.board)
+								opponent_fig.update_movable_positions(chess_board.board)
 								for f_pos in opponent_fig.movable_positions:
 									if king.curr_pos_num == f_pos[0] and chr(king.curr_pos_ltr) == f_pos[1]:
 										special_check += 1
