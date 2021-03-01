@@ -27,14 +27,12 @@ class Figure:
 			z = 0
 			for key in line:
 				figure = line[key]
-
 				if figure == None:
 					num = i + 1
 					ltr = letters[z]
 				else:
-					if figure.player == self.player or figure.is_alive == 0:
-						# if self.name == "P4":
-						# 	print("check")
+					if figure.player == self.player:
+						z += 1
 						continue
 					num = figure.curr_pos_num
 					ltr = chr(figure.curr_pos_ltr)
@@ -49,6 +47,9 @@ class Figure:
 
 
 	def move(self, new_pos_num, new_pos_ltr, test):
+		if self.is_alive == 0:
+			return False
+		
 		new_ltr = ord(new_pos_ltr)
 		
 		if self.name == "P1" or self.name == "P2" or \
@@ -82,7 +83,7 @@ class Figure:
 			self.player == "black" and new_ltr == self.curr_pos_ltr and new_pos_num == self.curr_pos_num - 1 or \
 			self.player == "black" and new_ltr == self.curr_pos_ltr + 1 and new_pos_num == self.curr_pos_num - 1 or \
 			self.player == "black" and new_ltr == self.curr_pos_ltr - 1 and new_pos_num == self.curr_pos_num - 1:
-			
+
 				if new_ltr == self.curr_pos_ltr + 1 or new_ltr == self.curr_pos_ltr - 1:
 					if self.board[new_pos_num - 1][new_pos_ltr] != None:
 						if test == 0:

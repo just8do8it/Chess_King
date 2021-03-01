@@ -90,12 +90,14 @@ class Game:
 
 		for fig in curr_player_copy.figures:
 			fig.update_movable_positions(chess_board_copy.board)
-			print("\n\nCurr_player: ", fig.name, fig.movable_positions)
+			if self.command_counter == 4:
+				print("\n\nCurr_player: ", fig.name, fig.movable_positions)
 			curr_player_copy.next_positions.append(fig.movable_positions)
 		
 		for fig in opponent_copy.figures:
 			fig.update_movable_positions(chess_board_copy.board)
-			print("\n\nOpponent: ", fig.name, fig.movable_positions)
+			if self.command_counter == 4:
+				print("\n\nOpponent: ", fig.name, fig.movable_positions)
 			opponent_copy.next_positions.append(fig.movable_positions)
 
 		
@@ -255,7 +257,7 @@ class Game:
 				true = True
 				result = source_fig.move(dest_number, dest_letter, 0)
 				if type(result) == type(true):
-					if source_fig.is_alive == 1 and result == True:
+					if result == True:
 						self.chess_board.board[src_number - 1][src_letter] = None
 						self.chess_board.board[dest_number - 1][dest_letter] = source_fig
 						self.passed = 1
