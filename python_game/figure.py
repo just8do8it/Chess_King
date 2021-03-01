@@ -95,6 +95,14 @@ class Figure:
 					else:
 						return False
 				else:
+					if new_pos_num == self.curr_pos_num + 2 or new_pos_num == self.curr_pos_num - 2:
+						if self.player == "white":
+							if self.board[new_pos_num - 2][new_pos_ltr] != None:
+								return False
+						else:
+							if self.board[new_pos_num][new_pos_ltr] != None:
+								return False
+
 					if self.board[new_pos_num - 1][new_pos_ltr] == None:
 						if test == 0:
 							self.curr_pos_num = new_pos_num
