@@ -121,7 +121,6 @@ class Game:
 				break
 		
 		
-		# print(check, mate, max_pos)
 
 		if not command_passed and check:
 			self.ended = -1
@@ -145,19 +144,19 @@ class Game:
 			final_chess_board = chess_board_copy
 
 			for fig in curr_figures:
-				# print(fig.name, fig.curr_pos_num, chr(fig.curr_pos_ltr))
-				# final_chess_board.print_board()
 				for pos in fig.movable_positions:
 					chess_board = copy.deepcopy(final_chess_board)
 					curr_figures, opponent_figures = self.make_board_copy(curr_player_copy, final_chess_board)
 
 					source_fig = chess_board.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)]
-					chess_board.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)] = None
-					chess_board.board[pos[0] - 1][pos[1]] = source_fig
-					source_fig.move(pos[0], pos[1], 0)
 					
+					chess_board.board[fig.curr_pos_num - 1][chr(fig.curr_pos_ltr)] = None
+					source_fig.move(pos[0], pos[1], 0)
+					chess_board.board[pos[0] - 1][pos[1]] = source_fig
+					
+					curr_figures, opponent_figures = self.make_board_copy(curr_player_copy, chess_board)
 					special_check = 0
-
+					
 					for figure in curr_figures:
 						if figure.name == "K1":
 							king = figure
@@ -168,7 +167,6 @@ class Game:
 										special_check += 1
 										break
 							break
-					print("Special: ", special_check, " Check", check)
 					if special_check < check:
 						mate = 0
 		
@@ -300,7 +298,7 @@ class Game:
 			if self.ok == 0 or self.passed == 0:
 				continue
 			else:				
-				self.win_condition_check(0, copy.deepcopy(self.chess_board), 
+				self.win_condition_check(1, copy.deepcopy(self.chess_board), 
 											copy.deepcopy(self.curr_player.figures),
 											copy.deepcopy(self.curr_player), 
 											copy.deepcopy(self.opponent))

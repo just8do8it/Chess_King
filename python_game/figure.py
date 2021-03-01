@@ -276,6 +276,7 @@ class Figure:
 				for i in range(abs(new_ltr - self.curr_pos_ltr) - 1):
 					if self.board[self.curr_pos_num + num_counter - 1][chr(self.curr_pos_ltr + ltr_counter)] != None:
 						return False
+					# print(self.board[2]['G'])
 					num_counter += spec_num_counter
 					ltr_counter += spec_ltr_counter
 
