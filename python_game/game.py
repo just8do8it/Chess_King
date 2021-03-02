@@ -95,33 +95,53 @@ class Game:
 		for fig in opponent_copy.figures:
 			fig.update_movable_positions(chess_board_copy.board)
 			opponent_copy.next_positions.append(fig.movable_positions)
-
 		
 		for fig in curr_figures:
 			if fig.name == "K1":
 				fig.update_movable_positions(chess_board_copy.board)
-				for fig_positions in opponent_copy.next_positions:
-					for f_pos in fig_positions:
-						if fig.curr_pos_num == f_pos[0] and chr(fig.curr_pos_ltr) == f_pos[1]:
+				for opponent_fig in opponent_copy.figures:
+					for f_pos in opponent_fig.movable_positions:
+						if fig.curr_pos_num == f_pos[0] and fig.curr_pos_ltr == f_pos[1]:
 							check += 1
 							break
 				break
-			
 		
 		for fig in curr_figures:
 			if fig.name == "K1":
 				fig.update_movable_positions(chess_board_copy.board)
-				# print(fig.movable_positions)
 				max_pos = len(fig.movable_positions)
 				for king_move in fig.movable_positions:
-					for fig_positions in opponent_copy.next_positions:
-						for f_pos in fig_positions:
+					for opponent_fig in opponent_copy.figures:
+						if opponent_fig.name[0] == "P":
+							chess_board = copy.deepcopy(chess_board_copy)
+							source_num = 0
+							source_ltr = ""
+							pawn = None
+							for line in chess_board.board:
+								for key in line:
+									figure = line[key]
+									if figure == None:
+										continue
+									if figure.name == "K1" and figure.player == curr_player_copy.color:
+										source_num = figure.curr_pos_num
+										source_ltr = figure.curr_pos_ltr 
+										figure.move(king_move[0], king_move[1], 0)
+									elif figure.name == opponent_fig.name and figure.player == opponent_copy.color:
+										pawn = figure
+							
+							if pawn != None:
+								source_fig = chess_board.board[source_num - 1][chr(source_ltr)]
+								chess_board.board[source_num - 1][chr(source_ltr)] = None
+								chess_board.board[king_move[0] - 1][king_move[1]] = source_fig
+
+								pawn.update_movable_positions(chess_board.board)
+								opponent_fig = pawn
+
+						for f_pos in opponent_fig.movable_positions:
 							if king_move[0] == f_pos[0] and king_move[1] == f_pos[1]:
 								mate += 1
 				break
 		
-		
-
 		if not command_passed and check:
 			self.ended = -1
 		else:
@@ -198,7 +218,6 @@ class Game:
 		self.is_moved = None
 		while(1):
 			if self.ok == 0 or self.passed == 0:
-				# print("Not a valid command. Try again\n")
 				self.ok = 1
 			self.passed = 0
 

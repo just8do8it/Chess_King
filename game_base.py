@@ -15,17 +15,20 @@ app = get_app()
 @app.route('/quit_game', methods=['POST'])
 @login_required
 def quit_game():
-    game = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id,
-                                                GameT.b_player == current_user.id)).first()
-    if game == None:
-        return abort(404)
+    # games = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id,
+    #                                             GameT.b_player == current_user.id)).all()
+    # if games == None:
+    #     return abort(404)
 
-    game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
-    if game_details.is_active:
-        user_stats = db_session.query(userStats).filter_by(user_id = current_user.id).first()
-        games = ast.literal_eval(user_stats.played_games)
-        games.remove(game.id)
-        user_stats.played_games = str(games)
+    # for game in games:
+    #     game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
+    #     if game_details.is_active:
+    #         user_stats = db_session.query(userStats).filter_by(user_id = current_user.id).first()
+    #         if user_stats.played_games != "":
+    #             played_games = ast.literal_eval(user_stats.played_games)
+    #             played_games.remove(game.id)
+    #             user_stats.played_games = str(played_games)
+    #         break
 
     current_user.is_playing = False
     db_session.commit()
@@ -62,6 +65,7 @@ def chess(game_id):
         else:
             return render_template("blacks_game.html", html_page="b_game.html")
     else:
+        game = db_session.query(GameT).filter_by(id = game_id).first()
         py_game = Game([], [], None)       
         variables = {}
 
@@ -107,9 +111,10 @@ def chess(game_id):
                 else:
                     games = ast.literal_eval(user_stats.played_games)
                 
-                games.append(curr_game.id)
+                if curr_game.id not in games:
+                    games.append(curr_game.id)
                 stats_query.update({"played_games": str(games)})
-                
+                db_session.commit()
                 
                 if py_game.w_checkmate == 1:
                     winner = db_session.query(User).filter_by(id = curr_game.b_player).first()
@@ -124,9 +129,25 @@ def chess(game_id):
                     else:
                         winner_is_me = 0
                     details_query.update({"is_active": False, "winner": winner.id})
+                    db_session.commit()
                 else:
                     winner_is_me = 2
-                    details_query.update({"is_active": False, "winner": -1})
+                    w_player_stats = db_session.query(userStats).filter_by(user_id = game.w_player).first()
+                    b_player_stats = db_session.query(userStats).filter_by(user_id = game.b_player).first()
+                    loser = None
+                    if w_player_stats.win_rate > b_player_stats.win_rate:
+                        loser = game.b_player
+                    elif w_player_stats.win_rate < b_player_stats.win_rate:
+                        loser = game.w_player
+                    else:
+                        winner = random.choice([game.w_player, game.b_player])
+                        if winner == game.w_player:
+                            loser = game.b_player
+                        else:
+                            loser = game.w_player
+                    
+                    details_query.update({"is_active": False, "winner": -1 * loser})
+                    db_session.commit()
                 
                 update_win_rate()
                     
@@ -148,8 +169,7 @@ def chess(game_id):
                         my_turn = 0
 
         taken_figures = py_game.w_player.won_figures + py_game.b_player.won_figures
-        
-        db_session.commit()
+
         variables = dict(board = name_board,
                         alive_figures = py_game.alive_figures,
                         taken_figures = taken_figures,
@@ -176,7 +196,7 @@ def update_win_rate():
             if details.winner == current_user.id:
                 game_endings.append("win")
                 win_count += 1
-            elif details.winner == "draw":
+            elif details.winner < 0:
                 draw_count += 1
     
     win_rate = (win_count + (0.5 * draw_count)) / len(game_ids) * 100

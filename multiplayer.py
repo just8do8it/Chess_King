@@ -29,13 +29,24 @@ def get_in_game():
                     opponent = first_player
 
                 if (first_player.is_waiting == 1 and second_player.is_waiting == 1) or opponent.is_playing == 1:
-                    current_user.is_waiting= False
+                    current_user.is_waiting = False
                     current_user.is_playing = True
                     db_session.commit()
-                    variable = dict(game_id=game.id)
+                    variable = dict(game_id = game.id)
                     return variable
 
                 break
+            else:
+                if game.tournament_id != None:
+                    tournament = db_session.query(Tournament).filter_by(id = game.tournament_id).first()
+                    if tournament.winner == None:
+                        if game_details.winner == -1 * current_user.id:
+                            current_user.is_waiting = False
+                            current_user.is_playing = False
+                            db_session.commit()
+                            variable = dict(game_id = "http://localhost:5000/play")
+                            return variable
+                    
     
     return abort(405)
 

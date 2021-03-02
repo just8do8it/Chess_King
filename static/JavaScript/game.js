@@ -7,7 +7,6 @@ var board = [];
 var alive_figures, taken_figures, my_turn, winner_is_me, can_move = 1, game_ended = 0, stop = 0;
 localStorage.setItem("game_ended", 0);
 localStorage.setItem("waiting", 0);
-localStorage.setItem("final", 0);
 document.getElementById("yourWonFigures").innerHTML = "Your won figures:<br>";
 document.getElementById("opponentsWonFigures").innerHTML = "Opponent's won figures:<br>";
 
@@ -188,52 +187,69 @@ function sendCommand(update) {
 								alert(data["winner"]);
 								window.location = "http://localhost:5000/play";
 							}
-						}).catch(function() {
-							console.log("error");
+						}).finally(function() {
+							window.onbeforeunload = null;
+							if (winner_is_me == 0) {
+								alert("You lose! You'll be redirected to the Play page.");
+								setTimeout(function () {
+									window.location = "http://localhost:5000/play";
+								}, 1500);
+							} else if (winner_is_me == 1) {
+								alert("You win! Wait to get matched for the next game.");
+								setInterval(function() {
+									document.getElementById("waiting").style.display = "inline";
+									fetch('/get_in_game', {
+										method: 'GET',
+										headers: {
+											'Content-Type': 'application/json',
+											'Accept': 'application/json'
+										}
+									}).then(function (response) {
+										response.json().then(function(data) {
+											if (localStorage.getItem("game_ended") == "1") {
+												console.log(data);
+												alert("You win! Proceed to the next game.");
+												localStorage.setItem("game_ended", 0);
+												setTimeout(function () {
+													window.location = "http://localhost:5000/game/" + data['game_id'];
+												}, 2000);
+											}
+										}).catch(function() {
+											console.log("error");
+										});
+									});
+								}, 2000);
+							} else {
+								alert("Draw! If you have higher win rate than your opponent, you will proceed in the tournament.");
+								setInterval(function() {
+									document.getElementById("waiting").style.display = "inline";
+									fetch('/get_in_game', {
+										method: 'GET',
+										headers: {
+											'Content-Type': 'application/json',
+											'Accept': 'application/json'
+										}
+									}).then(function (response) {
+										response.json().then(function(data) {
+											if (localStorage.getItem("game_ended") == "1") {
+												console.log(data);
+												localStorage.setItem("game_ended", 0);
+												setTimeout(function () {
+													if (data['game_id'].length > 7) {
+														window.location = data['game_id'];
+													} else {
+														window.location = "http://localhost:5000/game/" + data['game_id'];
+													}
+												}, 2000);
+											}
+										}).catch(function() {
+											console.log("error");
+										});
+									});
+								}, 2000);
+							}
 						});
 					});
-
-					window.onbeforeunload = null;
-					str = "";
-					if (winner_is_me == 0) {
-						str = "You lose!";
-					} else if (winner_is_me == 1) {
-						str = "You win!";
-						alert("You win! Wait to get matched for the next game.");
-						setInterval(function() {
-							document.getElementById("waiting").style.display = "inline";
-							fetch('/get_in_game', {
-								method: 'GET',
-								headers: {
-									'Content-Type': 'application/json',
-									'Accept': 'application/json'
-								}
-							}).then(function (response) {
-								response.json().then(function(data) {
-									if (localStorage.getItem("game_ended") == "1") {
-										console.log(data);
-										alert(str + " Proceed to the next game.");
-										localStorage.setItem("game_ended", 0);
-										localStorage.setItem("final", 1);
-										setTimeout(function () {
-											window.location = "http://localhost:5000/game/" + data['game_id'];
-										}, 2000);
-									}
-								}).catch(function() {
-									console.log("error");
-								});
-							});
-						}, 2000);
-					} else {
-						str = "Draw!";
-					}
-					
-					if (str != "You win!") {
-						alert(str + " You'll be redirected to the Play page.");
-						setTimeout(function () {
-							window.location = "http://localhost:5000/play";
-						}, 1500);
-					}
 				} else {
 					window.onbeforeunload = null;
 					str = "";

@@ -110,9 +110,20 @@ def start_quarter_final(tournament):
 
 def start_semi_final(tournament, games):
     semi_finalists = []
+    loser = None
     for game in games:
         game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
         if game_details.winner != None:
+            if game_details.winner < 0:
+                loser = -1 * game_details.winner
+                first = game.w_player
+                second = game.b_player
+
+                if loser == first:
+                    semi_finalists.append(second)
+                else:
+                    semi_finalists.append(first)
+                continue
             semi_finalists.append(game_details.winner)
 
     if len(semi_finalists) < 4:
