@@ -135,6 +135,8 @@ function sendMessage(event) {
 function sendCommand(update) {
 	if (update)
 		command = "update";
+	else
+		stop = 1;
 	var game_id = new String(window.location.pathname);
 	console.log(command);
 	fetch(game_id, {
@@ -268,8 +270,8 @@ function sendCommand(update) {
 				}
 			}
 		});
-	}).catch(error => {
-		console.error('Error:', error);
+	}).finally(function () {
+		stop = 0;
 	});
 }
 

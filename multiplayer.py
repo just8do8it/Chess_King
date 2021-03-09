@@ -68,7 +68,6 @@ def get_online_players():
         if created_games != None:
             for game in created_games:        
                 game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
-                print(type(game_details.winner))
                 if game_details.winner == None:
                     aborting = 1
                     break

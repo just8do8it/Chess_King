@@ -70,8 +70,11 @@ def profile():
 
             if details.winner == current_user.id:
                 game_endings.append("win")
-            elif details.winner == "draw":
-                game_endings.append("draw")
+            elif details.winner < 1:
+                if details.winner == -1 * current_user.id:
+                    game_endings.append("draw-win")
+                else:
+                    game_endings.append("draw-loss")
             else:
                 game_endings.append("loss")
     

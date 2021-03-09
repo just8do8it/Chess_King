@@ -81,10 +81,11 @@ class Game:
 		return curr_figures, opponent_figures
 
 	
-	def win_condition_check(self, command_passed, chess_board_copy, curr_figures, curr_player_copy, opponent_copy):
+	def win_condition_check(self, command_passed, chess_board_copy, curr_player_copy, opponent_copy):
 		check = 0
 		mate = 0
 		max_pos = 0
+		curr_figures = curr_player_copy.figures
 		curr_player_copy.next_positions.clear()
 		opponent_copy.next_positions.clear()
 
@@ -98,10 +99,9 @@ class Game:
 		
 		for fig in curr_figures:
 			if fig.name == "K1":
-				fig.update_movable_positions(chess_board_copy.board)
 				for opponent_fig in opponent_copy.figures:
 					for f_pos in opponent_fig.movable_positions:
-						if fig.curr_pos_num == f_pos[0] and fig.curr_pos_ltr == f_pos[1]:
+						if fig.curr_pos_num == f_pos[0] and chr(fig.curr_pos_ltr) == f_pos[1]:
 							check += 1
 							break
 				break
@@ -238,14 +238,12 @@ class Game:
 				if command == "exit":
 					break
 			else:
-				self.win_condition_check(0, copy.deepcopy(self.chess_board), 
-											copy.deepcopy(self.curr_player.figures),
+				self.win_condition_check(0, copy.deepcopy(self.chess_board),
 											copy.deepcopy(self.curr_player), 
 											copy.deepcopy(self.opponent))
 				break
 			
-			self.win_condition_check(0, copy.deepcopy(self.chess_board), 
-											copy.deepcopy(self.curr_player.figures),
+			self.win_condition_check(0, copy.deepcopy(self.chess_board),
 											copy.deepcopy(self.curr_player), 
 											copy.deepcopy(self.opponent))
 			if len(command) != 5:
@@ -317,8 +315,7 @@ class Game:
 			if self.ok == 0 or self.passed == 0:
 				continue
 			else:				
-				self.win_condition_check(1, copy.deepcopy(self.chess_board), 
-											copy.deepcopy(self.curr_player.figures),
+				self.win_condition_check(1, copy.deepcopy(self.chess_board),
 											copy.deepcopy(self.curr_player), 
 											copy.deepcopy(self.opponent))
 			self.alive_figures = []

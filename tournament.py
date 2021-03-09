@@ -180,7 +180,7 @@ def determine_winner(tournament, games):
 
             game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
             if game_details.winner != None:
-                tournament.winner = game_details.winner
+                tournament.winner = abs(game_details.winner)
                 db_session.commit()
                 winner = db_session.query(User).filter_by(id = tournament.winner).first()
                 variable = dict(winner="The winner is " + winner.username + "!")

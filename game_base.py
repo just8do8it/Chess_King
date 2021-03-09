@@ -121,19 +121,12 @@ def game(game_id):
                     w_player_stats = db_session.query(userStats).filter_by(user_id = game.w_player).first()
                     b_player_stats = db_session.query(userStats).filter_by(user_id = game.b_player).first()
                     winner = None
-                    loser = None
                     if w_player_stats.win_rate > b_player_stats.win_rate:
                         winner = game.w_player
-                        loser = game.b_player
                     elif w_player_stats.win_rate < b_player_stats.win_rate:
                         winner = game.b_player
-                        loser = game.w_player
                     else:
                         winner = random.choice([game.w_player, game.b_player])
-                        if winner == game.w_player:
-                            loser = game.b_player
-                        else:
-                            loser = game.w_player
                     
                     details_query.update({"winner": -1 * winner})
                     db_session.commit()
