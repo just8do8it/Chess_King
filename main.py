@@ -25,7 +25,7 @@ def home():
 
 @app.route('/play')
 @login_required
-def playroom():
+def play():
     return render_template('play.html')
 
 @app.route('/end_waiting', methods=['POST'])

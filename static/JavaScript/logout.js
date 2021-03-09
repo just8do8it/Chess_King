@@ -9,10 +9,6 @@ function logout(){
 			document.getElementById('login').innerHTML = "Login";
 			window.location = "http://localhost:5000/";
 			alert("Now you can login with another profile.");
-			console.log(response);
-		},
-		error: function(error){
-			console.log(error);
 		}
 	});
 }

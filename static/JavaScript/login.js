@@ -9,8 +9,6 @@ function login(event){
 			localStorage.setItem("username", username);
 			window.location = "http://localhost:5000/";
 			alert("Welcome, " + username + "!");
-			console.log(response);
-			location.reload();
 		},
 		error: function(error){
 			alert("Wrong credentials, try again.");

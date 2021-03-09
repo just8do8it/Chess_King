@@ -110,24 +110,16 @@ def start_quarter_final(tournament):
 
 def start_semi_final(tournament, games):
     semi_finalists = []
-    loser = None
     for game in games:
         game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
         if game_details.winner != None:
-            if game_details.winner < 0:
-                loser = -1 * game_details.winner
-                first = game.w_player
-                second = game.b_player
-
-                if loser == first:
-                    semi_finalists.append(second)
-                else:
-                    semi_finalists.append(first)
-                continue
-            semi_finalists.append(game_details.winner)
+            semi_finalists.append(abs(game_details.winner))
 
     if len(semi_finalists) < 4:
         return abort(409)
+    
+    tournament.semi_final = str(semi_finalists)
+    db_session.commit()
     
     for i in range(0, 4, 2):
         game_id = get_random_string(7)
@@ -138,7 +130,6 @@ def start_semi_final(tournament, games):
         game_details = gameDetails(game_id)
         db_session.add(game_details)
     
-    tournament.semi_final = str(semi_finalists)
     db_session.commit()
     return "OK"
 
@@ -149,8 +140,9 @@ def start_final(tournament, games):
     finalists = []
     for game in games:
         game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
-        if game_details.winner in semi_finalists:
-            winners.append(game_details.winner)
+        if game_details.winner:
+            if abs(game_details.winner) in semi_finalists:
+                winners.append(game_details.winner)
 
     for winner in winners:
         num_of_games = 0
@@ -160,8 +152,8 @@ def start_final(tournament, games):
             if tournament.id == game.tournament_id:
                 num_of_games += 1
         
-        if num_of_games > 1 and winner not in finalists:
-            finalists.append(winner)
+        if num_of_games > 1 and abs(winner) not in finalists:
+            finalists.append(abs(winner))
 
     if len(finalists) < 2:
         return abort(409)

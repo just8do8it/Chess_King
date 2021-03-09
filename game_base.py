@@ -15,21 +15,6 @@ app = get_app()
 @app.route('/quit_game', methods=['POST'])
 @login_required
 def quit_game():
-    # games = db_session.query(GameT).filter(or_(GameT.w_player == current_user.id,
-    #                                             GameT.b_player == current_user.id)).all()
-    # if games == None:
-    #     return abort(404)
-
-    # for game in games:
-    #     game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
-    #     if game_details.is_active:
-    #         user_stats = db_session.query(userStats).filter_by(user_id = current_user.id).first()
-    #         if user_stats.played_games != "":
-    #             played_games = ast.literal_eval(user_stats.played_games)
-    #             played_games.remove(game.id)
-    #             user_stats.played_games = str(played_games)
-    #         break
-
     current_user.is_playing = False
     db_session.commit()
     return "OK"
@@ -57,7 +42,8 @@ def message(game_id):
 
 @app.route('/game/<string:game_id>', methods=['GET', 'POST'])
 @login_required
-def chess(game_id):
+def game(game_id):
+    game = db_session.query(GameT).filter_by(id = game_id).first()
     if request.method == "GET":
         game = db_session.query(GameT).filter_by(id = game_id).first()
         if current_user.id == game.w_player:
@@ -65,7 +51,6 @@ def chess(game_id):
         else:
             return render_template("blacks_game.html", html_page="b_game.html")
     else:
-        game = db_session.query(GameT).filter_by(id = game_id).first()
         py_game = Game([], [], None)       
         variables = {}
 
@@ -101,6 +86,7 @@ def chess(game_id):
         
         if is_moved:
             details_query.update({"moves": str(commands)})
+            db_session.commit()
             winner = None
             if py_game.ended == 1:
                 my_turn = -1
@@ -128,16 +114,19 @@ def chess(game_id):
                         winner_is_me = 1
                     else:
                         winner_is_me = 0
-                    details_query.update({"is_active": False, "winner": winner.id})
+                    details_query.update({"winner": winner.id})
                     db_session.commit()
                 else:
                     winner_is_me = 2
                     w_player_stats = db_session.query(userStats).filter_by(user_id = game.w_player).first()
                     b_player_stats = db_session.query(userStats).filter_by(user_id = game.b_player).first()
+                    winner = None
                     loser = None
                     if w_player_stats.win_rate > b_player_stats.win_rate:
+                        winner = game.w_player
                         loser = game.b_player
                     elif w_player_stats.win_rate < b_player_stats.win_rate:
+                        winner = game.b_player
                         loser = game.w_player
                     else:
                         winner = random.choice([game.w_player, game.b_player])
@@ -146,7 +135,7 @@ def chess(game_id):
                         else:
                             loser = game.w_player
                     
-                    details_query.update({"is_active": False, "winner": -1 * loser})
+                    details_query.update({"winner": -1 * winner})
                     db_session.commit()
                 
                 update_win_rate()
@@ -169,7 +158,7 @@ def chess(game_id):
                         my_turn = 0
 
         taken_figures = py_game.w_player.won_figures + py_game.b_player.won_figures
-
+        
         variables = dict(board = name_board,
                         alive_figures = py_game.alive_figures,
                         taken_figures = taken_figures,

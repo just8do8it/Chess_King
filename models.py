@@ -62,7 +62,6 @@ class gameDetails(Base):
     game_id = Column(String(120), ForeignKey('games.id'), primary_key=True)
     moves = Column(String(3000))
     start_date = Column(DateTime(timezone=True), server_default=func.now())
-    is_active = Column(Boolean)
     winner = Column(Integer, ForeignKey('users.id'))
     user = relationship("User")
     game = relationship("GameT")
@@ -70,7 +69,6 @@ class gameDetails(Base):
     def __init__(self, game_id=None):
         self.game_id = game_id
         self.moves = ""
-        self.is_active = True
         self.winner = None
 
     def __repr__(self):

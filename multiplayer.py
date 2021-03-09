@@ -19,7 +19,8 @@ def get_in_game():
     if games != None:
         for game in games:
             game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
-            if game_details.is_active:
+            
+            if game_details.winner == None:
                 first_player = db_session.query(User).filter_by(id = game.w_player).first()
                 second_player = db_session.query(User).filter_by(id = game.b_player).first()
                 opponent = None
@@ -40,12 +41,13 @@ def get_in_game():
                 if game.tournament_id != None:
                     tournament = db_session.query(Tournament).filter_by(id = game.tournament_id).first()
                     if tournament.winner == None:
-                        if game_details.winner == -1 * current_user.id:
-                            current_user.is_waiting = False
-                            current_user.is_playing = False
-                            db_session.commit()
-                            variable = dict(game_id = "http://localhost:5000/play")
-                            return variable
+                        if game_details.winner < 0:
+                            if current_user.id != abs(game_details.winner):
+                                current_user.is_waiting = False
+                                current_user.is_playing = False
+                                db_session.commit()
+                                variable = dict(game_id = "http://localhost:5000/play")
+                                return variable
                     
     
     return abort(405)
@@ -66,7 +68,8 @@ def get_online_players():
         if created_games != None:
             for game in created_games:        
                 game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
-                if game_details.is_active:
+                print(type(game_details.winner))
+                if game_details.winner == None:
                     aborting = 1
                     break
         
