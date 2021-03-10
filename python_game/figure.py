@@ -314,32 +314,3 @@ class Figure:
 			return True, new_pos_num, new_ltr
 		else:
 			return True
-
-
-
-
-
-		# figures = []
-		# for line in board:
-		# 	for key in line:
-		# 		if line[key] != None and line[key].player != self.player:
-		# 			figures.append(line[key])
-		
-		# numbers = [0, 1, 2, 3, 4, 5, 6, 7]
-		# letters = ["A", "B", "C", "D", "E", "F", "G", "H"]		
-
-		# for num in numbers:
-		# 	for ltr in letters:
-		# 		skip = 0
-				
-		# 		for fig in figures:
-		# 			if fig.curr_pos_num == num + 1 and fig.curr_pos_ltr == ord(ltr):
-		# 				skip = 1
-				
-		# 		if skip == 1:
-		# 			continue
-				
-		# 		result = self.move(num + 1, ltr, 1)
-
-		# 		if result == True:
-		# 			self.movable_positions.append((num + 1, ltr))
