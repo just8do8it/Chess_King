@@ -62,6 +62,9 @@ def tournament_getting_players():
             return abort(409)
     
     current_user.is_waiting = 1
+    if tournament.quarter_final != "":
+        return abort(409)
+    
     waiting.append(current_user.id)
     tournament.waiting_users = str(waiting)
     db_session.commit()

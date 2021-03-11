@@ -84,6 +84,15 @@ def game(game_id):
         my_turn = None
         curr_game = db_session.query(GameT).filter_by(id = game_id).first()
         
+        if game_details.winner != None and game_details.winner != current_user.id:
+            variables = dict(board = name_board,
+                        alive_figures = py_game.alive_figures,
+                        taken_figures = [],
+                        my_turn = -1,
+                        winner_is_me = 0)
+
+            return variables
+        
         if is_moved:
             details_query.update({"moves": str(commands)})
             db_session.commit()
