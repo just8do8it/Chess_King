@@ -347,7 +347,7 @@ function addTakenFigure(black, figure, special_id, newline) {
 		} else {
 			document.getElementById(special_id).innerHTML += "&#9816; ";
 		}
-	} 
+	}
 
 	else if (figure == "B1" || figure == "B2") {
 		if (black) {

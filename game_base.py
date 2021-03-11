@@ -47,7 +47,7 @@ def game(game_id):
     if request.method == "GET":
         game = db_session.query(GameT).filter_by(id = game_id).first()
         if current_user.id == game.w_player:
-            return render_template("whites_game.html", html_page="game.html")
+            return render_template("whites_game.html", html_page="whites_game.html")
         else:
             return render_template("blacks_game.html", html_page="b_game.html")
     else:

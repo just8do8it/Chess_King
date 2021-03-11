@@ -29,12 +29,13 @@ class ChessBoard:
 		for line in self.board:
 			print(" ", counter + 1, end = "  ")
 			for key in line:
-				if self.board[counter][key] == None:
+				figure = self.board[counter][key]
+				if figure == None:
 					print("|" + "_" + "  " + "_" + "|", end = " ")
-				elif self.board[counter][key].player == "white":
-					print("|" + "_" + self.board[counter][key].name + "_" + "|", end = " ")
+				elif figure.player == "white":
+					print("|" + "_" + figure.name + "_" + "|", end = " ")
 				else:
-					print("|" + "_" + '\033[33m' + self.board[counter][key].name + '\033[m' + "_" + "|", end = " ")
+					print("|" + "_" + '\033[33m' + figure.name + '\033[m' + "_" + "|", end = " ")
 				
 			print("\n")
 			counter -= 1

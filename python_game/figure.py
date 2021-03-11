@@ -302,7 +302,13 @@ class Figure:
 	
 	def move_king(self, new_pos_num, new_pos_ltr, test, new_ltr):
 		if abs(new_pos_num - self.curr_pos_num) > 1 or abs(new_ltr - self.curr_pos_ltr) > 1:
-				return False
+			if self.curr_pos_num == self.start_pos_num and self.curr_pos_ltr == self.start_pos_ltr and test == 0:
+				if new_ltr > self.curr_pos_ltr:
+					return False, "forward"
+				else:
+					return False, "backwards"
+			
+			return False
 		
 		if test == 0:
 			self.curr_pos_num = new_pos_num
