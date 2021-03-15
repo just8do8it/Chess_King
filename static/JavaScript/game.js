@@ -65,7 +65,7 @@ function clicked(clicked_id) {
 
 function waitForOpponent() {
 	setInterval(function() {
-		if (!stop)
+		if (stop != 1)
 			sendCommand(1);
 	}, 2000);
 }
@@ -73,7 +73,7 @@ function waitForOpponent() {
 function refreshMessages() {
 	getMessages();
 	setInterval(function () {
-		if (!stop)
+		if (stop != 1)
 			getMessages();
 	}, 5000);
 }
@@ -116,7 +116,6 @@ function sendMessage(event) {
 	}
 	event.preventDefault();
 	var message = $('#message').val();
-	$('#message').val("");
 	var game_id = new String(window.location.pathname);
 	var url = game_id + "/messages";
 	fetch(url, {
@@ -168,7 +167,7 @@ function sendCommand(update) {
 				game_ended = 1;
 			}
 
-			if (game_ended) {
+			if (game_ended && !stop) {
 				stop = 1;
 				localStorage.setItem("game_ended", 1);
 			}

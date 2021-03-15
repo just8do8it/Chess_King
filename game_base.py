@@ -47,9 +47,17 @@ def game(game_id):
     if request.method == "GET":
         game = db_session.query(GameT).filter_by(id = game_id).first()
         if current_user.id == game.w_player:
-            return render_template("whites_game.html", html_page="whites_game.html")
+            opponent = db_session.query(User).filter_by(id = game.b_player).first()
+            opponent_stats = db_session.query(userStats).filter_by(user_id = game.b_player).first()
+            return render_template("whites_game.html", html_page = "whites_game.html", 
+                                                    opponent_name = opponent.username,
+                                                    opponent_win_rate = opponent_stats.win_rate)
         else:
-            return render_template("blacks_game.html", html_page="b_game.html")
+            opponent = db_session.query(User).filter_by(id = game.w_player).first()
+            opponent_stats = db_session.query(userStats).filter_by(user_id = game.w_player).first()
+            return render_template("blacks_game.html", html_page = "blacks_game.html", 
+                                                    opponent_name = opponent.username,
+                                                    opponent_win_rate = opponent_stats.win_rate)
     else:
         py_game = Game([], [], None)       
         variables = {}
@@ -82,7 +90,6 @@ def game(game_id):
             counter += 1
 
         my_turn = None
-        curr_game = db_session.query(GameT).filter_by(id = game_id).first()
         
         if game_details.winner != None and game_details.winner != current_user.id:
             variables = dict(board = name_board,
@@ -97,67 +104,58 @@ def game(game_id):
             details_query.update({"moves": str(commands)})
             db_session.commit()
             winner = None
-            if py_game.ended == 1:
-                my_turn = -1
-                stats_query = db_session.query(userStats).filter_by(user_id = current_user.id)
-                user_stats = stats_query.first()
-                if user_stats.played_games == "":
-                    games = []
-                else:
-                    games = ast.literal_eval(user_stats.played_games)
-                
-                if curr_game.id not in games:
-                    games.append(curr_game.id)
-                stats_query.update({"played_games": str(games)})
-                db_session.commit()
-                
-                if py_game.w_checkmate == 1:
-                    winner = db_session.query(User).filter_by(id = curr_game.b_player).first()
-                elif py_game.b_checkmate == 1:
-                    winner = db_session.query(User).filter_by(id = curr_game.w_player).first()
-                else:
-                    my_turn = -2
-
-                if my_turn == -1:
-                    if winner == current_user:
-                        winner_is_me = 1
-                    else:
-                        winner_is_me = 0
-                    details_query.update({"winner": winner.id})
-                    db_session.commit()
-                else:
-                    winner_is_me = 2
-                    w_player_stats = db_session.query(userStats).filter_by(user_id = game.w_player).first()
-                    b_player_stats = db_session.query(userStats).filter_by(user_id = game.b_player).first()
-                    winner = None
-                    if w_player_stats.win_rate > b_player_stats.win_rate:
-                        winner = game.w_player
-                    elif w_player_stats.win_rate < b_player_stats.win_rate:
-                        winner = game.b_player
-                    else:
-                        winner = random.choice([game.w_player, game.b_player])
-                    
-                    details_query.update({"winner": -1 * winner})
-                    db_session.commit()
-                
-                update_win_rate()
-                    
-            else:
-                if py_game.curr_player.color == "black":
-                    if current_user.id == curr_game.b_player:
-                        my_turn = 1
-                    else:
-                        my_turn = 0
-                else:
-                    if current_user.id == curr_game.w_player:
-                        my_turn = 1
-                    else:
-                        my_turn = 0
         else:
             if py_game.chess_board.counter == 1:
                 if py_game.curr_player.color == "white":
-                    if current_user.id == curr_game.b_player:
+                    if current_user.id == game.b_player:
                         my_turn = 0
+        
+        if py_game.ended == 1:
+            my_turn = -1
+            
+            if py_game.w_checkmate == 1:
+                winner = db_session.query(User).filter_by(id = game.b_player).first()
+            elif py_game.b_checkmate == 1:
+                winner = db_session.query(User).filter_by(id = game.w_player).first()
+            else:
+                my_turn = -2
+
+            if my_turn == -1:
+                if winner == current_user:
+                    winner_is_me = 1
+                else:
+                    winner_is_me = 0
+                details_query.update({"winner": winner.id})
+                db_session.commit()
+            else:
+                winner_is_me = 2
+                w_player_stats = db_session.query(userStats).filter_by(user_id = game.w_player).first()
+                b_player_stats = db_session.query(userStats).filter_by(user_id = game.b_player).first()
+                winner = None
+                if w_player_stats.win_rate > b_player_stats.win_rate:
+                    winner = game.w_player
+                elif w_player_stats.win_rate < b_player_stats.win_rate:
+                    winner = game.b_player
+                else:
+                    winner = random.choice([game.w_player, game.b_player])
+                
+                details_query.update({"winner": -1 * winner})
+                db_session.commit()
+            
+            update_win_rate(game.w_player, game)
+            update_win_rate(game.b_player, game)
+                
+        else:
+            if py_game.curr_player.color == "black":
+                if current_user.id == game.b_player:
+                    my_turn = 1
+                else:
+                    my_turn = 0
+            else:
+                if current_user.id == game.w_player:
+                    my_turn = 1
+                else:
+                    my_turn = 0
 
         taken_figures = py_game.w_player.won_figures + py_game.b_player.won_figures
         
@@ -170,9 +168,19 @@ def game(game_id):
         return variables
 
 
-def update_win_rate():
-    stats_query = db_session.query(userStats).filter_by(user_id = current_user.id)
+def update_win_rate(user_id, game):
+    games = []
+    stats_query = db_session.query(userStats).filter_by(user_id = user_id)
     stats = stats_query.first()
+    if stats.played_games == "":
+        games = []
+    else:
+        games = ast.literal_eval(stats.played_games)
+    
+    if game.id not in games:
+        games.append(game.id)
+    stats_query.update({"played_games": str(games)})
+    db_session.commit()
 
     game_ids = ast.literal_eval(stats.played_games)
     game_count = len(game_ids)
@@ -184,7 +192,7 @@ def update_win_rate():
         for id in game_ids:
             details = db_session.query(gameDetails).filter_by(game_id = id).first()
             
-            if details.winner == current_user.id:
+            if details.winner == user_id:
                 game_endings.append("win")
                 win_count += 1
             elif details.winner < 0:

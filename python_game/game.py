@@ -55,12 +55,12 @@ class Game:
 		names = ["R1", "H1", "B1", "Q1", "K1", "B2", "H2", "R2"]
 
 		for i in range(8):
-			w_figures.append(Figure(names[i], chess_board.board, chr(ord('A') + i), 1, "white"))
-			b_figures.append(Figure(names[i], chess_board.board, chr(ord('A') + i), 8, "black"))
+			w_figures.append(Figure(names[i], chess_board, chr(ord('A') + i), 1, "white"))
+			b_figures.append(Figure(names[i], chess_board, chr(ord('A') + i), 8, "black"))
 
 		for i in range(8):
-			w_figures.append(Figure("P" + str(i + 1), chess_board.board, chr(ord('A') + i), 2, "white"))
-			b_figures.append(Figure("P" + str(i + 1), chess_board.board, chr(ord('A') + i), 7, "black"))
+			w_figures.append(Figure("P" + str(i + 1), chess_board, chr(ord('A') + i), 2, "white"))
+			b_figures.append(Figure("P" + str(i + 1), chess_board, chr(ord('A') + i), 7, "black"))
 			
 
 		return w_figures, b_figures
@@ -150,7 +150,7 @@ class Game:
 					self.is_moved = 0
 					self.ended = 0
 
-		if check and mate:
+		if mate:
 			curr_figures, opponent_figures = self.make_board_copy(curr_player_copy, chess_board_copy)
 
 			for fig in curr_figures:
@@ -276,6 +276,8 @@ class Game:
 			if source_fig.player == self.curr_player.color:
 				true = True
 				result = source_fig.move(dest_number, dest_letter, 0)
+				if source_fig.name == "P1":
+					print("------------------------------------------")
 				if type(result) == type(true):
 					if result == True:
 						self.chess_board.board[src_number - 1][src_letter] = None
@@ -286,97 +288,82 @@ class Game:
 						self.ok = 0
 				else:
 					if type(result[1]) == type("string"):
-						rook = None
-						king = None
-						king_pos_letters = None
-						for figure in self.curr_player.figures:
-							if (result[1] == "forward" and figure.name == "R2") or \
-								(result[1] == "backwards" and figure.name == "R1"):
-								rook = figure
-							elif figure.name == "K1":
-								king = figure
+						if result[1] == "forward" or result[1] == "backwards":
+							rook = None
+							king = None
+							king_pos_letters = None
+							for figure in self.curr_player.figures:
+								if (result[1] == "forward" and figure.name == "R2") or \
+									(result[1] == "backwards" and figure.name == "R1"):
+									rook = figure
+								elif figure.name == "K1":
+									king = figure
 
-						if rook.curr_pos_num != rook.start_pos_num or \
-							rook.curr_pos_ltr != rook.start_pos_ltr:
-							self.ok = 0
-							continue
-
-						start_ltr = ""
-						end_ltr = ""
-						if king.curr_pos_ltr > rook.curr_pos_ltr:
-							start_ltr = rook.curr_pos_ltr + 1
-							end_ltr = king.curr_pos_ltr
-							king_pos_letters = (end_ltr - 1, end_ltr - 2)
-						else:
-							start_ltr = king.curr_pos_ltr + 1
-							end_ltr = rook.curr_pos_ltr
-							king_pos_letters = (start_ltr, start_ltr + 1)
-						
-						for pos_ltr in range(start_ltr, end_ltr):
-							if self.chess_board.board[king.curr_pos_num - 1][chr(pos_ltr)] != None:
+							if rook.curr_pos_num != rook.start_pos_num or \
+								rook.curr_pos_ltr != rook.start_pos_ltr:
 								self.ok = 0
+								continue
 
-						for opponent_fig in self.opponent.figures:
-							for pos in opponent_fig.movable_positions:
-								if pos[0] == king.curr_pos_num and \
-									(pos[1] == king_pos_letters[0] or pos[1] == king_pos_letters[1]):
+							start_ltr = ""
+							end_ltr = ""
+							if king.curr_pos_ltr > rook.curr_pos_ltr:
+								start_ltr = rook.curr_pos_ltr + 1
+								end_ltr = king.curr_pos_ltr
+								king_pos_letters = (end_ltr - 1, end_ltr - 2)
+							else:
+								start_ltr = king.curr_pos_ltr + 1
+								end_ltr = rook.curr_pos_ltr
+								king_pos_letters = (start_ltr, start_ltr + 1)
+							
+							for pos_ltr in range(start_ltr, end_ltr):
+								if self.chess_board.board[king.curr_pos_num - 1][chr(pos_ltr)] != None:
 									self.ok = 0
 
-						if self.curr_player.color == "white":
-							if self.w_check:
-								self.ok = 0
-						else:
-							if self.b_check:
-								self.ok = 0
+							for opponent_fig in self.opponent.figures:
+								for pos in opponent_fig.movable_positions:
+									if pos[0] == king.curr_pos_num and \
+										(pos[1] == king_pos_letters[0] or pos[1] == king_pos_letters[1]):
+										self.ok = 0
 
-						if self.ok:
-							rook.move(rook.curr_pos_num, chr(king_pos_letters[0]), 0)
-							king.move(king.curr_pos_num, chr(king_pos_letters[1]), 0)
+							if self.curr_player.color == "white":
+								if self.w_check:
+									self.ok = 0
+							else:
+								if self.b_check:
+									self.ok = 0
 
-							king.curr_pos_ltr = king_pos_letters[1]
-							
-							rook_board_fig = self.chess_board.board[rook.start_pos_num - 1][chr(rook.start_pos_ltr)]
-							self.chess_board.board[rook.start_pos_num - 1][chr(rook.start_pos_ltr)] = None
-							self.chess_board.board[rook.start_pos_num - 1][chr(king_pos_letters[0])] = rook_board_fig
+							if self.ok:
+								rook.move(rook.curr_pos_num, chr(king_pos_letters[0]), 0)
+								king.move(king.curr_pos_num, chr(king_pos_letters[1]), 0)
 
-							king_board_fig = self.chess_board.board[king.start_pos_num - 1][chr(king.start_pos_ltr)]
-							self.chess_board.board[king.start_pos_num - 1][chr(king.start_pos_ltr)] = None
-							self.chess_board.board[king.start_pos_num - 1][chr(king_pos_letters[1])] = king_board_fig
+								king.curr_pos_ltr = king_pos_letters[1]
+								
+								rook_board_fig = self.chess_board.board[rook.start_pos_num - 1][chr(rook.start_pos_ltr)]
+								self.chess_board.board[rook.start_pos_num - 1][chr(rook.start_pos_ltr)] = None
+								self.chess_board.board[rook.start_pos_num - 1][chr(king_pos_letters[0])] = rook_board_fig
 
-							
-							self.passed = 1
-							self.is_moved = 1
+								king_board_fig = self.chess_board.board[king.start_pos_num - 1][chr(king.start_pos_ltr)]
+								self.chess_board.board[king.start_pos_num - 1][chr(king.start_pos_ltr)] = None
+								self.chess_board.board[king.start_pos_num - 1][chr(king_pos_letters[1])] = king_board_fig
+
+								
+								self.passed = 1
+								self.is_moved = 1
 					else:	
-						taken_figure_num = result[1]
-						taken_figure_ltr = result[2]
+						taken_figure = result[1]
+						taken_figure.is_alive = 0
+						self.curr_player.won_figures.append([taken_figure.name, taken_figure.curr_pos_ltr,\
+															taken_figure.curr_pos_num, taken_figure.player])
 						
-						killed = 0
-
-						for fig in self.opponent.figures:
-							fig_details = [fig.name, fig.curr_pos_ltr, fig.curr_pos_num, fig.player]
-							if fig.curr_pos_num == taken_figure_num and \
-								fig.curr_pos_ltr == taken_figure_ltr and \
-								fig_details not in self.curr_player.won_figures:
-									fig.is_alive = 0
-									self.curr_player.won_figures.append(fig_details)
-									killed = 1
-						
-						if killed == 0:
-							for figure in self.curr_player.figures:
-								if source_fig.name == figure.name:
-									figure.curr_pos_num = src_number
-									figure.curr_pos_ltr = ord(src_letter)
-							self.ok = 0
-						else:
-							self.chess_board.board[src_number - 1][src_letter] = None
-							self.chess_board.board[dest_number - 1][dest_letter] = source_fig
-							self.passed = 1
-							self.is_moved = 1
-
-			
+						self.chess_board.board[src_number - 1][src_letter] = None
+						self.chess_board.board[dest_number - 1][dest_letter] = source_fig
+						self.passed = 1
+						self.is_moved = 1
 			if self.ok == 0 or self.passed == 0:
 				continue
 			else:				
+				if source_fig.name == "P1":
+					print("++++++++++++++++++++++++++++++++++++++++++")
 				self.win_condition_check(1, copy.deepcopy(self.chess_board),
 											copy.deepcopy(self.curr_player), 
 											copy.deepcopy(self.opponent))
@@ -390,6 +377,11 @@ class Game:
 
 			self.chess_board.counter += 1
 			self.command_counter += 1
+
+			if self.is_moved:
+				if self.chess_board.en_passant[0] != None and \
+						self.chess_board.en_passant[1] != self.chess_board.counter:
+					self.chess_board.en_passant = (None, 0) 
 	
 		return self.is_moved
 			

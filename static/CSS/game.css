@@ -5,6 +5,18 @@
     font-size: 1.5em;
 }
 
+#opponent {
+    position: absolute;
+    padding: 0.5%;
+    left: -0.5%;
+    top: 6.7%;
+    font-size: 1.5em;
+    border-style: solid;
+    border-color: black;
+    background-color: hsl(264, 100%, 92%);
+    /* color: white; */
+}
+
 #chat {
     background-color: white;
     width: 20%;

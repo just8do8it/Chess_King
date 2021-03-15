@@ -1,9 +1,11 @@
-import pdb
+import pdb, copy
+from board import ChessBoard
 
 class Figure:
-	def __init__(self, name, board, start_pos_ltr, start_pos_num, player):
+	def __init__(self, name, chess_board, start_pos_ltr, start_pos_num, player):
 		self.name = name
-		self.board = board
+		self.chess_board = chess_board
+		self.board = chess_board.board
 		self.start_pos_ltr = ord(start_pos_ltr)
 		self.start_pos_num = start_pos_num
 		self.curr_pos_ltr = ord(start_pos_ltr)
@@ -38,6 +40,10 @@ class Figure:
 					ltr = chr(figure.curr_pos_ltr)
 
 				result = self.move(num, ltr, 1)
+				# if result == None:
+					# print(self.name, self.player, self.curr_pos_num, chr(self.curr_pos_ltr), num, ltr)
+					# for line in board:
+					# 	print("\n", line)
 				if (type(result) == bool and result == True) or (type(result) != bool and result[0] == True):					
 					self.movable_positions.append((num, ltr))
 				
@@ -85,11 +91,28 @@ class Figure:
 			self.player == "black" and new_ltr == self.curr_pos_ltr - 1 and new_pos_num == self.curr_pos_num - 1:
 
 				if new_ltr == self.curr_pos_ltr + 1 or new_ltr == self.curr_pos_ltr - 1:
-					if self.board[new_pos_num - 1][new_pos_ltr] != None:
+					if self.chess_board.en_passant[0] != None:
+						# print("\n\n", self.board[self.curr_pos_num - 1][new_pos_ltr],
+						# 		"\n", self.chess_board.en_passant[0])
+						if self.name == "P1":
+							print(self.curr_pos_num, new_pos_ltr, 
+								self.chess_board.en_passant[0].curr_pos_num, 
+								chr(self.chess_board.en_passant[0].curr_pos_ltr))
+						# print(self.board[self.curr_pos_num][new_pos_ltr].name, self.chess_board.en_passant[0].name)
+						if self.board[new_pos_num - 1][new_pos_ltr] == None and \
+							self.board[self.curr_pos_num - 1][new_pos_ltr] == self.chess_board.en_passant[0]:
+								print("heyyyyyyyyyyyy")
+								if test == 0:
+									self.curr_pos_num = new_pos_num
+									self.curr_pos_ltr = new_ltr
+									return True, self.board[new_pos_num - 1][new_pos_ltr]
+						else:
+							return False
+					elif self.board[new_pos_num - 1][new_pos_ltr] != None:
 						if test == 0:
 							self.curr_pos_num = new_pos_num
 							self.curr_pos_ltr = new_ltr
-							return True, new_pos_num, new_ltr
+							return True, self.board[new_pos_num - 1][new_pos_ltr]
 						else:
 							return True
 					else:
@@ -102,6 +125,21 @@ class Figure:
 						else:
 							if self.board[new_pos_num][new_pos_ltr] != None:
 								return False
+						
+						if chr(new_ltr - 1) < 'A' or (chr(new_ltr - 1) >= 'A' and chr(new_ltr) < 'H'):
+							if self.board[new_pos_num - 1][chr(new_ltr + 1)] != None and \
+								self.board[new_pos_num - 1][chr(new_ltr + 1)].name[0] == "P":
+									# print("shit 1")
+									self.chess_board.en_passant = (self.board[new_pos_num - 1][chr(new_ltr + 1)],
+													self.chess_board.counter)
+									# print("bridge")
+						
+						if chr(new_ltr + 1) > 'H' or (chr(new_ltr) > 'A' and chr(new_ltr + 1) <= 'H'):
+							if self.board[new_pos_num - 1][chr(new_ltr - 1)] != None and \
+								self.board[new_pos_num - 1][chr(new_ltr - 1)].name[0] == "P":
+									# print("shit 2")
+									self.chess_board.en_passant = (self.board[new_pos_num - 1][chr(new_ltr - 1)],
+													self.chess_board.counter)
 
 					if self.board[new_pos_num - 1][new_pos_ltr] == None:
 						if test == 0:
@@ -152,7 +190,7 @@ class Figure:
 				return True
 
 			if self.board[new_pos_num - 1][new_pos_ltr] != None:
-				return True, new_pos_num, new_ltr
+				return True, self.board[new_pos_num - 1][new_pos_ltr]
 			else:
 				return True
 
@@ -163,7 +201,7 @@ class Figure:
 				return True
 
 			if self.board[new_pos_num - 1][new_pos_ltr] != None:
-				return True, new_pos_num, new_ltr
+				return True, self.board[new_pos_num - 1][new_pos_ltr]
 			else:
 				return True
 		
@@ -186,7 +224,7 @@ class Figure:
 					return True
 				
 				if self.board[new_pos_num - 1][new_pos_ltr] != None:
-					return True, new_pos_num, new_ltr
+					return True, self.board[new_pos_num - 1][new_pos_ltr]
 				else:
 					return True
 	
@@ -228,7 +266,7 @@ class Figure:
 				return True
 			
 			if self.board[new_pos_num - 1][new_pos_ltr] != None:
-				return True, new_pos_num, new_ltr
+				return True, self.board[new_pos_num - 1][new_pos_ltr]
 			else:
 				return True
 
@@ -295,7 +333,7 @@ class Figure:
 			return True
 		
 		if self.board[new_pos_num - 1][new_pos_ltr] != None:
-			return True, new_pos_num, new_ltr
+			return True, self.board[new_pos_num - 1][new_pos_ltr]
 		else:
 			return True
 
@@ -317,6 +355,6 @@ class Figure:
 			return True
 
 		if self.board[new_pos_num - 1][new_pos_ltr] != None:
-			return True, new_pos_num, new_ltr
+			return True, self.board[new_pos_num - 1][new_pos_ltr]
 		else:
 			return True

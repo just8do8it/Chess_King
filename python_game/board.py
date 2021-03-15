@@ -3,6 +3,7 @@ import pdb
 class ChessBoard:
 	def __init__(self):
 		self.counter = 1
+		self.en_passant = (None, 0)
 		self.letters = {"A": None, "B": None, "C": None, "D": None, "E": None, "F": None, "G": None, "H": None}
 		self.board = []
 
