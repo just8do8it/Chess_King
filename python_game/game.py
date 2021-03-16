@@ -217,6 +217,7 @@ class Game:
 		self.command_counter = 0
 		self.is_moved = None
 		while(1):
+			new_figure_name = ""
 			if self.ok == 0 or self.passed == 0:
 				self.ok = 1
 			self.passed = 0
@@ -247,8 +248,14 @@ class Game:
 											copy.deepcopy(self.curr_player), 
 											copy.deepcopy(self.opponent))
 			if len(command) != 5:
+				if len(command) == 1:
+					new_figure_name = command
 				self.ok = 0
 				continue
+			
+
+			if new_figure_name != "":
+				
 
 			src_letter = command[0]
 			src_number = command[1]

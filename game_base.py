@@ -61,10 +61,12 @@ def game(game_id):
     else:
         py_game = Game([], [], None)       
         variables = {}
-
+        new_figure_name = ""
         command = request.get_json()
         if isinstance(command, str) != True:
             return abort(404)
+        if len(command) == 1:
+            new_figure_name = command
         
         winner_is_me = None
         commands = []
@@ -73,9 +75,10 @@ def game(game_id):
         if game_details.moves != "":
             commands = ast.literal_eval(game_details.moves)
         
+
         if command != "update":
             commands.append(command)
-        # print(commands)
+        
         is_moved = py_game.run(commands)
 
         name_board = [{}, {}, {}, {}, {}, {}, {}, {}]
@@ -100,7 +103,7 @@ def game(game_id):
 
             return variables
         
-        if is_moved:
+        if is_moved or new_figure_name != "":
             details_query.update({"moves": str(commands)})
             db_session.commit()
             winner = None

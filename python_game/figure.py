@@ -54,25 +54,22 @@ class Figure:
 		
 		new_ltr = ord(new_pos_ltr)
 		
-		if self.name == "P1" or self.name == "P2" or \
-			self.name == "P3" or self.name == "P4" or \
-			self.name == "P5" or self.name == "P6" or \
-			self.name == "P7" or self.name == "P8":
-				return self.move_pawn(new_pos_num, new_pos_ltr, test, new_ltr)
+		if self.name[0] == 'P':
+			return self.move_pawn(new_pos_num, new_pos_ltr, test, new_ltr)
 		
-		elif self.name == "R1" or self.name == "R2":
+		elif self.name[0] == 'R':
 			return self.move_rook(new_pos_num, new_pos_ltr, test, new_ltr)
 
-		elif self.name == "H1" or self.name == "H2":
+		elif self.name[0] == 'H':
 			return self.move_horse(new_pos_num, new_pos_ltr, test, new_ltr)
 
-		elif self.name == "B1" or self.name == "B2":
+		elif self.name[0] == 'B':
 			return self.move_bishop(new_pos_num, new_pos_ltr, test, new_ltr)
 
-		elif self.name == "Q1":
+		elif self.name[0] == 'Q':
 			return self.move_queen(new_pos_num, new_pos_ltr, test, new_ltr)
 
-		elif self.name == "K1":
+		elif self.name[0] == 'K':
 			return self.move_king(new_pos_num, new_pos_ltr, test, new_ltr)
 
 
