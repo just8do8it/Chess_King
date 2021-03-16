@@ -253,9 +253,32 @@ class Game:
 				self.ok = 0
 				continue
 			
-
+			
 			if new_figure_name != "":
-				
+				alive_options = []
+				dead_options = []
+				prev_command = external_commands[self.command_counter - 1]
+				if self.chess_board.board[prev_command[4] - 1][prev_command[3]].name[0] == "P":
+					for taken_fig in self.opponent.won_figures:
+						if new_figure_name == taken_fig.name[0]:
+							dead_options.append(taken_fig.name)
+					
+					if len(dead_options):
+						new_figure_name = dead_options[0]
+						for name in dead_options:
+							if name[1] < new_figure_name[1]:
+								new_figure_name = name[1]
+					else:
+						for fig in self.opponent.figures:
+							if new_figure_name == fig.name[0]:
+								alive_options.append(fig.name)
+						
+						for name in alive_options:
+							if name[1] > new_figure_name[1]:
+								new_figure_name = name[1]
+						
+						new_figure_name[1] += 1
+
 
 			src_letter = command[0]
 			src_number = command[1]
