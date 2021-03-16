@@ -11,7 +11,7 @@ def reverse_board(board):
 	return new_board
 
 class TestGame(unittest.TestCase):
-	def test_rook(self):
+	def test_pawn(self):
 
 		chess_board = ChessBoard()
 

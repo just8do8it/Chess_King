@@ -80,32 +80,23 @@ class Game:
 		
 		return curr_figures, opponent_figures
 
-	
-	def win_condition_check(self, command_passed, chess_board_copy, curr_player_copy, opponent_copy):
+	def determine_check(self, curr_figures, opponent_copy, chess_board):
 		check = 0
-		mate = 0
-		max_pos = 0
-		curr_figures = curr_player_copy.figures
-		curr_player_copy.next_positions.clear()
-		opponent_copy.next_positions.clear()
-
-		for fig in curr_player_copy.figures:
-			fig.update_movable_positions(chess_board_copy.board)
-			curr_player_copy.next_positions.append(fig.movable_positions)
-		
-		for fig in opponent_copy.figures:
-			fig.update_movable_positions(chess_board_copy.board)
-			opponent_copy.next_positions.append(fig.movable_positions)
-		
 		for fig in curr_figures:
 			if fig.name == "K1":
+				king = fig
 				for opponent_fig in opponent_copy.figures:
+					if chess_board != None:
+						opponent_fig.update_movable_positions(chess_board.board)
 					for f_pos in opponent_fig.movable_positions:
-						if fig.curr_pos_num == f_pos[0] and chr(fig.curr_pos_ltr) == f_pos[1]:
+						if king.curr_pos_num == f_pos[0] and chr(king.curr_pos_ltr) == f_pos[1]:
 							check += 1
 							break
 				break
-		
+		return check
+
+	def determine_mate(self, curr_figures, curr_player_copy, opponent_copy, chess_board_copy):
+		mate = 0
 		for fig in curr_figures:
 			if fig.name == "K1":
 				fig.update_movable_positions(chess_board_copy.board)
@@ -142,6 +133,24 @@ class Game:
 								mate += 1
 				break
 		
+		return max_pos, mate
+
+	def win_condition_check(self, command_passed, chess_board_copy, curr_player_copy, opponent_copy):
+		curr_figures = curr_player_copy.figures
+		curr_player_copy.next_positions.clear()
+		opponent_copy.next_positions.clear()
+
+		for fig in curr_player_copy.figures:
+			fig.update_movable_positions(chess_board_copy.board)
+			curr_player_copy.next_positions.append(fig.movable_positions)
+		
+		for fig in opponent_copy.figures:
+			fig.update_movable_positions(chess_board_copy.board)
+			opponent_copy.next_positions.append(fig.movable_positions)
+		
+		check = self.determine_check(curr_figures, opponent_copy, None)
+		max_pos, mate = self.determine_mate(curr_figures, curr_player_copy, opponent_copy, chess_board_copy)
+		
 		if not command_passed and check:
 			self.ended = -1
 		else:
@@ -175,18 +184,9 @@ class Game:
 					chess_board.board[pos[0] - 1][pos[1]] = source_fig
 					
 					curr_figures, opponent_figures = self.make_board_copy(curr_player_copy, chess_board)
-					special_check = 0
+		
+					special_check = self.determine_check(curr_figures, opponent_copy, chess_board)
 					
-					for figure in curr_figures:
-						if figure.name == "K1":
-							king = figure
-							for opponent_fig in opponent_figures:
-								opponent_fig.update_movable_positions(chess_board.board)
-								for f_pos in opponent_fig.movable_positions:
-									if king.curr_pos_num == f_pos[0] and chr(king.curr_pos_ltr) == f_pos[1]:
-										special_check += 1
-										break
-							break
 					if special_check < check:
 						mate = 0
 		
