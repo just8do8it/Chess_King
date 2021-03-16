@@ -276,14 +276,13 @@ class Game:
 			if source_fig.player == self.curr_player.color:
 				true = True
 				result = source_fig.move(dest_number, dest_letter, 0)
-				if source_fig.name == "P1":
-					print("------------------------------------------")
 				if type(result) == type(true):
 					if result == True:
 						self.chess_board.board[src_number - 1][src_letter] = None
 						self.chess_board.board[dest_number - 1][dest_letter] = source_fig
 						self.passed = 1
 						self.is_moved = 1
+						source_fig.check_en_passant()
 					else:
 						self.ok = 0
 				else:
@@ -356,14 +355,13 @@ class Game:
 															taken_figure.curr_pos_num, taken_figure.player])
 						
 						self.chess_board.board[src_number - 1][src_letter] = None
+						self.chess_board.board[taken_figure.curr_pos_num - 1][chr(taken_figure.curr_pos_ltr)] = None
 						self.chess_board.board[dest_number - 1][dest_letter] = source_fig
 						self.passed = 1
 						self.is_moved = 1
 			if self.ok == 0 or self.passed == 0:
 				continue
-			else:				
-				if source_fig.name == "P1":
-					print("++++++++++++++++++++++++++++++++++++++++++")
+			else:
 				self.win_condition_check(1, copy.deepcopy(self.chess_board),
 											copy.deepcopy(self.curr_player), 
 											copy.deepcopy(self.opponent))
@@ -380,8 +378,8 @@ class Game:
 
 			if self.is_moved:
 				if self.chess_board.en_passant[0] != None and \
-						self.chess_board.en_passant[1] != self.chess_board.counter:
-					self.chess_board.en_passant = (None, 0) 
+						self.chess_board.en_passant[1] == self.chess_board.counter - 2:
+					self.chess_board.en_passant = (None, 0)
 	
 		return self.is_moved
 			
