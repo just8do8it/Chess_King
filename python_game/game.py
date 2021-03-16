@@ -80,12 +80,12 @@ class Game:
 		
 		return curr_figures, opponent_figures
 
-	def determine_check(self, curr_figures, opponent_copy, chess_board):
+	def determine_check(self, curr_figures, opponent_figures, chess_board):
 		check = 0
 		for fig in curr_figures:
 			if fig.name == "K1":
 				king = fig
-				for opponent_fig in opponent_copy.figures:
+				for opponent_fig in opponent_figures:
 					if chess_board != None:
 						opponent_fig.update_movable_positions(chess_board.board)
 					for f_pos in opponent_fig.movable_positions:
@@ -148,7 +148,7 @@ class Game:
 			fig.update_movable_positions(chess_board_copy.board)
 			opponent_copy.next_positions.append(fig.movable_positions)
 		
-		check = self.determine_check(curr_figures, opponent_copy, None)
+		check = self.determine_check(curr_figures, opponent_copy.figures, None)
 		max_pos, mate = self.determine_mate(curr_figures, curr_player_copy, opponent_copy, chess_board_copy)
 		
 		if not command_passed and check:
@@ -185,8 +185,8 @@ class Game:
 					
 					curr_figures, opponent_figures = self.make_board_copy(curr_player_copy, chess_board)
 		
-					special_check = self.determine_check(curr_figures, opponent_copy, chess_board)
-					
+					special_check = self.determine_check(curr_figures, opponent_figures, chess_board)
+
 					if special_check < check:
 						mate = 0
 		

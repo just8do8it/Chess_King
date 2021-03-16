@@ -53,7 +53,7 @@ class Figure:
 
 
 	def move(self, new_pos_num, new_pos_ltr, test):
-		if self.is_alive == 0:
+		if self.is_alive == 0 or (new_pos_num == self.curr_pos_num and ord(new_pos_ltr) == self.curr_pos_ltr):
 			return False
 		
 		new_ltr = ord(new_pos_ltr)
@@ -91,24 +91,24 @@ class Figure:
 			self.player == "black" and new_ltr == self.curr_pos_ltr - 1 and new_pos_num == self.curr_pos_num - 1:
 
 				if new_ltr == self.curr_pos_ltr + 1 or new_ltr == self.curr_pos_ltr - 1:
-					if self.chess_board.en_passant[0] != None:
-						# print("\n\n", self.board[self.curr_pos_num - 1][new_pos_ltr],
-						# 		"\n", self.chess_board.en_passant[0])
-						if self.name == "P1":
-							print(self.curr_pos_num, new_pos_ltr, 
-								self.chess_board.en_passant[0].curr_pos_num, 
-								chr(self.chess_board.en_passant[0].curr_pos_ltr))
-						# print(self.board[self.curr_pos_num][new_pos_ltr].name, self.chess_board.en_passant[0].name)
-						if self.board[new_pos_num - 1][new_pos_ltr] == None and \
-							self.board[self.curr_pos_num - 1][new_pos_ltr] == self.chess_board.en_passant[0]:
-								print("heyyyyyyyyyyyy")
-								if test == 0:
-									self.curr_pos_num = new_pos_num
-									self.curr_pos_ltr = new_ltr
-									return True, self.board[new_pos_num - 1][new_pos_ltr]
-						else:
-							return False
-					elif self.board[new_pos_num - 1][new_pos_ltr] != None:
+					# if self.chess_board.en_passant[0] != None:
+					# 	# print("\n\n", self.board[self.curr_pos_num - 1][new_pos_ltr],
+					# 	# 		"\n", self.chess_board.en_passant[0])
+					# 	if self.name == "P1":
+					# 		print(self.curr_pos_num, new_pos_ltr, 
+					# 			self.chess_board.en_passant[0].curr_pos_num, 
+					# 			chr(self.chess_board.en_passant[0].curr_pos_ltr))
+					# 	# print(self.board[self.curr_pos_num][new_pos_ltr].name, self.chess_board.en_passant[0].name)
+					# 	if self.board[new_pos_num - 1][new_pos_ltr] == None and \
+					# 		self.board[self.curr_pos_num - 1][new_pos_ltr] == self.chess_board.en_passant[0]:
+					# 			print("heyyyyyyyyyyyy")
+					# 			if test == 0:
+					# 				self.curr_pos_num = new_pos_num
+					# 				self.curr_pos_ltr = new_ltr
+					# 				return True, self.board[new_pos_num - 1][new_pos_ltr]
+					# 	else:
+					# 		return False
+					if self.board[new_pos_num - 1][new_pos_ltr] != None:
 						if test == 0:
 							self.curr_pos_num = new_pos_num
 							self.curr_pos_ltr = new_ltr

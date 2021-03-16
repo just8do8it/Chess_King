@@ -104,58 +104,57 @@ def game(game_id):
             details_query.update({"moves": str(commands)})
             db_session.commit()
             winner = None
+            if py_game.ended == 1:
+                my_turn = -1
+                
+                if py_game.w_checkmate == 1:
+                    winner = db_session.query(User).filter_by(id = game.b_player).first()
+                elif py_game.b_checkmate == 1:
+                    winner = db_session.query(User).filter_by(id = game.w_player).first()
+                else:
+                    my_turn = -2
+
+                if my_turn == -1:
+                    if winner == current_user:
+                        winner_is_me = 1
+                    else:
+                        winner_is_me = 0
+                    details_query.update({"winner": winner.id})
+                    db_session.commit()
+                else:
+                    winner_is_me = 2
+                    w_player_stats = db_session.query(userStats).filter_by(user_id = game.w_player).first()
+                    b_player_stats = db_session.query(userStats).filter_by(user_id = game.b_player).first()
+                    winner = None
+                    if w_player_stats.win_rate > b_player_stats.win_rate:
+                        winner = game.w_player
+                    elif w_player_stats.win_rate < b_player_stats.win_rate:
+                        winner = game.b_player
+                    else:
+                        winner = random.choice([game.w_player, game.b_player])
+                    
+                    details_query.update({"winner": -1 * winner})
+                    db_session.commit()
+                
+                update_win_rate(game.w_player, game)
+                update_win_rate(game.b_player, game)
+                    
+            else:
+                if py_game.curr_player.color == "black":
+                    if current_user.id == game.b_player:
+                        my_turn = 1
+                    else:
+                        my_turn = 0
+                else:
+                    if current_user.id == game.w_player:
+                        my_turn = 1
+                    else:
+                        my_turn = 0
         else:
             if py_game.chess_board.counter == 1:
                 if py_game.curr_player.color == "white":
                     if current_user.id == game.b_player:
                         my_turn = 0
-        
-        if py_game.ended == 1:
-            my_turn = -1
-            
-            if py_game.w_checkmate == 1:
-                winner = db_session.query(User).filter_by(id = game.b_player).first()
-            elif py_game.b_checkmate == 1:
-                winner = db_session.query(User).filter_by(id = game.w_player).first()
-            else:
-                my_turn = -2
-
-            if my_turn == -1:
-                if winner == current_user:
-                    winner_is_me = 1
-                else:
-                    winner_is_me = 0
-                details_query.update({"winner": winner.id})
-                db_session.commit()
-            else:
-                winner_is_me = 2
-                w_player_stats = db_session.query(userStats).filter_by(user_id = game.w_player).first()
-                b_player_stats = db_session.query(userStats).filter_by(user_id = game.b_player).first()
-                winner = None
-                if w_player_stats.win_rate > b_player_stats.win_rate:
-                    winner = game.w_player
-                elif w_player_stats.win_rate < b_player_stats.win_rate:
-                    winner = game.b_player
-                else:
-                    winner = random.choice([game.w_player, game.b_player])
-                
-                details_query.update({"winner": -1 * winner})
-                db_session.commit()
-            
-            update_win_rate(game.w_player, game)
-            update_win_rate(game.b_player, game)
-                
-        else:
-            if py_game.curr_player.color == "black":
-                if current_user.id == game.b_player:
-                    my_turn = 1
-                else:
-                    my_turn = 0
-            else:
-                if current_user.id == game.w_player:
-                    my_turn = 1
-                else:
-                    my_turn = 0
 
         taken_figures = py_game.w_player.won_figures + py_game.b_player.won_figures
         
