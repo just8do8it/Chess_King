@@ -183,11 +183,11 @@ class Figure:
 	
 
 	def move_horse(self, new_pos_num, new_pos_ltr, test, new_ltr):
-		if new_ltr < self.curr_pos_ltr - 2 or new_ltr > self.curr_pos_ltr + 2 or new_ltr == self.curr_pos_ltr or \
-				new_pos_num < self.curr_pos_num - 2 or new_pos_num > self.curr_pos_num + 2 or new_pos_num == self.curr_pos_num:
+		if abs(new_ltr - self.curr_pos_ltr) > 2 or new_ltr == self.curr_pos_ltr or \
+			abs(new_pos_num - self.curr_pos_num) > 2 or new_pos_num == self.curr_pos_num:
 					return False
 		else:
-			if abs(new_ltr - self.curr_pos_ltr) == 1 and abs(new_pos_num - self.curr_pos_num) == 1:
+			if abs(new_ltr - self.curr_pos_ltr) == abs(new_pos_num - self.curr_pos_num):
 				return False
 			else:
 				if test == 0:

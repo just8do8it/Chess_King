@@ -150,12 +150,12 @@ class Game:
 		
 		check = self.determine_check(curr_figures, opponent_copy.figures, None)
 		max_pos, mate = self.determine_mate(curr_figures, curr_player_copy, opponent_copy, chess_board_copy)
-		
 		if not command_passed and check:
 			self.ended = -1
 		else:
 			if self.ended == -1:
 				if check or (check and mate == max_pos and mate != 0):
+					print("HEREE")
 					self.is_moved = 0
 					self.ended = 0
 
@@ -250,35 +250,40 @@ class Game:
 			if len(command) != 5:
 				if len(command) == 1:
 					new_figure_name = command
-				self.ok = 0
-				continue
-			
+				else:
+					self.ok = 0
+					continue
 			
 			if new_figure_name != "":
 				alive_options = []
 				dead_options = []
 				prev_command = external_commands[self.command_counter - 1]
-				if self.chess_board.board[prev_command[4] - 1][prev_command[3]].name[0] == "P":
+				if self.chess_board.board[int(prev_command[4]) - 1][prev_command[3]].name[0] == "P":
 					for taken_fig in self.opponent.won_figures:
-						if new_figure_name == taken_fig.name[0]:
-							dead_options.append(taken_fig.name)
+						if new_figure_name == taken_fig[0][0]:
+							dead_options.append(taken_fig[0])
 					
 					if len(dead_options):
 						new_figure_name = dead_options[0]
 						for name in dead_options:
 							if name[1] < new_figure_name[1]:
-								new_figure_name = name[1]
+								new_figure_name = name
 					else:
 						for fig in self.opponent.figures:
 							if new_figure_name == fig.name[0]:
 								alive_options.append(fig.name)
 						
+						new_figure_name = alive_options[0]
 						for name in alive_options:
 							if name[1] > new_figure_name[1]:
-								new_figure_name = name[1]
+								new_figure_name = name
 						
-						new_figure_name[1] += 1
-
+					modified_fig_name = new_figure_name[0] + str(int(new_figure_name[1]) + 1)
+					self.chess_board.board[int(prev_command[4]) - 1][prev_command[3]].name = modified_fig_name
+					new_figure_name = ""
+					self.command_counter += 1
+					self.is_moved = 1
+					continue
 
 			src_letter = command[0]
 			src_number = command[1]

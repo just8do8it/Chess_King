@@ -126,17 +126,21 @@ def game(game_id):
                     db_session.commit()
                 else:
                     winner_is_me = 2
-                    w_player_stats = db_session.query(userStats).filter_by(user_id = game.w_player).first()
-                    b_player_stats = db_session.query(userStats).filter_by(user_id = game.b_player).first()
-                    winner = None
-                    if w_player_stats.win_rate > b_player_stats.win_rate:
-                        winner = game.w_player
-                    elif w_player_stats.win_rate < b_player_stats.win_rate:
-                        winner = game.b_player
+                    if game.tournament_id == None:
+                        details_query.update({"winner": 0})
                     else:
-                        winner = random.choice([game.w_player, game.b_player])
+                        w_player_stats = db_session.query(userStats).filter_by(user_id = game.w_player).first()
+                        b_player_stats = db_session.query(userStats).filter_by(user_id = game.b_player).first()
+                        winner = None
+                        if w_player_stats.win_rate > b_player_stats.win_rate:
+                            winner = game.w_player
+                        elif w_player_stats.win_rate < b_player_stats.win_rate:
+                            winner = game.b_player
+                        else:
+                            winner = random.choice([game.w_player, game.b_player])
+                        
+                        details_query.update({"winner": -1 * winner})
                     
-                    details_query.update({"winner": -1 * winner})
                     db_session.commit()
                 
                 update_win_rate(game.w_player, game)

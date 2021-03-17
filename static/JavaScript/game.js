@@ -158,11 +158,13 @@ function sendCommand(update) {
 
 			if (command[4] == 1 || command[4] == 8){
 				if (board[command[4] - 1][command[3]][0] == "P") {
-					var figure = prompt("Choose what figure to revive:", "Figure name (for example 'Q')");
-					if (figure != null) {
-						command = figure;
-						sendCommand(0);
+					var figure = prompt("Choose what figure to revive:", "For example 'Q' for queen");
+					while (figure == null || figure.length > 1 || 
+						(figure != "Q" && figure != "B" && figure != "H" && figure != "R" && figure != "P")) {
+						figure = prompt("Choose what figure to revive:", "For example 'Q' for queen");
 					}
+					command = figure;
+					sendCommand(0);
 				}
 			}
 
