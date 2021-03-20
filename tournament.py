@@ -5,7 +5,7 @@ from flask_session import Session
 from sqlalchemy import or_, and_, update, delete, insert
 from database import db_session
 from models import User, GameT, gameDetails, userStats, Tournament, Message
-import os, ast, models, pdb, string, random
+import os, ast, models, pdb, string, random, copy
 import auth, game_base
 
 app = get_app()
@@ -94,8 +94,9 @@ def tournament_matchmaking():
 
 
 def start_quarter_final(tournament):
-    waiting = ast.literal_eval(tournament.waiting_users)
+    waiting = copy.deepcopy(ast.literal_eval(tournament.waiting_users))
     if len(waiting) == 8:
+        tournament.waiting_users = ""
         for i in range(0, 8, 2):
             game_id = get_random_string(7)
             gameT = GameT(game_id, waiting[i], waiting[i + 1], tournament.id)
@@ -103,7 +104,6 @@ def start_quarter_final(tournament):
             game_details = gameDetails(game_id)
             db_session.add(game_details)
 
-        tournament.waiting_users = ""
         tournament.quarter_final = str(waiting)
         db_session.commit()
         return "OK"
@@ -116,8 +116,12 @@ def start_semi_final(tournament, games):
     for game in games:
         game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
         if game_details.winner != None:
-            semi_finalists.append(abs(game_details.winner))
+            if type(game_details.winner) is float:
+                semi_finalists.append(int(abs(game_details.winner) / 1.11))
+            else:
+                semi_finalists.append(abs(game_details.winner))
 
+    print(semi_finalists)
     if len(semi_finalists) < 4:
         return abort(409)
     
@@ -144,20 +148,25 @@ def start_final(tournament, games):
     for game in games:
         game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
         if game_details.winner:
-            if abs(game_details.winner) in semi_finalists:
-                winners.append(game_details.winner)
+            if abs(game_details.winner) in semi_finalists or int(abs(game_details.winner) / 1.11) in semi_finalists:
+                if type(game_details.winner) is float:
+                    winners.append(int(abs(game_details.winner) / 1.11))
+                else:
+                    winners.append(abs(game_details.winner))
 
     for winner in winners:
         num_of_games = 0
-        winner_games = db_session.query(gameDetails).filter_by(winner = winner).all()
+        winner_games = db_session.query(gameDetails).filter(or_(gameDetails.winner == winner,
+                                                                gameDetails.winner == -1 * winner)).all()
         for details in winner_games:
             game = db_session.query(GameT).filter_by(id = details.game_id).first()
             if tournament.id == game.tournament_id:
                 num_of_games += 1
-        
+        print(num_of_games)
         if num_of_games > 1 and abs(winner) not in finalists:
             finalists.append(abs(winner))
 
+    print(winners, finalists)
     if len(finalists) < 2:
         return abort(409)
     
@@ -183,7 +192,10 @@ def determine_winner(tournament, games):
 
             game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
             if game_details.winner != None:
-                tournament.winner = abs(game_details.winner)
+                if type(game_details.winner) is float:
+                    tournament.winner = int(abs(game_details.winner) / 1.11)
+                else:
+                    tournament.winner = abs(game_details.winner)
                 db_session.commit()
                 winner = db_session.query(User).filter_by(id = tournament.winner).first()
                 variable = dict(winner="The winner is " + winner.username + "!")

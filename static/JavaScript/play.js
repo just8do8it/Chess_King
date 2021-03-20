@@ -3,7 +3,7 @@ localStorage.setItem("tournament", 0);
 var game_id, white_player, black_player;
 
 function end_waiting(){
-	if (localStorage.getItem("tournament") == 1) {
+	if (localStorage.getItem("tournament") == "1") {
 		$.ajax({
 			url: '/tournament_end_waiting',
 			type: 'POST',

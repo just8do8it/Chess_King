@@ -40,7 +40,7 @@ class Figure:
 					ltr = chr(figure.curr_pos_ltr)
 
 				result = self.move(num, ltr, 1)
-				if (type(result) == bool and result == True) or (type(result) != bool and result[0] == True):					
+				if (type(result) is bool and result == True) or (type(result) is not bool and result[0] == True):					
 					self.movable_positions.append((num, ltr))
 				
 				z += 1

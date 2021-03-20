@@ -183,86 +183,88 @@ function sendCommand(update) {
 				stop = 1;
 				localStorage.setItem("game_ended", 1);
 			}
-
+			
 			if (localStorage.getItem("game_ended") == "1") {
+				alert(localStorage.getItem("tournament"));
 				if (localStorage.getItem("tournament") == "1") {
-					fetch('/tournament_matchmaking', {
-						method: 'GET',
-						headers: {
-							'Content-Type': 'application/json',
-							'Accept': 'application/json'
-						}
-					}).then(function (response) {
-						response.json().then(function(data) {
-							console.log(data);
-							if (typeof(data) != typeof("string")) {
-								localStorage.setItem("tournament", 0);
-								alert(data["winner"]);
-								window.location = "http://localhost:5000/play";
+					window.onbeforeunload = null;
+					if (winner_is_me == 0) {
+						alert("You lose! You'll be redirected to the Play page.");
+						setTimeout(function () {
+							window.location = "http://localhost:5000/play";
+						}, 1500);
+					} else {
+						fetch('/tournament_matchmaking', {
+							method: 'GET',
+							headers: {
+								'Content-Type': 'application/json',
+								'Accept': 'application/json'
 							}
-						}).finally(function() {
-							window.onbeforeunload = null;
-							if (winner_is_me == 0) {
-								alert("You lose! You'll be redirected to the Play page.");
-								setTimeout(function () {
+						}).then(function (response) {
+							response.json().then(function(data) {
+								console.log(data);
+								if (typeof(data) != typeof("string")) {
+									localStorage.setItem("tournament", 0);
+									alert(data["winner"]);
 									window.location = "http://localhost:5000/play";
-								}, 1500);
-							} else if (winner_is_me == 1) {
-								alert("You win! Wait to get matched for the next game.");
-								setInterval(function() {
-									document.getElementById("waiting").style.display = "inline";
-									fetch('/get_in_game', {
-										method: 'GET',
-										headers: {
-											'Content-Type': 'application/json',
-											'Accept': 'application/json'
-										}
-									}).then(function (response) {
-										response.json().then(function(data) {
-											if (localStorage.getItem("game_ended") == "1") {
-												console.log(data);
-												alert("You win! Proceed to the next game.");
-												localStorage.setItem("game_ended", 0);
-												setTimeout(function () {
-													window.location = "http://localhost:5000/game/" + data['game_id'];
-												}, 2000);
-											}
-										}).catch(function() {
-											console.log("error");
-										});
-									});
-								}, 2000);
-							} else {
-								alert("Draw! If you have higher win rate than your opponent, you will proceed in the tournament.");
-								setInterval(function() {
-									document.getElementById("waiting").style.display = "inline";
-									fetch('/get_in_game', {
-										method: 'GET',
-										headers: {
-											'Content-Type': 'application/json',
-											'Accept': 'application/json'
-										}
-									}).then(function (response) {
-										response.json().then(function(data) {
-											if (localStorage.getItem("game_ended") == "1") {
-												console.log(data);
-												localStorage.setItem("game_ended", 0);
-												setTimeout(function () {
-													if (data['game_id'].length > 7) {
-														window.location = data['game_id'];
-													} else {
-														window.location = "http://localhost:5000/game/" + data['game_id'];
-													}
-												}, 2000);
-											}
-										}).catch(function() {
-											console.log("error");
-										});
-									});
-								}, 2000);
-							}
+								}
+							});
 						});
-					});
+
+						if (winner_is_me == 1) {
+							alert("You win! Wait to get matched for the next game.");
+							setInterval(function() {
+								document.getElementById("waiting").style.display = "inline";
+								fetch('/get_in_game', {
+									method: 'GET',
+									headers: {
+										'Content-Type': 'application/json',
+										'Accept': 'application/json'
+									}
+								}).then(function (response) {
+									response.json().then(function(data) {
+										if (localStorage.getItem("game_ended") == "1") {
+											console.log(data);
+											localStorage.setItem("game_ended", 0);
+											setTimeout(function () {
+												window.location = "http://localhost:5000/game/" + data['game_id'];
+											}, 2000);
+										}
+									}).catch(function() {
+										console.log("error");
+									});
+								});
+							}, 2000);
+						} else {
+							alert("Draw! If you have higher win rate than your opponent, you will proceed in the tournament.");
+							setInterval(function() {
+								document.getElementById("waiting").style.display = "inline";
+								fetch('/get_in_game', {
+									method: 'GET',
+									headers: {
+										'Content-Type': 'application/json',
+										'Accept': 'application/json'
+									}
+								}).then(function (response) {
+									response.json().then(function(data) {
+										if (localStorage.getItem("game_ended") == "1") {
+											console.log(data);
+											localStorage.setItem("game_ended", 0);
+											setTimeout(function () {
+												if (data['game_id'] == "http://localhost:5000/play") {
+													window.location = "http://localhost:5000/play"
+												} else {
+													window.location = "http://localhost:5000/game/" + data['game_id'];
+												}
+											}, 2000);
+										}
+									}).catch(function() {
+										console.log("error");
+									});
+								});
+							}, 2000);
+						}
+					}	
 				} else {
 					window.onbeforeunload = null;
 					str = "";

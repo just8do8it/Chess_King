@@ -61,12 +61,10 @@ def game(game_id):
     else:
         py_game = Game([], [], None)       
         variables = {}
-        new_figure_name = ""
+
         command = request.get_json()
         if isinstance(command, str) != True:
             return abort(404)
-        if len(command) == 1:
-            new_figure_name = command
         
         winner_is_me = None
         commands = []
@@ -74,37 +72,17 @@ def game(game_id):
         game_details = details_query.first()
         if game_details.moves != "":
             commands = ast.literal_eval(game_details.moves)
-        
 
         if command != "update":
             commands.append(command)
         
         is_moved = py_game.run(commands)
 
-        name_board = [{}, {}, {}, {}, {}, {}, {}, {}]
-        
-        counter = 0
-        for line in py_game.chess_board.board:
-            for key in line:
-                if line[key] == None:
-                    name_board[counter][key] = "  "
-                    continue
-                name_board[counter][key] = line[key].name
-            counter += 1
-
         my_turn = None
-        
-        if game_details.winner != None and game_details.winner != current_user.id:
-            variables = dict(board = name_board,
-                        alive_figures = py_game.alive_figures,
-                        taken_figures = [],
-                        my_turn = -1,
-                        winner_is_me = 0)
 
-            return variables
-        
-        if is_moved or new_figure_name != "":
-            details_query.update({"moves": str(commands)})
+        if is_moved:
+            if command != "update" or (command == "update" and str(commands) == game_details.moves):
+               game_details.moves = str(commands)
             db_session.commit()
             winner = None
             if py_game.ended == 1:
@@ -122,24 +100,25 @@ def game(game_id):
                         winner_is_me = 1
                     else:
                         winner_is_me = 0
-                    details_query.update({"winner": winner.id})
+                    game_details.winner = winner.id
                     db_session.commit()
                 else:
                     winner_is_me = 2
                     if game.tournament_id == None:
-                        details_query.update({"winner": 0})
+                        game_details.winner = 0
                     else:
-                        w_player_stats = db_session.query(userStats).filter_by(user_id = game.w_player).first()
-                        b_player_stats = db_session.query(userStats).filter_by(user_id = game.b_player).first()
-                        winner = None
-                        if w_player_stats.win_rate > b_player_stats.win_rate:
-                            winner = game.w_player
-                        elif w_player_stats.win_rate < b_player_stats.win_rate:
-                            winner = game.b_player
-                        else:
-                            winner = random.choice([game.w_player, game.b_player])
-                        
-                        details_query.update({"winner": -1 * winner})
+                        if game_details.winner == None:
+                            w_player_stats = db_session.query(userStats).filter_by(user_id = game.w_player).first()
+                            b_player_stats = db_session.query(userStats).filter_by(user_id = game.b_player).first()
+                            winner = None
+                            if w_player_stats.win_rate > b_player_stats.win_rate:
+                                winner = game.w_player
+                            elif w_player_stats.win_rate < b_player_stats.win_rate:
+                                winner = game.b_player
+                            else:
+                                winner = random.choice([game.w_player, game.b_player])
+                            
+                            game_details.winner = -1.11 * winner
                     
                     db_session.commit()
                 
@@ -162,6 +141,18 @@ def game(game_id):
                 if py_game.curr_player.color == "white":
                     if current_user.id == game.b_player:
                         my_turn = 0
+        
+
+        name_board = [{}, {}, {}, {}, {}, {}, {}, {}]
+        
+        counter = 0
+        for line in py_game.chess_board.board:
+            for key in line:
+                if line[key] == None:
+                    name_board[counter][key] = "  "
+                    continue
+                name_board[counter][key] = line[key].name
+            counter += 1
 
         taken_figures = py_game.w_player.won_figures + py_game.b_player.won_figures
         
@@ -175,6 +166,10 @@ def game(game_id):
 
 
 def update_win_rate(user_id, game):
+    user = db_session.query(User).filter_by(id = user_id).first()
+    user.is_waiting = True
+    user.is_playing = False
+    
     games = []
     stats_query = db_session.query(userStats).filter_by(user_id = user_id)
     stats = stats_query.first()

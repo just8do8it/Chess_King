@@ -39,15 +39,15 @@ def get_in_game():
                 break
             else:
                 if game.tournament_id != None:
-                    tournament = db_session.query(Tournament).filter_by(id = game.tournament_id).first()
-                    if tournament.winner == None:
-                        if game_details.winner < 0:
-                            if current_user.id != abs(game_details.winner):
-                                current_user.is_waiting = False
-                                current_user.is_playing = False
-                                db_session.commit()
-                                variable = dict(game_id = "http://localhost:5000/play")
-                                return variable
+                    # tournament = db_session.query(Tournament).filter_by(id = game.tournament_id).first()
+                    if game_details.winner == -1.11 * game.w_player or game_details.winner == -1.11 * game.b_player:
+                        if current_user.id != int(abs(game_details.winner) / 1.11):
+                            current_user.is_waiting = False
+                            current_user.is_playing = False
+                            game_details.winner = int(game_details.winner / 1.11)
+                            db_session.commit()
+                            variable = dict(game_id = "http://localhost:5000/play")
+                            return variable
                     
     
     return abort(405)

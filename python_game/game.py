@@ -150,7 +150,7 @@ class Game:
 		
 		check = self.determine_check(curr_figures, opponent_copy.figures, None)
 		max_pos, mate = self.determine_mate(curr_figures, curr_player_copy, opponent_copy, chess_board_copy)
-		if not command_passed and check:
+		if not command_passed and (check or (not check and mate == max_pos and mate != 0)):
 			self.ended = -1
 		else:
 			if self.ended == -1:
@@ -236,8 +236,6 @@ class Game:
 			
 			if self.command_counter < len(external_commands):
 				command = external_commands[self.command_counter]
-				if command == "exit":
-					break
 			else:
 				self.win_condition_check(0, copy.deepcopy(self.chess_board),
 											copy.deepcopy(self.curr_player), 
@@ -309,9 +307,8 @@ class Game:
 				continue
 
 			if source_fig.player == self.curr_player.color:
-				true = True
 				result = source_fig.move(dest_number, dest_letter, 0)
-				if type(result) == type(true):
+				if type(result) is bool:
 					if result == True:
 						self.chess_board.board[src_number - 1][src_letter] = None
 						self.chess_board.board[dest_number - 1][dest_letter] = source_fig
@@ -321,7 +318,7 @@ class Game:
 					else:
 						self.ok = 0
 				else:
-					if type(result[1]) == type("string"):
+					if type(result[1]) is str:
 						if result[1] == "forward" or result[1] == "backwards":
 							rook = None
 							king = None
