@@ -150,6 +150,7 @@ class Game:
 		
 		check = self.determine_check(curr_figures, opponent_copy.figures, None)
 		max_pos, mate = self.determine_mate(curr_figures, curr_player_copy, opponent_copy, chess_board_copy)
+		# print("Real", mate, max_pos)
 		if not command_passed and (check or (not check and mate == max_pos and mate != 0)):
 			self.ended = -1
 		else:
@@ -159,7 +160,7 @@ class Game:
 					self.is_moved = 0
 					self.ended = 0
 
-		if mate:
+		if mate == max_pos and mate > 0:
 			curr_figures, opponent_figures = self.make_board_copy(curr_player_copy, chess_board_copy)
 
 			for fig in curr_figures:
@@ -186,9 +187,13 @@ class Game:
 					curr_figures, opponent_figures = self.make_board_copy(curr_player_copy, chess_board)
 		
 					special_check = self.determine_check(curr_figures, opponent_figures, chess_board)
+					mate_result = self.determine_mate(curr_figures, curr_player_copy, 
+																		opponent_copy, chess_board)
+					special_mate = mate_result[1]
 
-					if special_check < check:
-						mate = 0
+					if special_check < check or special_mate < max_pos:
+						# print(special_mate, special_max_pos)
+						mate -= 1
 		
 		if check != 0:
 			if mate == max_pos and mate != 0:
@@ -221,7 +226,7 @@ class Game:
 			if self.ok == 0 or self.passed == 0:
 				self.ok = 1
 			self.passed = 0
-
+			# print(external_commands)
 			self.curr_player = Player("", [])
 			command = ""
 			if self.command_counter == len(external_commands) - 1:
@@ -256,25 +261,24 @@ class Game:
 				alive_options = []
 				dead_options = []
 				prev_command = external_commands[self.command_counter - 1]
-				if self.chess_board.board[int(prev_command[4]) - 1][prev_command[3]].name[0] == "P":
-					for taken_fig in self.opponent.won_figures:
-						if new_figure_name == taken_fig[0][0]:
-							dead_options.append(taken_fig[0])
+				for taken_fig in self.opponent.won_figures:
+					if new_figure_name == taken_fig[0][0]:
+						dead_options.append(taken_fig[0])
+				
+				if len(dead_options):
+					new_figure_name = dead_options[0]
+					for name in dead_options:
+						if name[1] < new_figure_name[1]:
+							new_figure_name = name
+				else:
+					for fig in self.opponent.figures:
+						if new_figure_name == fig.name[0]:
+							alive_options.append(fig.name)
 					
-					if len(dead_options):
-						new_figure_name = dead_options[0]
-						for name in dead_options:
-							if name[1] < new_figure_name[1]:
-								new_figure_name = name
-					else:
-						for fig in self.opponent.figures:
-							if new_figure_name == fig.name[0]:
-								alive_options.append(fig.name)
-						
-						new_figure_name = alive_options[0]
-						for name in alive_options:
-							if name[1] > new_figure_name[1]:
-								new_figure_name = name
+					new_figure_name = alive_options[0]
+					for name in alive_options:
+						if name[1] > new_figure_name[1]:
+							new_figure_name = name
 						
 					modified_fig_name = new_figure_name[0] + str(int(new_figure_name[1]) + 1)
 					self.chess_board.board[int(prev_command[4]) - 1][prev_command[3]].name = modified_fig_name
@@ -295,6 +299,7 @@ class Game:
 				len(command) != 5 or \
 				command[2] != '-':
 					self.ok = 0
+					print("shit 1")
 					continue
 			
 			src_number = int(src_number)
@@ -304,6 +309,7 @@ class Game:
 
 			if source_fig == None:
 				self.ok = 0
+				print("shit 2")
 				continue
 
 			if source_fig.player == self.curr_player.color:
@@ -314,8 +320,10 @@ class Game:
 						self.chess_board.board[dest_number - 1][dest_letter] = source_fig
 						self.passed = 1
 						self.is_moved = 1
-						source_fig.check_en_passant()
+						if source_fig.name[0] == "P":
+							source_fig.check_en_passant()
 					else:
+						print("gotchu")
 						self.ok = 0
 				else:
 					if type(result[1]) is str:
@@ -333,6 +341,7 @@ class Game:
 							if rook.curr_pos_num != rook.start_pos_num or \
 								rook.curr_pos_ltr != rook.start_pos_ltr:
 								self.ok = 0
+								print("shit 3")
 								continue
 
 							start_ltr = ""
@@ -348,19 +357,23 @@ class Game:
 							
 							for pos_ltr in range(start_ltr, end_ltr):
 								if self.chess_board.board[king.curr_pos_num - 1][chr(pos_ltr)] != None:
+									print("gotchu pt.2")
 									self.ok = 0
 
 							for opponent_fig in self.opponent.figures:
 								for pos in opponent_fig.movable_positions:
 									if pos[0] == king.curr_pos_num and \
 										(pos[1] == king_pos_letters[0] or pos[1] == king_pos_letters[1]):
+										print("gotchu pt.3")
 										self.ok = 0
 
 							if self.curr_player.color == "white":
 								if self.w_check:
+									print("gotchu pt.4")
 									self.ok = 0
 							else:
 								if self.b_check:
+									print("gotchu pt.5")
 									self.ok = 0
 
 							if self.ok:
@@ -392,6 +405,7 @@ class Game:
 						self.passed = 1
 						self.is_moved = 1
 			if self.ok == 0 or self.passed == 0:
+				# print("shit 4")
 				continue
 			else:
 				self.win_condition_check(1, copy.deepcopy(self.chess_board),

@@ -61,6 +61,8 @@ def get_online_players():
     if user.count() >= 1:
         first_user = current_user
         second_user = user.first()
+        second_user.is_waiting = False
+        db_session.commit()
 
         created_games = db_session.query(GameT).filter(or_(GameT.w_player == first_user.id, 
                                                         GameT.b_player == first_user.id)).all()
@@ -69,6 +71,7 @@ def get_online_players():
             for game in created_games:        
                 game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
                 if game_details.winner == None:
+                    second_user.is_waiting = True
                     aborting = 1
                     break
         
@@ -81,12 +84,10 @@ def get_online_players():
 
             first_user.is_waiting = False
             first_user.is_playing = True
-            
-            second_user.is_waiting = False
+
             second_user.is_playing = True
 
             db_session.commit()
-
             variables = dict(game_id=game_id)
             return variables
     

@@ -157,7 +157,7 @@ function sendCommand(update) {
 			updateBoard();
 
 			if (command[4] == 1 || command[4] == 8){
-				if (board[command[4] - 1][command[3]][0] == "P") {
+				if (board[command[1] - 1][command[0]][0] == "P") {
 					var figure = prompt("Choose what figure to revive:", "For example 'Q' for queen");
 					while (figure == null || figure.length > 1 || 
 						(figure != "Q" && figure != "B" && figure != "H" && figure != "R" && figure != "P")) {

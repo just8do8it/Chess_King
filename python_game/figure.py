@@ -94,6 +94,8 @@ class Figure:
 								else:
 									return True
 						else:
+							if test == 0:
+								print(self.chess_board.en_passant[0].name)
 							return False
 
 					if self.board[new_pos_num - 1][new_pos_ltr] != None:
@@ -104,6 +106,8 @@ class Figure:
 						else:
 							return True
 					else:
+						if test == 0:
+							print("found 2")
 						return False
 				else:
 					if new_pos_num == self.curr_pos_num + 2 or new_pos_num == self.curr_pos_num - 2:
