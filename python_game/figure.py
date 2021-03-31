@@ -104,8 +104,6 @@ class Figure:
 						else:
 							return True
 					else:
-						if test == 0:
-							print("found 2")
 						return False
 				else:
 					if new_pos_num == self.curr_pos_num + 2 or new_pos_num == self.curr_pos_num - 2:
@@ -297,7 +295,6 @@ class Figure:
 				for i in range(abs(new_ltr - self.curr_pos_ltr) - 1):
 					if self.board[self.curr_pos_num + num_counter - 1][chr(self.curr_pos_ltr + ltr_counter)] != None:
 						return False
-					# print(self.board[2]['G'])
 					num_counter += spec_num_counter
 					ltr_counter += spec_ltr_counter
 

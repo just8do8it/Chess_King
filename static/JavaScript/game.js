@@ -186,7 +186,7 @@ function sendCommand(update) {
 			}
 			
 			if (localStorage.getItem("game_ended") == "1") {
-				if (localStorage.getItem("tournament") == "1") {
+				if (localStorage.getItem("tournament") != "0") {
 					window.onbeforeunload = null;
 					if (winner_is_me == 0) {
 						alert("You lose! You'll be redirected to the Play page.");
@@ -278,9 +278,24 @@ function sendCommand(update) {
 					}
 
 					alert(str + " You'll be redirected to the Play page.");
+					for (var i = 0; i < 5; ++i) {
+						fetch('/get_in_game', {
+							method: 'GET',
+							headers: {
+								'Content-Type': 'application/json',
+								'Accept': 'application/json'
+							}
+						}).then(function (response) {
+							response.json().then(function(data) {}
+							).catch(function() {
+								console.log("error");
+							});
+						});
+					}
+					
 					setTimeout(function () {
 						window.location = "http://localhost:5000/play";
-					}, 1500);
+					}, 2000);
 				}
 			}
 		});

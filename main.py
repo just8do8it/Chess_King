@@ -134,7 +134,6 @@ def replay(game_id):
             if move_counter < len(moves) and len(moves[move_counter]) == 1:
                 move_counter = min(len(moves), move_counter - 1)
     
-        print(len(moves), move_counter)
         py_game.run(moves[:move_counter])
 
         w_won_figs = []

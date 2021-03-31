@@ -39,7 +39,6 @@ def get_in_game():
                 break
             else:
                 if game.tournament_id != None:
-                    # tournament = db_session.query(Tournament).filter_by(id = game.tournament_id).first()
                     if game_details.winner == -1.11 * game.w_player or game_details.winner == -1.11 * game.b_player:
                         if current_user.id != int(abs(game_details.winner) / 1.11):
                             current_user.is_waiting = False

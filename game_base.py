@@ -77,7 +77,6 @@ def game(game_id):
             commands.append(command)
         else:
             moves = command[6:]
-            # print(moves)
             if game_details.moves == moves and game_details.winner == None:
                 return abort(404)
             command = "update"
@@ -88,7 +87,6 @@ def game(game_id):
 
         if is_moved:
             if command != "update" or (command == "update" and str(commands) == game_details.moves):
-                # print("HERE", commands)
                 game_details.moves = str(commands)
                 db_session.commit()
             winner = None
@@ -129,8 +127,8 @@ def game(game_id):
                     
                     db_session.commit()
                 
-                update_win_rate(game.w_player, game)
-                update_win_rate(game.b_player, game)
+                update_win_rate(game.w_player, game, winner_is_me, game_details.winner)
+                update_win_rate(game.b_player, game, winner_is_me, game_details.winner)
                     
             else:
                 if py_game.curr_player.color == "black":
@@ -173,8 +171,13 @@ def game(game_id):
         return variables
 
 
-def update_win_rate(user_id, game):
+def update_win_rate(user_id, game, winner_is_me, winner):
     user = db_session.query(User).filter_by(id = user_id).first()
+    if game.tournament_id != None and winner_is_me == 1:
+        user.is_waiting = True
+    elif winner_is_me == 2:
+        if winner == user_id or winner / -1.11 == user_id:
+            user.is_waiting = True
     user.is_playing = False
     
     games = []

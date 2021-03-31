@@ -77,31 +77,48 @@ def tournament_getting_players():
 @login_required
 def tournament_matchmaking():
     tournaments = db_session.query(Tournament).all()
-    for tournament in tournaments:
-        print(tournament.waiting_users)
-        if tournament.waiting_users != "":
-            return start_quarter_final(tournament)
-        else:
-            games = db_session.query(GameT).filter_by(tournament_id = tournament.id).all()
-            
-            if tournament.semi_final == "":
-                return start_semi_final(tournament, games)
-            
-            elif tournament.final == "" and tournament.semi_final != "Calculating...":
-                return start_final(tournament, games)
+    curr_tour = None
 
-            elif tournament.winner == None and tournament.final != "Calculating...":
-                return determine_winner(tournament, games)
-            
-            else:
-                return winner_notifier(tournament, games)
+    for tournament in tournaments:
+        games = db_session.query(GameT).filter_by(tournament_id = tournament.id).all()
+        for game in games:
+            if (current_user.id == game.w_player or current_user.id == game.b_player) and \
+                (tournament.winner == None or type(tournament.winner) is float):
+                    curr_tour = tournament
+                    break
+                
+        if curr_tour != None:
+            break
+
+    if curr_tour == None:
+        for tournament in tournaments:
+            if tournament.waiting_users != "":
+                return start_quarter_final(tournament)    
+    
+    else:
+        games = db_session.query(GameT).filter_by(tournament_id = curr_tour.id).all()
+        
+        if curr_tour.semi_final == "":
+            tournament.semi_final = "Calculating..."
+            db_session.commit()
+            return start_semi_final(curr_tour, games)
+        
+        elif curr_tour.final == "" and curr_tour.semi_final != "Calculating..." and curr_tour.semi_final != "":
+            tournament.final = "Calculating..."
+            db_session.commit()
+            return start_final(curr_tour, games)
+
+        elif curr_tour.winner == None and curr_tour.final != "Calculating..." and curr_tour.final != "":
+            return determine_winner(curr_tour, games)
+
+        elif curr_tour.winner != None:
+            return winner_notifier(curr_tour, games)
     
     return abort(409)
 
 
 def start_quarter_final(tournament):
     waiting = copy.deepcopy(ast.literal_eval(tournament.waiting_users))
-    print(waiting)
     if len(waiting) == 8:
         tournament.waiting_users = ""
         for i in range(0, 8, 2):
@@ -119,8 +136,6 @@ def start_quarter_final(tournament):
 
 
 def start_semi_final(tournament, games):
-    tournament.semi_final = "Calculating..."
-    db_session.commit()
     semi_finalists = []
     for game in games:
         game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
@@ -130,7 +145,6 @@ def start_semi_final(tournament, games):
             else:
                 semi_finalists.append(abs(game_details.winner))
 
-    print(semi_finalists)
     if len(semi_finalists) < 4:
         tournament.semi_final = ""
         db_session.commit()
@@ -153,8 +167,6 @@ def start_semi_final(tournament, games):
 
 
 def start_final(tournament, games):
-    tournament.final = "Calculating..."
-    db_session.commit()
     semi_finalists = ast.literal_eval(tournament.semi_final)
     winners = []
     finalists = []
@@ -175,7 +187,7 @@ def start_final(tournament, games):
             game = db_session.query(GameT).filter_by(id = details.game_id).first()
             if tournament.id == game.tournament_id:
                 num_of_games += 1
-
+        
         if num_of_games > 1 and abs(winner) not in finalists:
             finalists.append(abs(winner))
 
@@ -212,7 +224,7 @@ def determine_winner(tournament, games):
                 else:
                     winner_id = abs(game_details.winner)
                 
-                tournament.winner = -1 * winner_id
+                tournament.winner = winner_id
                 db_session.commit()
                 winner = db_session.query(User).filter_by(id = winner_id).first()
                 variable = dict(winner = "The winner is " + winner.username + "!")

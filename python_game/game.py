@@ -157,7 +157,6 @@ class Game:
 		else:
 			if self.ended == -1:
 				if check or (check and mate == max_pos and mate != 0):
-					#print("IN")
 					self.is_moved = 0
 					self.ended = 0
 
@@ -235,7 +234,6 @@ class Game:
 			if self.ok == 0 or self.passed == 0:
 				self.ok = 1
 			self.passed = 0
-			# print(external_commands)
 			self.curr_player = Player("", [])
 			command = ""
 			if self.command_counter == len(external_commands) - 1:
@@ -318,7 +316,6 @@ class Game:
 				len(command) != 5 or \
 				command[2] != '-':
 					self.ok = 0
-					print("shit 1")
 					continue
 			
 			src_number = int(src_number)
@@ -329,7 +326,6 @@ class Game:
 
 			if source_fig == None:
 				self.ok = 0
-				print("shit 2")
 				continue
 
 			if source_fig.player == self.curr_player.color:
@@ -343,7 +339,6 @@ class Game:
 						if source_fig.name[0] == "P":
 							source_fig.check_en_passant()
 					else:
-						# print("gotchu")
 						self.ok = 0
 				else:
 					if type(result[1]) is str:
@@ -361,7 +356,6 @@ class Game:
 							if rook.curr_pos_num != rook.start_pos_num or \
 								rook.curr_pos_ltr != rook.start_pos_ltr:
 								self.ok = 0
-								print("shit 3")
 								continue
 
 							start_ltr = ""
@@ -377,23 +371,19 @@ class Game:
 							
 							for pos_ltr in range(start_ltr, end_ltr):
 								if self.chess_board.board[king.curr_pos_num - 1][chr(pos_ltr)] != None:
-									print("gotchu pt.2")
 									self.ok = 0
 
 							for opponent_fig in self.opponent.figures:
 								for pos in opponent_fig.movable_positions:
 									if pos[0] == king.curr_pos_num and \
 										(pos[1] == king_pos_letters[0] or pos[1] == king_pos_letters[1]):
-										print("gotchu pt.3")
 										self.ok = 0
 
 							if self.curr_player.color == "white":
 								if self.w_check:
-									print("gotchu pt.4")
 									self.ok = 0
 							else:
 								if self.b_check:
-									print("gotchu pt.5")
 									self.ok = 0
 
 							if self.ok:
@@ -439,7 +429,6 @@ class Game:
 				self.chess_board.board[dest_number - 1][dest_letter] = dest_figure
 			
 			if self.ok == 0 or self.passed == 0:
-				# print("shit 4")
 				continue
 
 			self.alive_figures = []
@@ -459,8 +448,3 @@ class Game:
 					self.chess_board.en_passant = (None, 0)
 	
 		return self.is_moved
-			
-# game = Game([], [], None)
-# game.run(["E2-E4"])
-# game.run(["A7-A5"])
-# game.run(["F2-F3", "E7-E5", "G2-G4", "D8-H4"])
