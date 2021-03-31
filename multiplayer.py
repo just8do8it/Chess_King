@@ -28,7 +28,7 @@ def get_in_game():
                     opponent = second_player
                 else:
                     opponent = first_player
-
+                
                 if (first_player.is_waiting == 1 and second_player.is_waiting == 1) or opponent.is_playing == 1:
                     current_user.is_waiting = False
                     current_user.is_playing = True

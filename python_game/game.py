@@ -97,6 +97,7 @@ class Game:
 
 	def determine_mate(self, curr_figures, curr_player_copy, opponent_copy, chess_board_copy):
 		mate = 0
+		max_pos = None
 		for fig in curr_figures:
 			if fig.name == "K1":
 				fig.update_movable_positions(chess_board_copy.board)
@@ -150,15 +151,17 @@ class Game:
 		
 		check = self.determine_check(curr_figures, opponent_copy.figures, None)
 		max_pos, mate = self.determine_mate(curr_figures, curr_player_copy, opponent_copy, chess_board_copy)
-		# print("Real", mate, max_pos)
+
 		if not command_passed and (check or (not check and mate == max_pos and mate != 0)):
 			self.ended = -1
 		else:
 			if self.ended == -1:
 				if check or (check and mate == max_pos and mate != 0):
-					print("HEREE")
+					#print("IN")
 					self.is_moved = 0
 					self.ended = 0
+
+		is_not_stmt = 0
 
 		if mate == max_pos and mate > 0:
 			curr_figures, opponent_figures = self.make_board_copy(curr_player_copy, chess_board_copy)
@@ -187,14 +190,19 @@ class Game:
 					curr_figures, opponent_figures = self.make_board_copy(curr_player_copy, chess_board)
 		
 					special_check = self.determine_check(curr_figures, opponent_figures, chess_board)
+					 
 					mate_result = self.determine_mate(curr_figures, curr_player_copy, 
 																		opponent_copy, chess_board)
 					special_mate = mate_result[1]
 
-					if special_check < check or special_mate < max_pos:
-						# print(special_mate, special_max_pos)
-						mate -= 1
-		
+					if check == 0 and special_check == 0 and fig.name != "K1":
+						is_not_stmt = 1
+
+					if (check != 0 and special_check < check) or (check == 0 and special_mate < max_pos and \
+																					is_not_stmt == 1):
+						if mate > 0:
+							mate -= 1
+
 		if check != 0:
 			if mate == max_pos and mate != 0:
 				if self.curr_player == self.w_player:
@@ -213,7 +221,8 @@ class Game:
 				self.w_check = 0
 			else:
 				self.b_check = 0
-			if mate == max_pos and mate != 0:
+
+			if mate == max_pos and mate != 0 and is_not_stmt == 0:
 				self.draw = 1
 				self.ended = 1
 		
@@ -261,7 +270,10 @@ class Game:
 				alive_options = []
 				dead_options = []
 				prev_command = external_commands[self.command_counter - 1]
-				for taken_fig in self.opponent.won_figures:
+				temp = self.curr_player
+				self.curr_player = self.opponent
+				self.opponent = temp
+				for taken_fig in self.curr_player.won_figures:
 					if new_figure_name == taken_fig[0][0]:
 						dead_options.append(taken_fig[0])
 				
@@ -271,7 +283,7 @@ class Game:
 						if name[1] < new_figure_name[1]:
 							new_figure_name = name
 				else:
-					for fig in self.opponent.figures:
+					for fig in self.curr_player.figures:
 						if new_figure_name == fig.name[0]:
 							alive_options.append(fig.name)
 					
@@ -280,12 +292,19 @@ class Game:
 						if name[1] > new_figure_name[1]:
 							new_figure_name = name
 						
-					modified_fig_name = new_figure_name[0] + str(int(new_figure_name[1]) + 1)
-					self.chess_board.board[int(prev_command[4]) - 1][prev_command[3]].name = modified_fig_name
-					new_figure_name = ""
-					self.command_counter += 1
-					self.is_moved = 1
-					continue
+				modified_fig_name = new_figure_name[0] + str(int(new_figure_name[1]) + 1)
+				self.chess_board.board[int(prev_command[4]) - 1][prev_command[3]].name = modified_fig_name
+				self.chess_board.board[int(prev_command[4]) - 1][prev_command[3]].update_movable_positions(
+																			self.chess_board.board)
+
+				new_figure_name = ""
+				self.command_counter += 1
+				self.is_moved = 1
+				self.win_condition_check(1, copy.deepcopy(self.chess_board),
+										copy.deepcopy(self.curr_player), 
+										copy.deepcopy(self.opponent))
+				
+				continue
 
 			src_letter = command[0]
 			src_number = command[1]
@@ -306,6 +325,7 @@ class Game:
 			dest_number = int(dest_number)
 
 			source_fig = self.chess_board.board[src_number - 1][src_letter]
+			dest_figure = self.chess_board.board[dest_number - 1][dest_letter]
 
 			if source_fig == None:
 				self.ok = 0
@@ -323,7 +343,7 @@ class Game:
 						if source_fig.name[0] == "P":
 							source_fig.check_en_passant()
 					else:
-						print("gotchu")
+						# print("gotchu")
 						self.ok = 0
 				else:
 					if type(result[1]) is str:
@@ -404,13 +424,24 @@ class Game:
 						self.chess_board.board[dest_number - 1][dest_letter] = source_fig
 						self.passed = 1
 						self.is_moved = 1
+
+					
+			
+			old_is_moved = self.is_moved
+			self.win_condition_check(1, copy.deepcopy(self.chess_board),
+										copy.deepcopy(self.curr_player), 
+										copy.deepcopy(self.opponent))
+
+			if self.is_moved != old_is_moved:
+				source_fig.curr_pos_num = src_number
+				source_fig.curr_pos_ltr = ord(src_letter)
+				self.chess_board.board[src_number - 1][src_letter] = source_fig
+				self.chess_board.board[dest_number - 1][dest_letter] = dest_figure
+			
 			if self.ok == 0 or self.passed == 0:
 				# print("shit 4")
 				continue
-			else:
-				self.win_condition_check(1, copy.deepcopy(self.chess_board),
-											copy.deepcopy(self.curr_player), 
-											copy.deepcopy(self.opponent))
+
 			self.alive_figures = []
 			for x in self.w_player.figures:
 				if x.is_alive:

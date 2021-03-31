@@ -94,8 +94,6 @@ class Figure:
 								else:
 									return True
 						else:
-							if test == 0:
-								print(self.chess_board.en_passant[0].name)
 							return False
 
 					if self.board[new_pos_num - 1][new_pos_ltr] != None:

@@ -73,8 +73,14 @@ def game(game_id):
         if game_details.moves != "":
             commands = ast.literal_eval(game_details.moves)
 
-        if command != "update":
+        if not "update" in command:
             commands.append(command)
+        else:
+            moves = command[6:]
+            # print(moves)
+            if game_details.moves == moves and game_details.winner == None:
+                return abort(404)
+            command = "update"
         
         is_moved = py_game.run(commands)
 
@@ -82,8 +88,9 @@ def game(game_id):
 
         if is_moved:
             if command != "update" or (command == "update" and str(commands) == game_details.moves):
-               game_details.moves = str(commands)
-            db_session.commit()
+                # print("HERE", commands)
+                game_details.moves = str(commands)
+                db_session.commit()
             winner = None
             if py_game.ended == 1:
                 my_turn = -1
@@ -157,6 +164,7 @@ def game(game_id):
         taken_figures = py_game.w_player.won_figures + py_game.b_player.won_figures
         
         variables = dict(board = name_board,
+                        commands = game_details.moves,
                         alive_figures = py_game.alive_figures,
                         taken_figures = taken_figures,
                         my_turn = my_turn,
@@ -167,7 +175,6 @@ def game(game_id):
 
 def update_win_rate(user_id, game):
     user = db_session.query(User).filter_by(id = user_id).first()
-    user.is_waiting = True
     user.is_playing = False
     
     games = []

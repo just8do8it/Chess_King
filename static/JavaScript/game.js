@@ -4,7 +4,7 @@ var destinationId = "";
 var prevColor = "";
 var command = "";
 var board = [];
-var alive_figures, taken_figures, my_turn, winner_is_me, can_move = 1, game_ended = 0, stop = 0;
+var commands = "", alive_figures, taken_figures, my_turn, winner_is_me, can_move = 1, game_ended = 0, stop = 0;
 localStorage.setItem("game_ended", 0);
 localStorage.setItem("waiting", 0);
 document.getElementById("yourWonFigures").innerHTML = "Your won figures:<br>";
@@ -133,7 +133,7 @@ function sendMessage(event) {
 
 function sendCommand(update) {
 	if (update)
-		command = "update";
+		command = "update" + commands;
 	else
 		stop = 1;
 	var game_id = new String(window.location.pathname);
@@ -149,6 +149,7 @@ function sendCommand(update) {
 			console.log(data);
 
 			board = data['board'];
+			commands = data['commands'];
 			alive_figures = data['alive_figures'];
 			taken_figures = data['taken_figures'];
 			my_turn = data['my_turn'];
@@ -157,7 +158,7 @@ function sendCommand(update) {
 			updateBoard();
 
 			if (command[4] == 1 || command[4] == 8){
-				if (board[command[1] - 1][command[0]][0] == "P") {
+				if (board[command[4] - 1][command[3]][0] == "P") {
 					var figure = prompt("Choose what figure to revive:", "For example 'Q' for queen");
 					while (figure == null || figure.length > 1 || 
 						(figure != "Q" && figure != "B" && figure != "H" && figure != "R" && figure != "P")) {
@@ -185,7 +186,6 @@ function sendCommand(update) {
 			}
 			
 			if (localStorage.getItem("game_ended") == "1") {
-				alert(localStorage.getItem("tournament"));
 				if (localStorage.getItem("tournament") == "1") {
 					window.onbeforeunload = null;
 					if (winner_is_me == 0) {

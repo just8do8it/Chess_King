@@ -116,7 +116,7 @@ function updateTakenFigures() {
 
 
 function addTakenFigure(black, figure, special_id, newline) {
-	if (figure == "R1" || figure == "R2") {
+	if (figure[0] == 'R' || figure[0] == 'R') {
 		if (black) {
 			document.getElementById(special_id).innerHTML += "&#9820; ";
 		} else {
@@ -124,15 +124,15 @@ function addTakenFigure(black, figure, special_id, newline) {
 		}
 	} 
 
-	else if (figure == "H1" || figure == "H2") {
+	else if (figure[0] == 'H' || figure[0] == 'H') {
 		if (black) {
 			document.getElementById(special_id).innerHTML += "&#9822; ";
 		} else {
 			document.getElementById(special_id).innerHTML += "&#9816; ";
 		}
-	} 
+	}
 
-	else if (figure == "B1" || figure == "B2") {
+	else if (figure[0] == 'B' || figure[0] == 'B') {
 		if (black) {
 			document.getElementById(special_id).innerHTML += "&#9821; ";
 		} else {
@@ -140,7 +140,7 @@ function addTakenFigure(black, figure, special_id, newline) {
 		}
 	} 
 
-	else if (figure == "Q1") {
+	else if (figure[0] == 'Q') {
 		if (black) {
 			document.getElementById(special_id).innerHTML += "&#9819; ";
 		} else {
@@ -148,7 +148,7 @@ function addTakenFigure(black, figure, special_id, newline) {
 		}
 	}
 
-	else if (figure == "K1") {
+	else if (figure[0] == 'K') {
 		if (black) {
 			document.getElementById(special_id).innerHTML += "&#9818; ";
 		} else {
@@ -156,7 +156,7 @@ function addTakenFigure(black, figure, special_id, newline) {
 		}
 	}
 
-	else if (figure[0] == "P") {
+	else if (figure[0] == 'P') {
 		if (black) {
 			document.getElementById(special_id).innerHTML += "&#9823; ";
 		} else {
@@ -200,45 +200,46 @@ function updateBoard() {
 function determineFigure(black, currLine, key, i) {
 	var figure = currLine[key];
 
-	if (figure == "R1" || figure == "R2") {
+	if (figure[0] == 'R' || figure[0] == 'R') {
 		if (black)
 			document.getElementById(key + String(i + 1)).innerHTML = "&#9820;";
 		else
 			document.getElementById(key + String(i + 1)).innerHTML = "&#9814;";
 	} 
 
-	else if (figure == "H1" || figure == "H2") {
+	else if (figure[0] == 'H' || figure[0] == 'H') {
 		if (black)
 			document.getElementById(key + String(i + 1)).innerHTML = "&#9822;";
 		else
 			document.getElementById(key + String(i + 1)).innerHTML = "&#9816;";
 	} 
 
-	else if (figure == "B1" || figure == "B2") {
+	else if (figure[0] == 'B' || figure[0] == 'B') {
 		if (black)
 			document.getElementById(key + String(i + 1)).innerHTML = "&#9821;";
 		else
 			document.getElementById(key + String(i + 1)).innerHTML = "&#9815;";
 	} 
 
-	else if (figure == "Q1") {
+	else if (figure[0] == 'Q') {
 		if (black)
 			document.getElementById(key + String(i + 1)).innerHTML = "&#9819;";
 		else
 			document.getElementById(key + String(i + 1)).innerHTML = "&#9813;";
 	} 
 
-	else if (figure == "K1") {
+	else if (figure[0] == 'K') {
 		if (black)
 			document.getElementById(key + String(i + 1)).innerHTML = "&#9818;";
 		else
 			document.getElementById(key + String(i + 1)).innerHTML = "&#9812;";
 	}
 
-	else if (figure[0] == "P") {
+	else if (figure[0] == 'P') {
 		if (black)
 			document.getElementById(key + String(i + 1)).innerHTML = "&#9823;";
 		else
 			document.getElementById(key + String(i + 1)).innerHTML = "&#9817;";
 	}
 }
+
