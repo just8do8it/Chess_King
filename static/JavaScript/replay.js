@@ -13,6 +13,7 @@ document.getElementById("opponentsWonFigures").innerHTML = "Opponent's won figur
 function previous() {
     if (move_counter > 0) {
         move_counter -= 1;
+		move_counter *= -1;
     }
     sendCommand();
 }

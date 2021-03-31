@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 from sqlalchemy import or_, and_, update, delete, insert
 from database import db_session
 from models import User, GameT, gameDetails, userStats, Tournament, Message
-import os, ast, models, pdb, string, random, math
+import os, ast, models, pdb, string, random
 import auth, game_base, multiplayer, tournament
 
 app = create_app()
@@ -114,17 +114,27 @@ def replay(game_id):
 
         py_game = Game([], [], None)
 
+        neg = 0
+        if move_counter < 0:
+            move_counter *= -1
+            neg = 1 
 
         if move_counter > len(moves):
             move_counter = len(moves)
         
         for i in range(move_counter):
             if moves[i] and len(moves[i]) == 1:
-                move_counter = min(len(moves) - 1, move_counter + 1)
+                if not neg:
+                    move_counter = min(len(moves), move_counter + 1)
         
-        if moves[move_counter] and len(moves[move_counter]) == 1:
-            move_counter = min(len(moves) - 1, move_counter + 1)
-        
+        if not neg:
+            if move_counter < len(moves) and len(moves[move_counter]) == 1:
+                move_counter = min(len(moves), move_counter + 1)
+        else:
+            if move_counter < len(moves) and len(moves[move_counter]) == 1:
+                move_counter = min(len(moves), move_counter - 1)
+    
+        print(len(moves), move_counter)
         py_game.run(moves[:move_counter])
 
         w_won_figs = []
