@@ -1,7 +1,7 @@
 Chess King
 
 Лого: 
-https://github.com/just8do8it/TUES/blob/master/templates/chessKingLogo.png
+https://github.com/just8do8it/TUES/blob/master/templates/images/chessKingLogo.png
 
 Документация на продукта: 
 https://github.com/just8do8it/TUES/blob/master/Documentation/Chess%20Website%20Documentation.docx
