@@ -1,5 +1,5 @@
 body {
-    background-color: #c49dff !important;
+    background-color: #55c5adbb !important;
 }
 
 p {
@@ -18,5 +18,5 @@ p {
 }
 
 .game:hover {
-    color: rgb(156, 10, 161);
+    color: #006970da;
 }
