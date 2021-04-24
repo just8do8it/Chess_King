@@ -52,11 +52,12 @@ class Game:
 		w_figures = []
 		b_figures = []
 		
-		names = ["R1", "H1", "B1", "Q1", "K1", "B2", "H2", "R2"]
+		w_names = ["R1", "H1", "B1", "Q1", "K1", "B2", "H2", "R2"]
+		b_names = ["R1", "H1", "B1", "Q1", "K1", "B2", "H2", "R2"]
 
 		for i in range(8):
-			w_figures.append(Figure(names[i], chess_board, chr(ord('A') + i), 1, "white"))
-			b_figures.append(Figure(names[i], chess_board, chr(ord('A') + i), 8, "black"))
+			w_figures.append(Figure(w_names[i], chess_board, chr(ord('A') + i), 1, "white"))
+			b_figures.append(Figure(b_names[i], chess_board, chr(ord('A') + i), 8, "black"))
 
 		for i in range(8):
 			w_figures.append(Figure("P" + str(i + 1), chess_board, chr(ord('A') + i), 2, "white"))
