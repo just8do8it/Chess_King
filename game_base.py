@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from flask_session import Session
 from sqlalchemy import or_, and_, update, delete, insert
 from database import db_session
-from models import Command, User, GameT, gameDetails, userStats, Tournament, Message, Command
+from models import User, GameT, gameDetails, userStats, Tournament, Message
 import os, ast, models, pdb, string, random, time
 import auth
 
@@ -68,27 +68,19 @@ def game(game_id):
         
         winner_is_me = None
         commands = []
-        special_commands = []
         details_query = db_session.query(gameDetails).filter_by(game_id = game_id)
         game_details = details_query.first()
         if game_details.moves != "":
             commands = ast.literal_eval(game_details.moves)
-        
-        commands_query = db_session.query(Command).filter_by(game_id = game_id).all()
-        if len(commands_query) > 0:
-            for comm in commands_query:
-                special_commands.append(comm.text)
 
         if not "update" in command:
             commands.append(command)
         else:
             moves = command[6:]
             if game_details.moves == moves and game_details.winner == None:
-                print("shouldn't be here")
                 return abort(404)
             command = "update"
         
-        print(commands)
         is_moved = py_game.run(commands)
 
         my_turn = None
@@ -97,12 +89,6 @@ def game(game_id):
             if command != "update" or (command == "update" and str(commands) == game_details.moves):
                 game_details.moves = str(commands)
                 db_session.commit()
-
-            if command != "update":
-                move = Command(game_id, command)
-                db_session.add(move)
-                db_session.commit()
-
             winner = None
             if py_game.ended == 1:
                 my_turn = -1
@@ -175,13 +161,8 @@ def game(game_id):
 
         taken_figures = py_game.w_player.won_figures + py_game.b_player.won_figures
         
-        commands_query = db_session.query(Command).filter_by(game_id = game_id).all()
-        commands = []
-        for comm in commands_query:
-            commands.append(comm.text)
-
         variables = dict(board = name_board,
-                        commands = commands,
+                        commands = game_details.moves,
                         alive_figures = py_game.alive_figures,
                         taken_figures = taken_figures,
                         my_turn = my_turn,

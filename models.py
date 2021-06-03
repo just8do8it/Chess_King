@@ -127,16 +127,16 @@ class Message(Base):
     def __repr__(self):
         return '<Message %r>' % (self.id)
 
-class Command(Base):
-    __tablename__ = 'commands'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    game_id = Column(String(120), ForeignKey('games.id'))
-    text = Column(String(200))
-    game = relationship("GameT")
+# class Command(Base):
+#     __tablename__ = 'commands'
+#     id = Column(Integer, primary_key=True, autoincrement=True)
+#     game_id = Column(String(120), ForeignKey('games.id'))
+#     text = Column(String(200))
+#     game = relationship("GameT")
 
-    def __init__(self, game_id, text):
-        self.game_id = game_id
-        self.text = text
+#     def __init__(self, game_id, text):
+#         self.game_id = game_id
+#         self.text = text
 
-    def __repr__(self):
-        return '<Command %r>' % (self.id)
+#     def __repr__(self):
+#         return '<Command %r>' % (self.id)
