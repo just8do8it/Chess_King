@@ -132,6 +132,7 @@ function sendMessage(event) {
 
 
 function sendCommand(update) {
+	console.log("тук");
 	if (update)
 		command = "update" + commands;
 	else
