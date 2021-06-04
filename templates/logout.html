@@ -27,14 +27,19 @@
 </nav>
   
 <div class="container">
-  <form action="" onsubmit="logout()">
+  <form action="" onsubmit="logout(event)">
     <h1><b>Are you sure you want to logout?</b></h1>
 
     <button type="submit" id="loginbtn">Logout</button>
   </form>
 </div>
 
+<div id="overlay" onclick="overlayOff()">
+  <div id="text"></div>
+</div>
+
 <script src="../static/JavaScript/logout.js"></script>
+<script src="../static/JavaScript/shared.js"></script>
 
 </body>
 </html>

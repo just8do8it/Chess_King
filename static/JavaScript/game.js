@@ -190,10 +190,10 @@ function sendCommand(update) {
 				if (localStorage.getItem("tournament") != "0") {
 					window.onbeforeunload = null;
 					if (winner_is_me == 0) {
-						alert("You lose! You'll be redirected to the Play page.");
+						overlayOn("You lose! You'll be redirected to the Play page.");
 						setTimeout(function () {
 							window.location = "http://localhost:5000/play";
-						}, 1500);
+						}, 4000);
 					} else {
 						fetch('/tournament_matchmaking', {
 							method: 'GET',
@@ -207,14 +207,14 @@ function sendCommand(update) {
 								if (data instanceof Object) {
 									console.log("quitted");
 									localStorage.setItem("tournament", 0);
-									alert(data["winner"]);
+									on(data["winner"]);
 									window.location = "http://localhost:5000/play";
 								}
 							});
 						});
 
 						if (winner_is_me == 1) {
-							alert("You win! Wait to get matched for the next game.");
+							overlayOn("You win! Wait to get matched for the next game.");
 							setInterval(function() {
 								document.getElementById("waiting").style.display = "inline";
 								fetch('/get_in_game', {
@@ -236,9 +236,9 @@ function sendCommand(update) {
 										console.log("error");
 									});
 								});
-							}, 2000);
+							}, 4000);
 						} else {
-							alert("Draw! If you have higher win rate than your opponent, you will proceed in the tournament.");
+							overlayOn("Draw! If you have higher win rate than your opponent, you will proceed in the tournament.");
 							setInterval(function() {
 								document.getElementById("waiting").style.display = "inline";
 								fetch('/get_in_game', {
@@ -264,7 +264,7 @@ function sendCommand(update) {
 										console.log("error");
 									});
 								});
-							}, 2000);
+							}, 4000);
 						}
 					}	
 				} else {
@@ -277,8 +277,8 @@ function sendCommand(update) {
 					} else {
 						str = "Draw!";
 					}
-
-					alert(str + " You'll be redirected to the Play page.");
+					var overlayText = String(str) + " You'll be redirected to the Play page."
+					overlayOn(overlayText);
 					for (var i = 0; i < 5; ++i) {
 						fetch('/get_in_game', {
 							method: 'GET',
@@ -296,7 +296,7 @@ function sendCommand(update) {
 					
 					setTimeout(function () {
 						window.location = "http://localhost:5000/play";
-					}, 2000);
+					}, 4000);
 				}
 			}
 		});
