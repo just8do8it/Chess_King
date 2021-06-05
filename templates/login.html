@@ -6,46 +6,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="../static/CSS/login.css">
-    <link rel="stylesheet" type="text/css" href="../static/CSS/shared.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-</head>
-<body>
-
-<nav class="navbar navbar-inverse">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand">Chess King</a>
-    </div>
-    <ul class="nav navbar-nav">
-      <li><a href="http://localhost:5000/">Home</a></li>
-      <li id="play"><a href="http://localhost:5000/play">Play</a></li>
-      <li class="active"><a id="login" href="http://localhost:5000/login">Login</a></li>
-      <li id="profile"><a href="http://localhost:5000/profile">Your Profile</a></li>
-    </ul>
-  </div>
-</nav>
-  
-<div class="container">
-  <form onsubmit="login(event)" autocomplete="off">
-    <h1><b>Login</b></h1>
-    <hr>
+    <link rel="stylesheet" type="text/css" href="../static/CSS/navbar.css">
+  </head>
+  <body>
     
-    <label for="username"><b>Username</b></label><br>
-    <input type="text" placeholder="Enter username" name="username" id="inputUsername" required><br>
-
-    <label for="password"><b>Password</b></label><br>
-    <input type="password" placeholder="Enter Password" name="password" id="inputPassword" required>
-
-    <button type="submit" id="loginbtn">Login</button>
-  </form>
-</div>
-  
-<div class="container signin">
-    <p>Don't have an account? <a class="signUp" href="http://localhost:5000/signUp">Sign up</a></p>
-</div>
-
-<script src="../static/JavaScript/login.js"></script>
-
-</body>
-</html>
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand">Chess King</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li><a href="http://localhost:5000/">Home</a></li>
+          <li id="play"><a href="http://localhost:5000/play">Play</a></li>
+          <li class="active"><a id="login" href="http://localhost:5000/login">Login</a></li>
+          <li id="profile"><a href="http://localhost:5000/profile">Your Profile</a></li>
+        </ul>
+      </div>
+    </nav>
+    
+    <div class="container">
+      <form onsubmit="login(event)" autocomplete="off">
+        <h1><b>Login</b></h1>
+        <hr>
+        
+        <label for="username"><b>Username</b></label><br>
+        <input type="text" placeholder="Enter username" name="username" id="inputUsername" required><br>
+        
+        <label for="password"><b>Password</b></label><br>
+        <input type="password" placeholder="Enter Password" name="password" id="inputPassword" required>
+        
+        <button type="submit" id="loginbtn">Login</button>
+      </form>
+    </div>
+    
+    <div class="container signin">
+      <p>Don't have an account? <a class="signUp" href="http://localhost:5000/signUp">Sign up</a></p>
+    </div>
+    
+    <div id="overlay" onclick="overlayOff()">
+      <div id="text"></div>
+    </div>
+    
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="../static/JavaScript/login.js"></script>
+    <script src="../static/JavaScript/overlay.js"></script>
+    
+  </body>
+  </html>

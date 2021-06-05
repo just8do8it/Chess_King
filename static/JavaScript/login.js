@@ -7,11 +7,14 @@ function login(event){
 		type: 'POST',
 		success: function(response){
 			localStorage.setItem("username", username);
-			window.location = "http://localhost:5000/";
-			alert("Welcome, " + username + "!");
+			var text = "Welcome, " + username + "!";
+			overlayOn(text);
+			setTimeout(function () {
+				window.location = "http://localhost:5000/";
+			}, 2000);
 		},
 		error: function(error){
-			alert("Wrong credentials, try again.");
+			overlayOn("Wrong credentials, try again.");
 		}
 	});
 }

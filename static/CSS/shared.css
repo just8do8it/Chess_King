@@ -1,8 +1,0 @@
-li#profile {
-    position: absolute;
-    right: 2%;
-}
-
-li > a {
-    cursor: pointer;
-}

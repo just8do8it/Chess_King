@@ -5,28 +5,28 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/CSS/home.css">
+    <link rel="stylesheet" type="text/css" href="../static/CSS/navbar.css">
+  </head>
+  <body>
+    
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand">Chess King</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="http://localhost:5000/">Home</a></li>
+          <li id="play"><a href="http://localhost:5000/play">Play</a></li>
+          <li><a id="login" href={{url}}>{{button}}</a></li>
+          <li id="profile"><a href="http://localhost:5000/profile">Your Profile</a></li>
+        </ul>
+      </div>
+    </nav>
+    
+    <p>Welcome to Chess King!<br><br>In order to play, please sign up or login into your profile.</p>
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="../static/CSS/home.css">
-    <link rel="stylesheet" type="text/css" href="../static/CSS/shared.css">
-</head>
-<body>
-
-<nav class="navbar navbar-inverse">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand">Chess King</a>
-    </div>
-    <ul class="nav navbar-nav">
-      <li class="active"><a href="http://localhost:5000/">Home</a></li>
-      <li id="play"><a href="http://localhost:5000/play">Play</a></li>
-      <li><a id="login" href={{url}}>{{button}}</a></li>
-      <li id="profile"><a href="http://localhost:5000/profile">Your Profile</a></li>
-    </ul>
-  </div>
-</nav>
-
-<p>Welcome to Chess King!<br><br>In order to play, please sign up or login into your profile.</p>
-
-</body>
-</html>
+  </body>
+  </html>
