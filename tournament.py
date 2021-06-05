@@ -140,10 +140,7 @@ def start_semi_final(tournament, games):
     for game in games:
         game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
         if game_details.winner != None:
-            if type(game_details.winner) is float:
-                semi_finalists.append(int(abs(game_details.winner) / 1.11))
-            else:
-                semi_finalists.append(abs(game_details.winner))
+            semi_finalists.append(abs(game_details.winner))
 
     if len(semi_finalists) < 4:
         tournament.semi_final = ""
@@ -173,11 +170,8 @@ def start_final(tournament, games):
     for game in games:
         game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
         if game_details.winner:
-            if abs(game_details.winner) in semi_finalists or int(abs(game_details.winner) / 1.11) in semi_finalists:
-                if type(game_details.winner) is float:
-                    winners.append(int(abs(game_details.winner) / 1.11))
-                else:
-                    winners.append(abs(game_details.winner))
+            if abs(game_details.winner) in semi_finalists:
+                winners.append(abs(game_details.winner))
 
     for winner in winners:
         num_of_games = 0
@@ -219,10 +213,7 @@ def determine_winner(tournament, games):
             game_details = db_session.query(gameDetails).filter_by(game_id = game.id).first()
             if game_details.winner != None:
                 winner_id = None
-                if type(game_details.winner) is float:
-                    winner_id = int(abs(game_details.winner) / 1.11)
-                else:
-                    winner_id = abs(game_details.winner)
+                winner_id = abs(game_details.winner)
                 
                 tournament.winner = winner_id
                 db_session.commit()

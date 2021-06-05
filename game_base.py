@@ -123,7 +123,7 @@ def game(game_id):
                             else:
                                 winner = random.choice([game.w_player, game.b_player])
                             
-                            game_details.winner = -1.11 * winner
+                            game_details.winner = -winner
                     
                     db_session.commit()
                 
@@ -176,7 +176,7 @@ def update_win_rate(user_id, game, winner_is_me, winner):
     if game.tournament_id != None and winner_is_me == 1:
         user.is_waiting = True
     elif winner_is_me == 2:
-        if winner == user_id or winner / -1.11 == user_id:
+        if winner == user_id or winner == -user_id:
             user.is_waiting = True
     user.is_playing = False
     
@@ -206,7 +206,7 @@ def update_win_rate(user_id, game, winner_is_me, winner):
             if details.winner == user_id:
                 game_endings.append("win")
                 win_count += 1
-            elif details.winner < 0:
+            elif details.winner <= 0:
                 draw_count += 1
     
     win_rate = (win_count + (0.5 * draw_count)) / len(game_ids) * 100
