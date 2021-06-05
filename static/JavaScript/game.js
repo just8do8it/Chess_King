@@ -10,11 +10,6 @@ localStorage.setItem("waiting", 0);
 document.getElementById("yourWonFigures").innerHTML = "Your won figures:<br>";
 document.getElementById("opponentsWonFigures").innerHTML = "Opponent's won figures:<br>";
 
-// $(function(){
-// 	$("#white_chessboard").load("white_chessboard.html");
-// 	$("#black_chessboard").load("black_chessboard.html"); 
-// });
-
 waitForOpponent();
 refreshMessages();
 
@@ -177,6 +172,7 @@ function sendCommand(update) {
 
 			if(my_turn == 1) {
 				can_move = 1;
+				document.getElementById("turn").style.left = "130%";
 				document.getElementById("turn").innerHTML = "Your turn";
 			} else if (my_turn == 0) {
 				can_move = 0;
@@ -185,6 +181,7 @@ function sendCommand(update) {
 			} else if (my_turn < 0) {
 				game_ended = 1;
 			}
+
 
 			if (game_ended && !stop) {
 				stop = 1;

@@ -39,6 +39,45 @@ function multiplayer() {
 	document.getElementById("heading").innerHTML = 'Waiting...';
 
 	localStorage.setItem("waiting", 1);
+	
+	// -------------------------------------------------------------------------------
+
+	// const response = await fetch('/get_online_players', {
+	// 	method: 'GET',
+	// 	headers: {
+	// 		'Content-Type': 'application/json',
+	// 		'Accept': 'application/json'
+	// 	}
+	// });
+
+	// const data = await response.json().catch(function() {
+	// 	setInterval(async function() {
+	// 		const response2 = await fetch('/get_in_game', {
+	// 			method: 'GET',
+	// 			headers: {
+	// 				'Content-Type': 'application/json',
+	// 				'Accept': 'application/json'
+	// 			}
+	// 		});
+			
+	// 		const data2 = response2.json();
+	// 		console.log(data2);
+	// 		window.onbeforeunload = null;
+	// 		end_waiting();
+	// 		alert(data2['game_id']);
+	// 		window.location = "http://localhost:5000/game/" + data2['game_id'];
+	// 	}, 2000);
+	// });
+	
+	
+	
+	// console.log(data);
+	// window.onbeforeunload = null;
+	// end_waiting();
+	// game_id = data['game_id'];
+	// window.location = "http://localhost:5000/game/" + game_id;
+
+	// -------------------------------------------------------------------------------
 
 	fetch('/get_online_players', {
 		method: 'GET',

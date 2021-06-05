@@ -6,35 +6,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="../static/CSS/profile.css">
-    <link rel="stylesheet" type="text/css" href="../static/CSS/shared.css">
+    <link rel="stylesheet" type="text/css" href="../static/CSS/navbar.css">
+  </head>
+  <body>
+    
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand">Chess King</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li><a href="http://localhost:5000/">Home</a></li>
+          <li id="play"><a href="http://localhost:5000/play">Play</a></li>
+          <li><a id="login" href="http://localhost:5000/logout">Logout</a></li>
+          <li id="profile" class="active"><a href="http://localhost:5000/profile">Your Profile</a></li>
+        </ul>
+      </div>
+    </nav>
+    
+    <p style="font-size: 60px;">{{username}}</p>
+    <p style="font-size: 30px;">Games played: {{game_count}}</p>
+    <p style="font-size: 30px;">Win rate: {{win_rate}}%</p> <br>
+    <p style="font-size: 30px;"><strong>Game history</strong></p>
+    
+    {% for i in range(game_count) %}
+    <br><li id="game"><a class="game" href="/replay/{{game_ids[i]}}">{{game_dates[i]}} - {{ games[i] }} ({{game_endings[i]}})</a></li>
+    {% endfor %}
+    <br><br>
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-</head>
-<body>
-
-<nav class="navbar navbar-inverse">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand">Chess King</a>
-    </div>
-    <ul class="nav navbar-nav">
-      <li><a href="http://localhost:5000/">Home</a></li>
-      <li id="play"><a href="http://localhost:5000/play">Play</a></li>
-      <li><a id="login" href="http://localhost:5000/logout">Logout</a></li>
-      <li id="profile" class="active"><a href="http://localhost:5000/profile">Your Profile</a></li>
-    </ul>
-  </div>
-</nav>
-  
-<p style="font-size: 60px;">{{username}}</p>
-<p style="font-size: 30px;">Games played: {{game_count}}</p>
-<p style="font-size: 30px;">Win rate: {{win_rate}}%</p> <br>
-<p style="font-size: 30px;"><strong>Game history</strong></p>
-
-{% for i in range(game_count) %}
-    <br><li id="game"><a class="game" href="/replay/{{game_ids[i]}}">{{game_dates[i]}} - {{ games[i] }} ({{game_endings[i]}})</a></li>
-{% endfor %}
-<br><br>
-
-</body>
-</html>
+  </body>
+  </html>
