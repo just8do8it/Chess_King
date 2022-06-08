@@ -1,4 +1,4 @@
-## ![Chess King](https://raw.githubusercontent.com/just8do8it/Chess_King/master/templates/images/chessKingLogo.png)
+## ![Chess King](https://raw.githubusercontent.com/just8do8it/Chess_King/master/src/templates/images/chessKingLogo.png)
 
 [Документация](https://github.com/just8do8it/TUES/blob/master/Documentation/Chess%20Website%20Documentation.docx) || Разработено от **Благовест Атанасов** [just8do8it](https://github.com/just8do8it)
 
